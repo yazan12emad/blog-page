@@ -37,6 +37,7 @@ class UploadFiles
         }
     }
 
+    //git remote add origin https://github.com/yazan12emad/blog-page.git
     public function validSize(array $file, &$uploadOk, &$msg): bool
     {
         if ($file['size'] > 5000000) {
