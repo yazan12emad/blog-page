@@ -1,31 +1,42 @@
 <?php
+
 namespace app\core;
+
+use app\controllers\AuthController;
+
 if (!defined('SECURE_BOOT')) {
     header('Location: ../');
     die('Direct access is not permitted.');
 }
+
 class Router
 {
     // Point the routes to the protected app/controllers directory
-    private array $routes = [
-            "/home.php" => __DIR__ . "/../controllers/home.php",
-            "/blogs.php" => __DIR__ . "/../controllers/blogs.php",
-            "/categories.php" => __DIR__ . "/../controllers/categories.php",
-            "/signUp.php" => __DIR__ . "/../controllers/signUp.php",
-            "/logIn.php" => __DIR__ . "/../controllers/logIn.php",
-            "/profilePage.php" => __DIR__ . "/../controllers/profilePage.php",
-            "/logout.php" => __DIR__ . "/../controllers/logout.php",
-            "/forgetPassword.php" => __DIR__ . "/../controllers/forgetPassword.php",
-            '/submitNewPassword.php' => __DIR__ . "/../controllers/submitNewPassword.php",
+    private array $routes = [];
 
-    ];
+
+    public function __construct()
+    {
+        $this->routes = require_once ROOT_PATH . DIRECTORY_SEPARATOR . 'routes.php';
+    }
 
     public function route(): void
     {
         $url = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
         if (array_key_exists($url, $this->routes)) {
-            require $this->routes[$url];
+
+            [$controller, $method] = $this->routes[$url];
+            $AuthController = new AuthController();
+            $result = $AuthController->{$method}();
+            if (!empty($result)) {
+                echo $result;
+            }
+//            call_user_func($this->routes[$url]);
+//            die;
+
+
+//            require $this->routes[$url];
         } else {
             // A request for an invalid route results in a 404 error
             http_response_code(404);

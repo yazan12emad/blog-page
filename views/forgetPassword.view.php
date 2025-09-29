@@ -46,9 +46,9 @@
                                class="form-input pl-10 w-full rounded-md border-gray-300 focus:border-blue-500"
                                placeholder="Enter your email address">
                     </div>
-                    <?php if(isset($error['forgetPasswordError'])):  ?>
+                    <?php if(isset($forgetPasswordError)):  ?>
                     <div id="emailError" class="text-xs text-red-500 mt-1 ">
-                        <?php echo $error['forgetPasswordError'];  ?>
+                        <?php echo $forgetPasswordError;  ?>
                     </div>
                     <?php  endif; ?>
                 </div>

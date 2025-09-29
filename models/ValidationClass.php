@@ -6,21 +6,18 @@ if (!defined('SECURE_BOOT')) {
     header('Location: ../');
     die('Direct access is not permitted.');
 }
-use app\core\DataBase;
+
 use app\core\session;
 
 
 
 class ValidationClass
 {
-    protected $db;     //Remove DB
     protected $session;
 
     public function __construct()
     {
-        $this->db = new DataBase();
-
-        $this->session = new Session();
+        $this->session = Session::getInstance();
 
     }
 
@@ -43,9 +40,6 @@ class ValidationClass
             return false;
         } else if ($currentUserName == $newUserName) {
             $msg = 'Its the same user name ';
-            return false;
-        } else if ($this->db->checkUserData('userName', $newUserName)) {
-            $msg = 'User name already used ';
             return false;
         } else
             return true;
@@ -73,10 +67,7 @@ class ValidationClass
         } else if ($currentUserEmail === $emailAddress) {
             $msg = 'email address is the same email';
             return false;
-        } else if ($this->db->checkUserData('emailAddress', $emailAddress)) {
-            $msg = 'email address already used';
-            return false;
-        } else {
+        } else   {
 
             return true;
         }
@@ -94,24 +85,29 @@ class ValidationClass
     }
 
 
-    public function validateNewPasswordEdit($oldPassword, $currentPassword, $newPassword, &$msg = null)
+    public function validateNewPasswordEdit($oldPasswordHash, $currentPasswordInput, $newPasswordInput, &$msg = null)
     {
-
-        if (!$this->validationPassword($currentPassword)) {
-            $msg = " current password is invalid";
+        if (!$this->validationPassword($currentPasswordInput)) {
+            $msg = "Current password format is invalid";
             return false;
-        } else if (!$this->validationPassword($newPassword)) {
-            $msg = 'new password is invalid';
+        }
+        else if (!$this->validationPassword($newPasswordInput)) {
+            $msg = 'New password format is invalid';
             return false;
-        } else if ($oldPassword !== $currentPassword) {
-            $msg = ' current password is Incorrect';;
+        }
+        else if (!password_verify($currentPasswordInput, $oldPasswordHash)) {
+            $msg = 'Current password is incorrect';
             return false;
-        } else if ($currentPassword === $newPassword) {
-            $msg = ' new password is the same old password';
+        }
+        else if (password_verify($newPasswordInput, $oldPasswordHash)) {
+            $msg = 'New password cannot be the same as old password';
             return false;
-        } else
+        }
+        else {
             return true;
+        }
     }
+
 
 }
 

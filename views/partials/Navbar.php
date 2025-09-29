@@ -48,8 +48,16 @@
                         <!-- Profile Button -->
                         <button id="profileBtn" class="flex items-center rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                             <span class="sr-only">Open user menu</span>
-                            <?php $navData=navbar();
-                            if (!$navData['logged_in']) : ?>
+
+
+<!--                            --><?php //User::getInstance()->isGuest() ?>
+<!--                            --><?php //User::getInstance()->setUser($user) ?>
+<!--                            --><?php //User::getInstance()->logout() ?>
+<!---->
+<!--                            --><?php //User::getInstance()->get('name') ?>
+
+                            <?php
+                            if (!isset($navData)): ?>
                             <img src="/public/person.png"
                                  alt="1User Avatar"
                                  class="h-10 w-10 rounded-full object-cover"/>
@@ -63,16 +71,16 @@
 
                         <!-- Dropdown Menu -->
                         <div id="profileDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg ring-1 ring-red ring-opacity-5 z-50">
-                            <?php if (!$navData['logged_in']) : ?>
+                            <?php if (!isset($navData)): ?>
 
                                 <a href="signUp.php" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Sign Up</a>
                                 <a href="logIn.php" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">log in </a>
 
                             <?php else : ?>
 
-                                <a href="profilePage.php" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Your Profile</a>
+                                <a href="profile.php" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Your Profile</a>
                                 <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a>
-                                <a href="home.php?action=logout" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Sign Out</a>
+                                <a href="logout.php" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Sign Out</a>
                             <?php endif; ?>
                         </div>
 

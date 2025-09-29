@@ -35,11 +35,11 @@
                 <p class="text-blue-100">Sign in to your account</p>
             </div>
 
-            <form id="loginForm" class="py-6 px-8" method="POST">
+            <form id="loginForm" class="py-6 px-8" method="POST" action="" >
                 <!-- Display PHP errors here if any -->
-                <?php if (isset($errors['login'])): ?>
+                <?php if (isset($logInError)): ?>
                     <div class="mb-4 p-3 bg-red-100 text-red-700 text-sm rounded-md">
-                        <?php echo $errors['login']; ?>
+                        <?php echo $logInError; ?>
                     </div>
                 <?php endif; ?>
 
@@ -54,9 +54,9 @@
                                class="form-input pl-10 w-full rounded-md border-gray-300 focus:border-blue-500"
                                placeholder="Enter your email or username">
                     </div>
-                    <?php if (isset($errors['userName'])): ?>
+                    <?php if (isset($userError)): ?>
                         <div class="text-xs text-red-500 mt-1">
-                            <?php echo $errors['userName']; ?>
+                            <?php echo $userError; ?>
                         </div>
                     <?php endif; ?>
                 </div>
@@ -75,9 +75,9 @@
                             <i class="password-toggle fas fa-eye-slash text-gray-400" id="togglePassword"></i>
                         </div>
                     </div>
-                    <?php if (isset($errors['password'])): ?>
+                    <?php if (isset($passError)): ?>
                         <div class="text-xs text-red-500 mt-1">
-                            <?php echo $errors['password']; ?>
+                            <?php echo $passError; ?>
                         </div>
                     <?php endif; ?>
                 </div>

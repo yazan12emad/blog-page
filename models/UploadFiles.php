@@ -5,23 +5,33 @@ if (!defined('SECURE_BOOT')) {
     header('Location: ../');
     die('Direct access is not permitted.');
 }
-use app\core\DataBase;
+
 use app\core\session;
 
 class UploadFiles
 {
-    protected $db;
+//    protected ;
     protected $session;
+    protected $UM;
+
 
     public function __construct()
     {
-        $this->db = new DataBase();
-        $this->session = new Session();
-    }
+       // $this->db = new DataBase();
+        $this->session = Session::getInstance();
+        $this->UM = new UserModel();
 
+    }
+    // refactor //
     public function checkIsItImg(array $file, &$uploadOk, &$msg): bool
     {
-        $check = getimagesize($file['tmp_name']);
+        if (empty($file['tmp_name'])) {
+            $uploadOk = 0;
+            $msg = "No file uploaded.";
+            return false;
+        }
+
+        $check = @getimagesize($file['tmp_name']);
         if ($check !== false) {
             if ($check[2] == IMAGETYPE_PNG) {
                 return $this->validSize($file, $uploadOk, $msg);
@@ -36,6 +46,8 @@ class UploadFiles
             return false;
         }
     }
+    // refactor //
+
 
     //git remote add origin https://github.com/yazan12emad/blog-page.git
     public function validSize(array $file, &$uploadOk, &$msg): bool
@@ -74,7 +86,7 @@ class UploadFiles
 
             $msg = "The file " . basename($file['name']) . " has been uploaded.";
 
-            return $this->db->updateUserData($this->session->get('id') ,'profileImg', $target_file);
+            return $this->UM->updateUserData($this->session->get('id') ,'profileImg', $target_file);
         } else {
             $uploadOk = 0;
             $msg = "Error uploading the file.";

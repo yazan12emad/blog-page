@@ -45,8 +45,8 @@
             <form id="resetPasswordForm" class="py-6 px-8" method="POST">
                 <!-- Success message (hidden by default) -->
 
-                <?php if(isset($error['resetPassword'])): ?>
-                <div id="successMessage" class="mb-4 p-3 bg-green-100 text-green-700 text-sm rounded-md hidden">
+                <?php if(isset($passChange)): ?>
+                <div id="successMessage" class="mb-4 p-3 bg-green-100 text-green-700 text-sm rounded-md ">
                     Your password has been successfully reset.
                 </div>
                 <?php endif; ?>
@@ -63,8 +63,8 @@
                                class="form-input pl-10 pr-10 w-full rounded-md border-gray-300 focus:border-blue-500"
                                placeholder="Enter your reset code ">
                         <div id="passwordRequirements" class="text-xs text-gray-500 mt-1">
-                            <?php if(isset($error['tokenError'])):
-                            echo $error['tokenError'];
+                            <?php if(isset($tokenError)):
+                            echo $tokenError;
                             endif; ?>
 
                         </div>
@@ -93,9 +93,9 @@
                     <div id="passwordRequirements" class="text-xs text-gray-500 mt-1">
                         Password must be at least 8 characters with uppercase, lowercase, number, and special character.
                     </div>
-                    <div id="newPasswordError" class="text-xs text-red-500 mt-1 hidden">
-                        <?php if(isset($error['newPassword'])):
-                            echo $error['newPassword'];
+                    <div id="newPasswordError" class="text-xs text-red-500 mt-1 ">
+                        <?php if(isset($newPasswordError)):
+                            echo $newPasswordError;
                         endif; ?>
                     </div>
                 </div>
@@ -114,10 +114,11 @@
                             <i class="password-toggle fas fa-eye-slash text-gray-400" id="toggleConfirmPassword"></i>
                         </div>
                     </div>
-                    <div id="confirmPasswordError" class="text-xs text-red-500 mt-1 hidden">
-                        <?php if(isset($error['confirmPassword'])):
-                            echo $error['confirmPassword'];
+                    <div id="" class="text-xs text-red-500 mt-1 ">
+                        <?php if(isset($confirmPasswordError)):
+                            echo $confirmPasswordError;
                         endif; ?>
+
                     </div>
                 </div>
 

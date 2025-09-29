@@ -51,9 +51,9 @@
                                placeholder="Enter your username">
                     </div>
                     <?php
-                    if (isset($error['userName'])):  ?>
+                    if (isset($userError)):  ?>
                     <div class="text-xs text-red-500 mt-1">
-                            <?php echo $error['userName']; ?>
+                            <?php echo $userError; ?>
 
                     <?php endif; ?>
                 </div>
@@ -71,9 +71,9 @@
                                placeholder="Enter your email">
                     </div>
                     <?php
-                    if (isset($error['emailAddress'])):  ?>
+                    if (isset($emailAddressError)):  ?>
                     <div class="text-xs text-red-500 mt-1">
-                        <?php echo $error['emailAddress']; ?>
+                        <?php echo $emailAddressError; ?>
 
                         <?php endif; ?>
                 </div>
@@ -104,9 +104,9 @@
                         </div>
                     </div>
                     <?php
-                    if (isset($error['password'])): ?>
+                    if (isset($passwordError)): ?>
                         <div class="text-xs text-500 mt-1">
-                            <?php echo $error['password']; ?>
+                            <?php echo $passwordError; ?>
 
                         </div>
                     <?php endif; ?>

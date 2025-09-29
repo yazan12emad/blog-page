@@ -1,22 +1,30 @@
 <?php
+// This file for check if the user do :
+// post any form
+// redirect if the user search for files un access files
+//by ob_start print the return form the controllers print it with view
 
-namespace app\controllers;
+
+namespace app\core;
 abstract class Controller
 {
 
-    public function isPost()
+    public function isPost() : bool
     {
+
         return $_SERVER['REQUEST_METHOD'] === 'POST';
+
     }
 
-    public function redirect($url)
+    public function redirect($url) : void
     {
         header('location: ' . $url);
         exit;
     }
 
 
-    public function render(string $string, array $array = [])
+
+    public function render(string $string, array $array = []): string
     {
         ob_start();
         extract($array);
@@ -26,7 +34,7 @@ abstract class Controller
         return $content;
     }
 
-    public function partialRender(string $string, array $array = [])
+    public function partialRender(string $string, array $array = []):string
     {
         ob_start();
         extract($array);

@@ -1,5 +1,10 @@
-<?php require_once "./controllers/profilePage.php"; ?>
-
+<?php
+/**
+ *@var string $imgBefore
+ * @var string $currentUserName
+ * @var string $currentUserEmail
+ */
+?>
 
 <!DOCTYPE html>
 <html lang="en" class="h-full bg-gray-100">
@@ -77,7 +82,7 @@
                     </div>
 
                     <p class="text-sm text-gray-500 mt-2">
-                        <?= isset($error['imgError']) ? $error['imgError'] : 'Click on camera icon to change photo' ?>
+                        <?= $imgError ?? 'Click on camera icon to change photo' ?>
                     </p>
                 </div>
 
@@ -93,8 +98,8 @@
                                 <input class="font-medium" id="userName" name="userName"
                                        value="<?= $currentUserName ?>">
                                 <?php
-                                if (isset($error['userNameError']))
-                                    echo '<div>' . $error['userNameError'] . '</div>'; ?>
+                                if (isset($userNameError))
+                                    echo '<div>' . $userNameError . '</div>'; ?>
 
                             </div>
                             <button class="text-blue-600 hover:text-blue-800 edit-btn" data-field="username">
@@ -109,8 +114,8 @@
                                 <input class="font-medium" id="emailAddress" name="emailAddress"
                                        value="<?= $currentUserEmail ?>">
                                 <?php
-                                if (isset($error['emailAddressError']))
-                                    echo '<div>' . $error['emailAddressError'] . '</div>'; ?>
+                                if (isset($emailAddressError))
+                                    echo '<div>' . $emailAddressError .'</div>'; ?>
 
                             </div>
                             <button class="text-blue-600 hover:text-blue-800 edit-btn" data-field="email">
@@ -146,8 +151,8 @@
 
                 </div>
                         <?php
-                        if (isset($error['passwordError']))
-                        echo '<div>' . $error['passwordError'] . '</div>'; ?>
+                        if (isset($passwordError))
+                        echo '<div>' . $passwordError . '</div>'; ?>
                         <br>
                         <div class="flex justify-center items-center mb-6  ">
                             <button class="px-4 py-2 text-white bg-green-600 rounded-md hover:bg-green-700" type="submit">
@@ -169,6 +174,7 @@
 </div>
 </main>
 </div>
+<?php require "views/partials/footer.php"; ?>
 
 
 </body>
