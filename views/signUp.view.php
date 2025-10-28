@@ -21,7 +21,7 @@
 </head>
 <body class="h-full">
 <div class="">
-    <?php // Inside blogs.view.php
+    <?php // Inside blog.view.php
     require 'views/partials/Navbar.php';
     require "views/partials/banner.php";
     ?>
@@ -51,9 +51,9 @@
                                placeholder="Enter your username">
                     </div>
                     <?php
-                    if (isset($userError)):  ?>
+                    if (isset($error['UserNameError'])): ?>
                     <div class="text-xs text-red-500 mt-1">
-                            <?php echo $userError; ?>
+                            <?php echo $error['UserNameError'];  ?>
 
                     <?php endif; ?>
                 </div>
@@ -71,9 +71,9 @@
                                placeholder="Enter your email">
                     </div>
                     <?php
-                    if (isset($emailAddressError)):  ?>
+                    if (isset($error['emailAddressError'])):  ?>
                     <div class="text-xs text-red-500 mt-1">
-                        <?php echo $emailAddressError; ?>
+                        <?php echo $error['emailAddressError'];  ?>
 
                         <?php endif; ?>
                 </div>
@@ -104,9 +104,9 @@
                         </div>
                     </div>
                     <?php
-                    if (isset($passwordError)): ?>
+                    if (isset($error['passwordError'])): ?>
                         <div class="text-xs text-500 mt-1">
-                            <?php echo $passwordError; ?>
+                            <?php echo $error['passwordError']; ?>
 
                         </div>
                     <?php endif; ?>
@@ -141,13 +141,20 @@
                         Create Account
                     </button>
                 </div>
+                    <?php
+                    if (isset($error['generalError'])): ?>
+                        <div class="text-xs text-500 mt-1">
+                            <?php echo $error['generalError']; ?>
+
+                        </div>
+                    <?php endif; ?>
 
 
                 <!-- log in button   -->
 
                 <div class="text-center text-sm text-gray-600">
                     Already have an account?
-                    <a href="logIn.php" class="text-blue-600 font-medium hover:underline">Sign in</a>
+                    <a href="login" class="text-blue-600 font-medium hover:underline">Sign in</a>
 
                 </div>
             </form>

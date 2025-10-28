@@ -29,7 +29,7 @@
 
 
 
-            <form id="forgotPassword" class="py-6 px-8" method="POST" action='forgetPassword.php'>
+            <form id="forgotPassword" class="py-6 px-8" method="POST" action=''>
                 <!-- Success message (hidden by default) -->
                 <div id="successMessage" class="mb-4 p-3 bg-green-100 text-green-700 text-sm rounded-md hidden">
                     Password reset instructions have been sent to your email.
@@ -46,9 +46,9 @@
                                class="form-input pl-10 w-full rounded-md border-gray-300 focus:border-blue-500"
                                placeholder="Enter your email address">
                     </div>
-                    <?php if(isset($forgetPasswordError)):  ?>
+                    <?php if(isset($error['forgetPasswordError'])):  ?>
                     <div id="emailError" class="text-xs text-red-500 mt-1 ">
-                        <?php echo $forgetPasswordError;  ?>
+                        <?php echo $error['forgetPasswordError'];  ?>
                     </div>
                     <?php  endif; ?>
                 </div>
@@ -65,7 +65,7 @@
                 <!-- Back to login link -->
                 <div class="text-center text-sm text-gray-600">
                     Remember your password?
-                    <a href="logIn.php" class="text-blue-600 font-medium hover:underline">Back to Login</a>
+                    <a href="login" class="text-blue-600 font-medium hover:underline">Back to Log in</a>
                 </div>
             </form>
         </div>
@@ -77,16 +77,7 @@
  require "views/partials/footer.php";
 ?>
 
-<script>
-    // Form validation
-    const form = document.getElementById('forgotPasswordForm');
-    const emailInput = document.getElementById('email');
-    const emailError = document.getElementById('emailError');
-    const successMessage = document.getElementById('successMessage');
 
-
-
-</script>
 
 </body>
 </html>

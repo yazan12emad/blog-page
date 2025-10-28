@@ -1,6 +1,3 @@
-<?php
-
-?>
 
 
 <!doctype html>
@@ -19,8 +16,9 @@
 <div class="">
 
     <?php
-    require 'views/partials/Navbar.php';
-    require "partials/banner.php"; ?>
+    require __DIR__ . '/partials/Navbar.php';
+    require __DIR__ . '/partials/banner.php';
+    ?>
     <main>
         <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
 

@@ -7,8 +7,7 @@ if (!defined('SECURE_BOOT')) {
     die('Direct access is not permitted.');
 }
 
-use app\Exception;
-use app\PDO;
+
 
 class DataBase
 {

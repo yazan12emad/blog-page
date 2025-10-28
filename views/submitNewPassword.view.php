@@ -45,7 +45,7 @@
             <form id="resetPasswordForm" class="py-6 px-8" method="POST">
                 <!-- Success message (hidden by default) -->
 
-                <?php if(isset($passChange)): ?>
+                <?php if(isset($error['submitNewPasswordPassChange'])): ?>
                 <div id="successMessage" class="mb-4 p-3 bg-green-100 text-green-700 text-sm rounded-md ">
                     Your password has been successfully reset.
                 </div>
@@ -63,8 +63,8 @@
                                class="form-input pl-10 pr-10 w-full rounded-md border-gray-300 focus:border-blue-500"
                                placeholder="Enter your reset code ">
                         <div id="passwordRequirements" class="text-xs text-gray-500 mt-1">
-                            <?php if(isset($tokenError)):
-                            echo $tokenError;
+                            <?php if(isset($error['submitNewPasswordTokenError'])):
+                            echo $error['submitNewPasswordTokenError'];
                             endif; ?>
 
                         </div>
@@ -94,8 +94,8 @@
                         Password must be at least 8 characters with uppercase, lowercase, number, and special character.
                     </div>
                     <div id="newPasswordError" class="text-xs text-red-500 mt-1 ">
-                        <?php if(isset($newPasswordError)):
-                            echo $newPasswordError;
+                        <?php if(isset($error['submitNewPasswordError'])):
+                            echo $error['submitNewPasswordError'];
                         endif; ?>
                     </div>
                 </div>
@@ -115,8 +115,8 @@
                         </div>
                     </div>
                     <div id="" class="text-xs text-red-500 mt-1 ">
-                        <?php if(isset($confirmPasswordError)):
-                            echo $confirmPasswordError;
+                        <?php if(isset($error['submitNewPasswordConfirmPasswordError'])):
+                            echo $error['submitNewPasswordConfirmPasswordError'];
                         endif; ?>
 
                     </div>
@@ -134,7 +134,7 @@
                 <!-- Back to login link -->
                 <div class="text-center text-sm text-gray-600">
                     Remember your password?
-                    <a href="logIn.php" class="text-blue-600 font-medium hover:underline">Back to Login</a>
+                    <a href="login" class="text-blue-600 font-medium hover:underline">Back to Log in</a>
                 </div>
             </form>
         </div>

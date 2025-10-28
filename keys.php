@@ -16,6 +16,6 @@ return [
         'SMTPAuth' => true,
         'Username' => 'bba99b64486755',
         'Password' => 'c7e0becec9c2d9',
-        'Port    ' => 2525,
+        'Port' => 2525,
     ],
 ];

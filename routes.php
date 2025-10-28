@@ -1,24 +1,33 @@
 <?php
 
 use app\controllers\AuthController;
-if (!defined('SECURE_BOOT')) {
-    header('Location: ../');
-    die('Direct access is not permitted.');
-}
+use app\controllers\BlogController;
+use app\controllers\categoriesController;
+
 
 
 return  [
 
-        "/blogs.php" => __DIR__ . "/../controllers/blogs.php",
-        "/categories.php" => __DIR__ . "/../controllers/categories.php",
+        // AuthController class
+        '/login' => [AuthController::class, 'login'],
+        '/signUp' => [AuthController::class, 'register'],
+        '/home' => [AuthController::class, 'showHome'],
+        '/profile' => [AuthController::class, 'profile'],
+        '/logout' => [AuthController::class, 'logout'],
+        '/forgetPassword' => [AuthController::class, 'forgetPassword'],
+        '/submitNewPassword' =>[AuthController::class, 'submitNewPassword'],
 
-        '/logIn.php' => [AuthController::class, 'login'],
-        '/signUp.php' => [AuthController::class, 'register'],
-        '/home.php' => [AuthController::class, 'showHome'],
-        '/profile.php' => [AuthController::class, 'profile'],
-        '/logout.php' => [AuthController::class, 'logout'],
-        '/forgetPassword.php' => [AuthController::class, 'forgetPassword'],
-        '/submitNewPassword.php' =>[AuthController::class, 'submitNewPassword'],
+    // blog class
+
+    '/blog' => [BlogController::class, 'showBlogs'],
+    '/blog/create'=>[BlogController::class, 'createNewBlog'],
+
+    // categories class
+    '/categories' => [categoriesController::class , 'showCategories'],
+    '/categories/add' => [categoriesController::class , 'addCategory'],
+    '/categories/edit' => [categoriesController::class , 'editCategory'],
+    '/categories/delete' => [categoriesController::class , 'deleteCategory'],
+
 
 
 

@@ -37,9 +37,9 @@
 
             <form id="loginForm" class="py-6 px-8" method="POST" action="" >
                 <!-- Display PHP errors here if any -->
-                <?php if (isset($logInError)): ?>
+                <?php if (isset($error['generalError'])): ?>
                     <div class="mb-4 p-3 bg-red-100 text-red-700 text-sm rounded-md">
-                        <?php echo $logInError; ?>
+                        <?php echo $error['generalError']; ?>
                     </div>
                 <?php endif; ?>
 
@@ -54,9 +54,9 @@
                                class="form-input pl-10 w-full rounded-md border-gray-300 focus:border-blue-500"
                                placeholder="Enter your email or username">
                     </div>
-                    <?php if (isset($userError)): ?>
+                    <?php if (isset($error['UserNameError']) || isset($error['emailAddressError'])): ?>
                         <div class="text-xs text-red-500 mt-1">
-                            <?php echo $userError; ?>
+                            <?php echo $error['UserNameError'] ?? $error['emailAddressError']; ?>
                         </div>
                     <?php endif; ?>
                 </div>
@@ -75,9 +75,9 @@
                             <i class="password-toggle fas fa-eye-slash text-gray-400" id="togglePassword"></i>
                         </div>
                     </div>
-                    <?php if (isset($passError)): ?>
+                    <?php if (isset($error['passwordError'])): ?>
                         <div class="text-xs text-red-500 mt-1">
-                            <?php echo $passError; ?>
+                            <?php echo $error['passwordError']; ?>
                         </div>
                     <?php endif; ?>
                 </div>
@@ -90,7 +90,7 @@
                         <label for="remember" class="ml-2 block text-sm text-gray-700">Remember me</label>
                     </div>
                     <div>
-                        <a href="forgetPassword.php" class="text-sm text-blue-600 hover:underline">Forgot password?</a>
+                        <a href="/forgetPassword" class="text-sm text-blue-600 hover:underline">Forgot password?</a>
                     </div>
                 </div>
 
@@ -106,7 +106,7 @@
                 <!-- Sign up link -->
                 <div class="text-center text-sm text-gray-600">
                     Don't have an account?
-                    <a href="signUp.php" class="text-blue-600 font-medium hover:underline">Sign up</a>
+                    <a href="signUp" class="text-blue-600 font-medium hover:underline">Sign up</a>
                 </div>
             </form>
         </div>

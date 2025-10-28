@@ -12,63 +12,17 @@ class UploadFiles
 {
 //    protected ;
     protected $session;
-    protected $UM;
 
 
     public function __construct()
     {
        // $this->db = new DataBase();
         $this->session = Session::getInstance();
-        $this->UM = new UserModel();
 
     }
-    // refactor //
-    public function checkIsItImg(array $file, &$uploadOk, &$msg): bool
+    public function addImg( $file = [],  &$msg = []): false|string
     {
-        if (empty($file['tmp_name'])) {
-            $uploadOk = 0;
-            $msg = "No file uploaded.";
-            return false;
-        }
-
-        $check = @getimagesize($file['tmp_name']);
-        if ($check !== false) {
-            if ($check[2] == IMAGETYPE_PNG) {
-                return $this->validSize($file, $uploadOk, $msg);
-            } else {
-                $uploadOk = 0;
-                $msg = "The image must be .png";
-                return false;
-            }
-        } else {
-            $uploadOk = 0;
-            $msg = "File is not an image.";
-            return false;
-        }
-    }
-    // refactor //
-
-
-    //git remote add origin https://github.com/yazan12emad/blog-page.git
-    public function validSize(array $file, &$uploadOk, &$msg): bool
-    {
-        if ($file['size'] > 5000000) {
-            $msg = "Sorry, your file is too large.";
-            $uploadOk = 0;
-            return false;
-        }
-        $uploadOk = 1;
-        return true;
-    }
-
-//    public function deletePastImg($imgPath){
-//        unlink($imgPath);
-//        return true;
-//    }
-
-    public function addImg(array $file, &$uploadOk, &$msg = null)
-    {
-        if (!$this->checkIsItImg($file, $uploadOk, $msg)) {
+        if (!$this->checkIsItImg($file,$msg)) {
             return false;
         }
 
@@ -84,13 +38,54 @@ class UploadFiles
 
         if (move_uploaded_file($file['tmp_name'], $target_file)) {
 
-            $msg = "The file " . basename($file['name']) . " has been uploaded.";
+            $msg['errorUploadImg'] = "The file " . basename($file['name']) . " has been uploaded.";
 
-            return $this->UM->updateUserData($this->session->get('id') ,'profileImg', $target_file);
+            return  $target_file;
+
         } else {
-            $uploadOk = 0;
-            $msg = "Error uploading the file.";
+            $msg['errorUploadImg'] = "Error uploading the file.";
             return false;
         }
     }
+
+
+    public function checkIsItImg( $file = [], &$msg = []): bool
+    {
+
+        if (empty($file['tmp_name'])) {
+            $msg['errorUploadImg'] = "No file uploaded.";
+            return false;
+        }
+
+        $check = @getimagesize($file['tmp_name']);
+
+        if ($check !== false) {
+            if ($check[2] == IMAGETYPE_PNG) {
+                return $this->validSize($file, $msg);
+            } else {
+                $msg['errorUploadImg'] = "The image must be .png";
+                return false;
+            }
+        } else {
+            $msg['errorUploadImg'] = "File is not an image.";
+            return false;
+        }
+    }
+
+
+
+    public function validSize(array $file, &$msg = []): bool
+    {
+        if ($file['size'] >= 5000000) {
+            $msg['errorUploadImg'] = "Sorry, your file is too large.";
+            return false;
+        }
+        return true;
+    }
+
+//    public function deletePastImg($imgPath){
+//        unlink($imgPath);
+//        return true;
+//    }
+
 }

@@ -1,6 +1,6 @@
 <?php
 /**
- *@var string $imgBefore
+ *@var string $imgAfter
  * @var string $currentUserName
  * @var string $currentUserEmail
  */
@@ -70,7 +70,7 @@
                 <form method="post" enctype="multipart/form-data">
                 <div class="flex flex-col items-center mb-6">
                     <div class="relative">
-                        <img src="<?=$imgBefore?>"
+                        <img src="<?=$imgAfter?>"
                              alt="Profile Image"
                              class="w-32 h-32 rounded-full border-4 border-white shadow-lg profile-img">
 
@@ -82,7 +82,7 @@
                     </div>
 
                     <p class="text-sm text-gray-500 mt-2">
-                        <?= $imgError ?? 'Click on camera icon to change photo' ?>
+                        <?= $error['errorUploadImg'] ?? 'Click on camera icon to change photo' ?>
                     </p>
                 </div>
 
@@ -98,8 +98,8 @@
                                 <input class="font-medium" id="userName" name="userName"
                                        value="<?= $currentUserName ?>">
                                 <?php
-                                if (isset($userNameError))
-                                    echo '<div>' . $userNameError . '</div>'; ?>
+                                if (isset($error['userNameError']))
+                                    echo '<div>' . $error['userNameError'] . '</div>'; ?>
 
                             </div>
                             <button class="text-blue-600 hover:text-blue-800 edit-btn" data-field="username">
@@ -114,8 +114,8 @@
                                 <input class="font-medium" id="emailAddress" name="emailAddress"
                                        value="<?= $currentUserEmail ?>">
                                 <?php
-                                if (isset($emailAddressError))
-                                    echo '<div>' . $emailAddressError .'</div>'; ?>
+                                if (isset($error['emailAddressError']))
+                                    echo '<div>' . $error['emailAddressError'] .'</div>'; ?>
 
                             </div>
                             <button class="text-blue-600 hover:text-blue-800 edit-btn" data-field="email">
@@ -128,9 +128,12 @@
                             <div>
                                 <p class="text-sm text-gray-500">Current Password</p>
                                 <input class="font-medium" id="password" name="currentPassword" value="">
-
-
+                              <br>
+                                <?php
+                                if (isset($error['currentPasswordError']))
+                                    echo '<div>' . $error['currentPasswordError'] . '</div>'; ?>
                             </div>
+
                             <button class="text-blue-600 hover:text-blue-800 edit-btn" data-field="password">
                                 <i class="fas fa-edit"></i>
                             </button>
@@ -151,8 +154,8 @@
 
                 </div>
                         <?php
-                        if (isset($passwordError))
-                        echo '<div>' . $passwordError . '</div>'; ?>
+                        if (isset($error['newPasswordError']))
+                        echo '<div>' . $error['newPasswordError'] . '</div>'; ?>
                         <br>
                         <div class="flex justify-center items-center mb-6  ">
                             <button class="px-4 py-2 text-white bg-green-600 rounded-md hover:bg-green-700" type="submit">

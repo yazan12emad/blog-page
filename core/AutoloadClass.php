@@ -1,10 +1,8 @@
 <?php
 
 namespace app\core;
-if (!defined('SECURE_BOOT')) {
-    header('Location: ../');
-    die('Direct access is not permitted.');
-}
+
+
 class AutoloadClass
 {
 

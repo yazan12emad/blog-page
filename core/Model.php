@@ -10,11 +10,13 @@ abstract class Model
         return DataBase::getInstance();
     }
 
-    public function session(): Session
+    public function getSession(): Session
     {
         return Session::getInstance();
 
     }
+
+
 
 
 }

@@ -15,18 +15,18 @@ class Session
     private function __construct()
     {
         if (session_status() == PHP_SESSION_NONE) {
-
             session_start();
         }
     }
 
-    public static function getInstance()
+    public static function getInstance() : Session
     {
         if (self::$instance === null) {
             self::$instance = new self();
         }
         return self::$instance;
     }
+
     public function __wakeup(){
 
     }
@@ -78,9 +78,24 @@ class Session
         $_SESSION['emailAddress'] = $userData['emailAddress'];
         $_SESSION['password'] = $userData['password'];
         $_SESSION['profileImg'] = '/public/default.png';
-
+        $_SESSION['userRole'] = $userData['user_role'];
 
     }
+
+    public function isGuest(): bool
+    {
+        return empty($this->get('id'));
+    }
+
+    public function isAdmin(): bool{
+        if($_SESSION['userRole'] == 'admin')
+            return true;
+            else
+               return false;
+
+    }
+
+
 
 
 }

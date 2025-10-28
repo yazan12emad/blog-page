@@ -22,50 +22,47 @@ class ValidationClass
     }
 
 
-    public function notEmpty($value): bool
+    public function notEmpty($value , &$msg = []): bool
     {
-        if (empty($value)) {
+        if (empty($value) ||strlen(trim($value)) === 0) {
+            $msg = 'This field is required.';
             return false;
         }
-        if (strlen(trim($value)) === 0) {
-            return false;
-        }
+
         return true;
     }
 
-    public function validateUserNameEdit($currentUserName, $newUserName, &$msg = null): bool
+    public function validateUserNameEdit($currentUserName, $newUserName, &$msg =[] ): bool
     {
         if (!$this->notEmpty($newUserName)) {
-            $msg = 'user name must at least contain letters and numbers';
+            $msg['UserNameError'] = 'user name must at least contain letters and numbers';
             return false;
         } else if ($currentUserName == $newUserName) {
-            $msg = 'Its the same user name ';
+            $msg['UserNameError'] = 'Its the same user name ';
             return false;
         } else
             return true;
 
     }
 
-    function validateEmail($emailAddress): bool
+    function validateEmail($emailAddress , &$msg=[]): bool
     {
 
-        if (!$this->notEmpty($emailAddress))
+        if ((!$this->notEmpty($emailAddress)) || (!filter_var($emailAddress, FILTER_VALIDATE_EMAIL))) {
+            $msg['emailAddressError'] = 'email address must not be empty';
             return false;
-        if (!filter_var($emailAddress, FILTER_VALIDATE_EMAIL))
-            return false;
-
-        else
+        }
             return true;
 
     }
 
-    public function validateEmailEdit($currentUserEmail, $emailAddress, &$msg = null): bool|string
+    public function validateEmailEdit($currentUserEmail, $emailAddress, &$msg =[] ): bool|string
     {
         if (!$this->validateEmail($emailAddress)) {
-            $msg = 'email address is Invalid';
+            $msg['emailAddressError'] = 'email address is Invalid';
             return false;
         } else if ($currentUserEmail === $emailAddress) {
-            $msg = 'email address is the same email';
+            $msg['emailAddressError'] = 'email address is the same email';
             return false;
         } else   {
 
@@ -74,33 +71,32 @@ class ValidationClass
 
     }
 
-    public function validationPassword($password): bool
+    public function validationPassword($password , &$msg = null): bool
     {
-        if (!$this->notEmpty($password))
+        if (!$this->notEmpty($password) || strlen($password) < 7){
+            $msg['passwordError'] = 'Password must be at least 8 characters long';
             return false;
-        else if (strlen($password) <= 7)
-            return false;
-        else
+    }
             return true;
     }
 
 
-    public function validateNewPasswordEdit($oldPasswordHash, $currentPasswordInput, $newPasswordInput, &$msg = null)
+    public function validateNewPasswordEdit($oldPasswordHash, $currentPasswordInput, $newPasswordInput, &$msg = null): bool
     {
         if (!$this->validationPassword($currentPasswordInput)) {
-            $msg = "Current password format is invalid";
+            $msg['currentPasswordError'] = "Password must be at least 7 characters long";
             return false;
         }
         else if (!$this->validationPassword($newPasswordInput)) {
-            $msg = 'New password format is invalid';
+            $msg['newPasswordError'] = 'New password format is invalid';
             return false;
         }
-        else if (!password_verify($currentPasswordInput, $oldPasswordHash)) {
-            $msg = 'Current password is incorrect';
+        else if (password_verify($currentPasswordInput, $oldPasswordHash)) {
+            $msg['currentPasswordError'] = 'Current password is incorrect';
             return false;
         }
         else if (password_verify($newPasswordInput, $oldPasswordHash)) {
-            $msg = 'New password cannot be the same as old password';
+            $msg['newPasswordError'] = 'New password cannot be the same as old password';
             return false;
         }
         else {

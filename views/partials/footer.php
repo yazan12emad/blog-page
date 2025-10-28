@@ -57,11 +57,11 @@
     </style>
 </head>
 <body class="h-full flex flex-col">
-<div class="min-h-full flex flex-col">
 
+<div class="flex flex-col">
 
-    <!-- Footer Section - Now sticks to bottom -->
-    <footer class="bg-gray-800 text-white pt-12 pb-8 mt-auto">
+        <!-- Footer Section - Now sticks to bottom -->
+    <footer class="bg-gray-800 text-white pt-12 pb-8 ">
         <div class="container mx-auto px-4">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
                 <!-- Brand/About Section -->
