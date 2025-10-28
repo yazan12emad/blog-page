@@ -1,10 +1,3 @@
-<?php
-
-
-
-?>
-
-
 <!doctype html>
 <html lang="en" class="h-full bg-gray-100" >
 <head>
@@ -17,7 +10,6 @@
 </head>
 
 <body class="h-full" >
-
 
     <?php // Inside blogs.view.php
     require 'views/partials/Navbar.php';
