@@ -19,10 +19,18 @@ class Router
         $this->routes = require_once ROOT_PATH . DIRECTORY_SEPARATOR . 'routes.php';
     }
 
+    public function slug($url){
+
+
+        return $url;
+    }
+
     public function route(): void
     {
         $url = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-        // check if the URL is existed or not
+
+        $url =  $this->slug($url);
+        var_dump($url);
         if (array_key_exists($url, $this->routes)) {
             [$controller, $method] = $this->routes[$url];
             $AuthController = new $controller();

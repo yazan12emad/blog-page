@@ -236,7 +236,6 @@ class AuthController extends Controller
             $newPassword = trim($_POST['newPassword']);
             $confirmPassword = trim($_POST['confirmPassword']);
             $savedToken = $this->ResetPasswordModel->getToken($currentID);
-            var_dump($savedToken);
 
             if (!$this->userModel->submitNewPassword(
                 $currentID,

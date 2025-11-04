@@ -3,6 +3,7 @@
 use app\controllers\AuthController;
 use app\controllers\BlogController;
 use app\controllers\categoriesController;
+use app\controllers\AdminSite;
 
 
 
@@ -21,6 +22,7 @@ return  [
 
     '/blog' => [BlogController::class, 'showBlogs'],
     '/blog/create'=>[BlogController::class, 'createNewBlog'],
+    '/blog/delete'=>[BlogController::class, 'deleteBlog'],
 
     // categories class
     '/categories' => [categoriesController::class , 'showCategories'],
@@ -29,6 +31,24 @@ return  [
     '/categories/delete' => [categoriesController::class , 'deleteCategory'],
 
 
+        //admin
+    '/admin' => [AdminSite::class , 'showSite'],
+    '/admin/users' => [AdminSite::class , 'showUsers'],
+    '/admin/users/delete'=> [AdminSite::class , 'deleteUser'],
+    '/admin/users/edit'=> [AdminSite::class , 'editUser'],
+    '/admin/users/update' => [AdminSite::class , 'editUser'],
+
+
+    '/admin/category' => [AdminSite::class , 'showCategories'],
+    '/admin/categories/delete' => [AdminSite::class , 'deleteCategory'],
+    '/admin/categories/edit' => [AdminSite::class , 'editCategory'],
+    '/admin/categories/update'=> [AdminSite::class , 'editCategory'],
+
+
+    '/admin/blog' => [AdminSite::class , 'showBlog'],
+    '/admin/blog/delete' => [AdminSite::class , 'deleteBlog'],
+    '/admin/blog/edit'=> [AdminSite::class , 'editBlog'],
+        '/admin/blog/update'=> [AdminSite::class , 'editBlog'],
 
 
 

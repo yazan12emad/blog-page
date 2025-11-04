@@ -58,14 +58,10 @@ class categoriesModel extends Model
          }
     }
 
-    public function updateCategory($cate_id ,$new_name , &$msg): bool
+    public function updateCategory($cate_id ,$new_name , &$msg , $der): bool
     {
-        if($this->checkIfExist($new_name))
-        {
-            $msg = 'category already exists';
-            return false;
-        }
-          else if($this->DataBase->query("UPDATE categories set cate_name = :new_name WHERE cate_id = :cate_id" ,[
+        if(empty($der))
+              if($this->DataBase->query("UPDATE categories set cate_name = :new_name WHERE cate_id = :cate_id" ,[
             'new_name' => $new_name,
             'cate_id' => $cate_id
         ]))
@@ -77,13 +73,27 @@ class categoriesModel extends Model
             $msg = 'error to update category';
             return false;
         }
+        else
+            if($this->DataBase->query("UPDATE categories set cate_name = :new_name  , description = :description WHERE cate_id = :cate_id" ,[
+                'new_name' => $new_name,
+                'cate_id' => $cate_id ,
+                'description' => $der
+            ]))
+        return true;
+            else {
+                $msg = 'error to update category';
+                return false;
+
+            }
+
     }
 
     public function deleteCategory($cate_id , &$msg): bool {
          if($this->DataBase->query("DELETE FROM categories WHERE cate_id = :cate_id" ,
             [
                 'cate_id' => $cate_id
-            ])){
+            ]))
+         {
              $msg = 'category deleted';
              return true;
          }
@@ -97,7 +107,7 @@ class categoriesModel extends Model
         return $this->DataBase->query("SELECT * FROM categories WHERE cate_id = :cate_id" ,
             [
                 'cate_id' => $cate_id
-            ])->fetchAll();
+            ])->fetch(\PDO::FETCH_ASSOC);
     }
 
 

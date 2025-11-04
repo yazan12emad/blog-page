@@ -16,6 +16,7 @@ abstract class Controller
     private $session;
 
 
+
     public function isPost() : bool
     {
         return $_SERVER['REQUEST_METHOD'] === 'POST';
@@ -37,16 +38,17 @@ abstract class Controller
         ];
 
         else if($this->session->isAdmin())
-
              $navData =
                  [
                  'logIn' => true ,
-                 'role' =>'admin'
+                 'role' =>'admin',
+                'admin_id' => $this->session->get('id'),
                  ];
         else $navData=
             [
             'logIn' => true ,
-            'role' =>'user'
+            'role' =>'user' ,
+            'user_id' => $this->session->get('id'),
             ];
 
         return $navData;

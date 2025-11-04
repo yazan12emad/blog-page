@@ -29,7 +29,6 @@ class User  {
 
     public function getUserInfo(): array
     {
-        var_dump($this->User['id']);
         return $this->User;
     }
 

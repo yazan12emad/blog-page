@@ -21,6 +21,9 @@
                         <a href="home" aria-current="page" class=" <?= isUrl('/home') ? 'bg-gray-900' : 'text-gray-300'  ?>  rounded-md px-3 py-2 text-sm font-medium text-white">Home</a>
                         <a href="blog" class=" <?= isUrl('/blog') ? 'bg-gray-900' : 'text-gray-300'  ?> rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-white/5 hover:text-white">Blog</a>
                         <a href="categories" class=" <?= isUrl('/categories') ? 'bg-gray-900' : 'text-gray-300'  ?> rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-white/5 hover:text-red">Categories</a>
+                        <?php if (isset($navData['role']) && $navData['role'] === 'admin'): ?>
+                        <a href="admin" class=" <?= isUrl('/categories') ? 'bg-gray-900' : 'text-gray-300'  ?> rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-white/5 hover:text-red">Admin</a>
+                        <?php endif; ?>
 
                     </div>
                 </div>

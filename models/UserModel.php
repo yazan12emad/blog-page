@@ -97,7 +97,7 @@ class UserModel extends Model
 
     public function changeProfileUserName($currentID, $userName, $currentUserName, &$msg = [])
     {
-        //  change userName    //
+        //  change userName   //
         if (!$this->ValidationClass->validateUserNameEdit($currentUserName, $userName, $msg))
             return false;
 
@@ -271,6 +271,13 @@ class UserModel extends Model
         }
     }
 
+    public function getUserFullInfo(): array
+    {
+            return ($this->getDb()->query('SELECT * FROM `UsersInformation` ')->fetchAll(\PDO::FETCH_ASSOC));
+
+        }
+
+
     public function checkUserData($key, $value): bool
     {
         $dataExist = $this->getDb()->query('SELECT * FROM `UsersInformation` WHERE ' . $key . ' = :value',
@@ -297,22 +304,25 @@ class UserModel extends Model
 
     public function updateUserData($id, $key, $newValue)
     {
-
-        $allowedColumns = ['userName', 'emailAddress', 'password', 'profileImg'];
-        if (!in_array($key, $allowedColumns)) {
-            throw new Exception("Invalid column name");
-        }
-        // Prepare safe SQL
-        $this->getDb()->query("UPDATE `UsersInformation` SET $key = :value WHERE id = :id", [
+        if($this->getDb()->query("UPDATE `UsersInformation` SET $key = :value WHERE id = :id", [
             ':value' => trim($newValue),
             ':id' => $id
-        ]);
+        ]))
         return true;
+        else
+            return   throw new Exception("Invalid column name");
+
     }
 
-    public function deleteUser($userId)
+    public function deleteUser($userId):bool
     {
+         if($this->getDb()->query("DELETE FROM UsersInformation where id =:id" , [
+                ':id' => $userId
+            ]
 
+        ))
+             return true;
+         return false;
     }
 
 }
