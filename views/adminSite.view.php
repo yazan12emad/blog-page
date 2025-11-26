@@ -128,9 +128,9 @@
                         <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
                             <i class="fas fa-users text-blue-600 text-xl"></i>
                         </div>
-                        <h2 class="text-xl font-semibold text-gray-800">User Management</h2>
+                        <h2 class="text-xl font-semibold text-gray-800">User Management </h2>
                     </div>
-                    <p class="text-gray-600 mb-4">Manage system users, roles, and permissions</p>
+                    <p class="text-gray-600 mb-4">Manage system users, roles, and permissions in one page </p>
                     <div class="space-y-3">
                         <button onclick="loadUsers()"
                                 class="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors action-btn flex items-center justify-center">
