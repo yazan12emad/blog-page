@@ -54,12 +54,12 @@
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
         }
+
     </style>
 </head>
-<body class="h-full flex flex-col">
+<body class="h-full min-h-full flex flex-col">
 
 <div class="flex flex-col">
-
         <!-- Footer Section - Now sticks to bottom -->
     <footer class="bg-gray-800 text-white pt-12 pb-8 ">
         <div class="container mx-auto px-4">

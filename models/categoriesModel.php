@@ -60,9 +60,13 @@ class categoriesModel extends Model
 
     public function updateCategory($cate_id ,$new_name , &$msg , $der): bool
     {
+        if(empty(trim($new_name))) {
+            $msg = 'new category name is required';
+            return false;
+        }
         if(empty($der))
               if($this->DataBase->query("UPDATE categories set cate_name = :new_name WHERE cate_id = :cate_id" ,[
-            'new_name' => $new_name,
+            'new_name' => trim($new_name),
             'cate_id' => $cate_id
         ]))
         {
@@ -75,9 +79,9 @@ class categoriesModel extends Model
         }
         else
             if($this->DataBase->query("UPDATE categories set cate_name = :new_name  , description = :description WHERE cate_id = :cate_id" ,[
-                'new_name' => $new_name,
+                'new_name' => trim($new_name),
                 'cate_id' => $cate_id ,
-                'description' => $der
+                'description' => trim($der)
             ]))
         return true;
             else {

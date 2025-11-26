@@ -1,6 +1,9 @@
 <?php
 /* @var $categories   array
  * @var $results array
+ * @var $navData array
+ * @var $pages int
+ * @var $category string
  */
 ?>
 
@@ -8,10 +11,14 @@
 <html lang="en" class="h-full bg-gray-100">
 <head>
     <meta charset="utf-8">
-    <title>Blog Project</title>
+    <title>blog | All Blog </title>
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <script src='https://www.google.com/recaptcha/api.js'></script>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
+    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet"/>
+    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
 
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -21,10 +28,12 @@
         .blog-card {
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
+
         .blog-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         }
+
         .gradient-bg {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
@@ -38,7 +47,6 @@ require "views/partials/banner.php";
 ?>
 
 
-
 <!-- Main Content -->
 <main>
     <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
@@ -50,7 +58,8 @@ require "views/partials/banner.php";
 
         <!-- Create New Blog Button -->
         <div class="mb-10 text-right">
-             <button id="createBlogBtn" class="gradient-bg text-white px-6 py-3 rounded-lg font-medium hover:opacity-90 transition-opacity shadow-md">
+            <button id="createBlogBtn"
+                    class="gradient-bg text-white px-6 py-3 rounded-lg font-medium hover:opacity-90 transition-opacity shadow-md hidden">
                 <i class="fas fa-plus mr-2"></i>Create New Blog
             </button>
 
@@ -58,31 +67,82 @@ require "views/partials/banner.php";
 
         <!-- Blog Grid -->
         <div id="blogGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <!-- Blog cards will be dynamically inserted here -->
+
         </div>
 
 
 
-        <!-- Pagination add to do it  -->
-        <div class="mt-12 flex justify-center">
-            <nav class="flex items-center space-x-2">
-                <button class="px-3 py-2 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300">
-                    <i class="fas fa-chevron-left"></i>
-                </button>
-                <button class="px-4 py-2 rounded-md gradient-bg text-white">1</button>
-                <button class="px-4 py-2 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300">2</button>
-                <button class="px-4 py-2 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300">3</button>
-                <button class="px-3 py-2 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300">
-                    <i class="fas fa-chevron-right"></i>
-                </button>
+                <!-- first button  -->
+
+                <?php
+                if(isset($_GET['page']) && $_GET['page'] ) {
+                    // <!-- pagination buttons  -->
+                    echo '<div class="mt-12 flex justify-center "> Showing ' . $_GET["page"] . ' of  ' . $pages . ' </div>';
+
+                    echo '<div class="mt-6 flex justify-center">';
+
+                    echo '<nav class="flex items-center space-x-2">';
+
+                    $page = $_GET['page'] - 5 >= 1 ? (int)$_GET['page'] - 5 : 1 ;
+
+
+                    if (isset($category)) {
+                        // Prev arrow
+                        if ($page > 1) {
+                            echo '<a href="/blog/' . $category . '?page=1" class="px-4 py-2 rounded-md gradient-bg text-white">First</a> ';
+
+                            echo '<a href="/blog/' . $category . '?page=' . ($_GET['page'] - 1) . '" class="px-3 py-2 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300">
+            <i class="fas fa-chevron-left"></i>
+          </a>';
+                        }
+                        // Page numbers
+                        for ($number = $page; $number <= min($page + 10, $pages); $number++) {
+                            echo '<a href="/blog/' . $category . '?page=' . $number . '" class="px-4 py-2 rounded-md gradient-bg text-white">' . $number . '</a>';
+                        }
+
+                        // Next arrow
+                        if ($page < $pages) {
+                            echo '<a href="/blog/' . $category . '?page=' . ($_GET['page'] + 1) . '" class="px-3 py-2 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300">
+            <i class="fas fa-chevron-right"></i>
+          </a>';
+                            // last button
+                            echo '<a href="/blog/' . $category . '?page=' . $pages . '" class="px-4 py-2 rounded-md gradient-bg text-white">last</a>';
+                        }
+                    } else {
+                        if ($page > 1) {
+                            echo '<a href="/blog?page=1" class="px-4 py-2 rounded-md gradient-bg text-white">First</a> ';
+                            echo '<a href="/blog?page=' . ($_GET['page'] - 1) . '" class="px-3 py-2 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300">
+            <i class="fas fa-chevron-left"></i>
+          </a>';
+                        }
+
+
+                        // Page numbers
+                        for ($number = $page; $number <= min($page + 10, $pages); $number++) {
+                            echo '<a href="/blog?page=' . $number . '" class="px-4 py-2 rounded-md gradient-bg text-white">' . $number . '</a>';
+                        }
+
+                        // Next arrow
+                        if ($page < $pages) {
+                            echo '<a href="/blog?page=' . ($_GET['page'] + 1) . '" class="px-3 py-2 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300">
+            <i class="fas fa-chevron-right"></i>
+          </a>';
+                            // last button
+                            echo '<a href="/blog?page=' . $pages . '" class="px-4 py-2 rounded-md gradient-bg text-white">last</a>';
+                        }
+                    }
+
+                }
+
+                ?>
+
+
             </nav>
         </div>
 
 
-
     </div>
 </main>
-
 
 
 <!-- Create Blog Modal to create a new blog -->
@@ -95,8 +155,9 @@ require "views/partials/banner.php";
                     <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
-                <!--  blogForm   -->
-            <form id="blogForm" class="space-y-6" >
+            <!--  blogForm   -->
+            <form id="blogForm" class="space-y-6">
+
                 <!-- Blog Title -->
                 <div>
                     <label for="blogTitle" class="block text-sm font-medium text-gray-700 mb-1">Blog Title</label>
@@ -104,21 +165,26 @@ require "views/partials/banner.php";
                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
                 </div>
 
-                <!-- Blog Body -->
                 <div>
-                    <label for="blogBody" class="block text-sm font-medium text-gray-700 mb-1">Blog Content</label>
-                    <textarea id="blogBody" name="blog_body" rows="6" required
-                              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"></textarea>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Blog Content</label>
+
+                    <!-- Quill editor -->
+                    <div id="editor" class="w-full border border-gray-300 rounded-lg min-h-[150px] px-3 py-2"></div>
+
+                    <!-- Hidden input to send data -->
+                    <input type="hidden" name="blog_body" id="blog_body">
                 </div>
 
                 <!-- Blog Picture -->
                 <div>
                     <label for="blogPicture" class="block text-sm font-medium text-gray-700 mb-1">Blog Picture</label>
                     <div class="flex items-center justify-center w-full">
-                        <label for="blogPicture" class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+                        <label for="blogPicture"
+                               class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
                             <div class="flex flex-col items-center justify-center pt-5 pb-6">
                                 <i class="fas fa-cloud-upload-alt text-gray-400 text-2xl mb-2"></i>
-                                <p class="mb-2 text-sm text-gray-500"><span class="font-semibold">Click to upload</span> or drag and drop</p>
+                                <p class="mb-2 text-sm text-gray-500"><span class="font-semibold">Click to upload</span>
+                                    or drag and drop</p>
                                 <p class="text-xs text-gray-500">PNG, JPG, GIF (MAX. 2MB)</p>
                             </div>
                             <input id="blogPicture" name="blog_picture" type="file" class="hidden" accept="image/*">
@@ -138,22 +204,24 @@ require "views/partials/banner.php";
                     </select>
                 </div>
 
-<!--                <div class="g-recaptcha px-5 py-2.5 text-gray-700 " data-sitekey="6LfNiAAsAAAAABtbu-gy2UoYgX-a7FAsgr4nNqZS"></div>-->
 
-                <div class="g-recaptcha" data-sitekey="6LfNiAAsAAAAABtbu-gy2UoYgX-a7FAsgr4nNqZS" ></div>
+                <div class="g-recaptcha" data-sitekey="6LfNiAAsAAAAABtbu-gy2UoYgX-a7FAsgr4nNqZS"></div>
 
                 <!-- Form Actions -->
                 <div class="flex justify-end space-x-3 pt-4">
-                    <button type="button" id="cancelBtn" class="px-5 py-2.5 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors">
+                    <button type="button" id="cancelBtn"
+                            class="px-5 py-2.5 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors">
                         Cancel
                     </button>
 
 
-                    <button type="submit" class="px-5 py-2.5 gradient-bg text-white rounded-lg hover:opacity-90 transition-opacity">
+                    <button type="submit"
+                            class="px-5 py-2.5 gradient-bg text-white rounded-lg hover:opacity-90 transition-opacity">
                         Create Blog
                     </button>
                 </div>
             </form>
+
         </div>
     </div>
 </div>
@@ -186,16 +254,14 @@ require "views/partials/banner.php";
 </div>
 
 
-<?php  require "views/partials/footer.php"; ?>
+<?php require "views/partials/footer.php"; ?>
 
 
 <script>
 
-    // Sample blog data - In a real application, this would come from your PHP controller
-
-    // Sample categories - In a real application, this would come from your database
 
     // DOM Elements
+
     const blogGrid = document.getElementById('blogGrid');
     const createBlogBtn = document.getElementById('createBlogBtn');
     const createBlogModal = document.getElementById('createBlogModal');
@@ -210,7 +276,6 @@ require "views/partials/banner.php";
     const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
     const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
     const deleteCategoryName = document.getElementById('deleteBlog');
-
     let currentBlogId = null;
     let currentBlogTitle = null;
 
@@ -222,9 +287,47 @@ require "views/partials/banner.php";
     let Admin_id = <?= json_encode($navData['admin_id'] ?? null); ?>;
     let role = <?= json_encode($navData['role'] ?? null); ?>;
 
+    const toolbarOptions = [
+        ['bold', 'italic', 'underline', 'strike'],
+        ['blockquote', 'code-block'],
+        ['link', 'image', 'video', 'formula'],
+
+        [{'header': 1}, {'header': 2}],
+        [{'list': 'ordered'}, {'list': 'bullet'}, {'list': 'check'}],
+        [{'script': 'sub'}, {'script': 'super'}],
+        [{'indent': '-1'}, {'indent': '+1'}],
+        [{'direction': 'rtl'}],
+
+        [{'size': ['small', false, 'large', 'huge']}],
+        [{'header': [1, 2, 3, 4, 5, 6, false]}],
+
+        [{'color': []}, {'background': []}],
+        [{'font': []}],
+        [{'align': []}],
+
+        ['clean']
+    ];
 
 
+    //Quill code for Rich text editor
+    const quill = new Quill('#editor', {
+        theme: 'snow',
+        modules: {
+            toolbar: toolbarOptions,
+            history: {
+                delay: 2000,
+                maxStack: 500,
+                userOnly: true
+            },
 
+        }
+
+    });
+
+    blogForm.addEventListener('submit', function (e) {
+        const blogBodyInput = document.getElementById('blog_body');
+        blogBodyInput.value = quill.root.innerHTML;
+    });
 
 
     function openDeleteModal(BlogId, BlogTitle) {
@@ -233,6 +336,7 @@ require "views/partials/banner.php";
         deleteModal.classList.remove('hidden');
         document.body.style.overflow = 'hidden';
     }
+
     function closeModal() {
         deleteModal.classList.add('hidden');
         document.body.style.overflow = 'auto';
@@ -267,63 +371,68 @@ require "views/partials/banner.php";
     // to show the blog that return from the DB
     function renderBlogs() {
         blogGrid.innerHTML = '';
+
+        // ✅ Check if there are no blogs
+        if (sampleBlogs.length === 0) {
+            blogGrid.innerHTML = `
+            <div class="text-center text-gray-500 py-10">
+                <i class="fas fa-info-circle text-3xl mb-3 text-purple-500"></i>
+                <p class="text-lg font-medium">There are no blogs about this category 📝</p>
+            </div>
+        `;
+            return;
+        }
+
+        // ✅ Otherwise, render all blogs
         sampleBlogs.forEach(blog => {
             const blogCard = document.createElement('div');
             blogCard.className = 'blog-card bg-white rounded-xl shadow-md overflow-hidden flex flex-col';
             blogCard.innerHTML = `
-                    <div class="h-48 overflow-hidden">
-                        <img src="${blog.blog_picture}" alt="${blog.blog_title}" class="w-full h-full object-cover">
-                    </div>
-                    <div class="p-6 flex-grow flex flex-col">
-                        <div class="flex justify-between items-start mb-2">
-                            <span class="inline-block bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full">${blog.cate_name}</span>
-                            <span class="text-gray-500 text-sm">${blog.created_at}</span>
-                        </div>
-                        <h3 class="text-xl font-bold text-gray-900 mb-3">${blog.blog_title}</h3>
-                        <p class="text-gray-600 mb-4 flex-grow">${blog.blog_body}</p>
-                        <div class="mt-auto">
-                                <!-- edit , delete button  -->
-                            ${(() => {
+            <div class="h-48 overflow-hidden">
+                <img src="${blog.blog_picture}" alt="${blog.blog_title}" class="w-full h-full object-cover">
+            </div>
+            <div class="p-6 flex-grow flex flex-col">
+                <div class="flex justify-between items-start mb-2">
+                    <span class="inline-block bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full">${blog.cate_name}</span>
+                    <span class="text-gray-500 text-sm">${new Date(blog.created_at).toLocaleDateString()}</span>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-3">${blog.blog_title}</h3>
+                <p class="text-gray-600 mb-4 flex-grow">${blog.blog_body}</p>
+                <div class="mt-auto">
+                    ${(() => {
                 if (role === 'admin') {
                     return `
-            <button class="w-full edit-category-btn bg-yellow-500 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-yellow-600 transition-colors"
-                    data-id="${blog.blog_id}"
-                    data-name="${blog.blog_title}">
-                <i class="fas fa-edit"></i>
-            </button>
-            <button class="w-full delete-category-btn bg-red-500 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-red-600 transition-colors"
-                    data-id="${blog.blog_id}"
-                    data-name="${blog.blog_title}">
-                <i class="fas fa-trash"></i>
-            </button>
-        `;
+                                <button class="w-full edit-category-btn bg-yellow-500 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-yellow-600 transition-colors"
+                                        data-id="${blog.blog_id}" data-name="${blog.blog_title}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="w-full delete-category-btn bg-red-500 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-red-600 transition-colors"
+                                        data-id="${blog.blog_id}" data-name="${blog.blog_title}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            `;
                 }
                 if (role === 'user' && user_id === blog.author_id) {
                     return `
-            <button class="w-full edit-category-btn bg-yellow-500 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-yellow-600 transition-colors"
-                    data-id="${blog.blog_id}"
-                    data-name="${blog.blog_title}">
-                <i class="fas fa-edit"></i>
-            </button>
-            <button class="w-full delete-category-btn bg-red-500 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-red-600 transition-colors"
-                    data-id="${blog.blog_id}"
-                    data-name="${blog.blog_title}">
-                <i class="fas fa-trash"></i>
-            </button>
-        `;
+                                <button id='edit' class="w-full edit-category-btn bg-yellow-500 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-yellow-600 transition-colors"
+                                        data-id="${blog.blog_id}" data-name="${blog.blog_title}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="w-full delete-category-btn bg-red-500 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-red-600 transition-colors"
+                                        data-id="${blog.blog_id}" data-name="${blog.blog_title}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            `;
                 }
-                else
-                    return ``
+                return ``;
             })()}
-                                <!-- read more button -->
-                            <button class="w-full gradient-bg text-white py-2 rounded-lg font-medium hover:opacity-90 transition-opacity flex items-center justify-center">
-                                <i class="fas fa-book-open mr-2"></i>Read More
-                            </button>
-
-                        </div>
-                    </div>
-                `;
-
+                    <button class="w-full gradient-bg text-white py-2 rounded-lg font-medium hover:opacity-90 transition-opacity flex items-center justify-center ">
+                    <a  href="/Full-Blog/${blog.blog_title}/${blog.blog_id}" class="blog-link">
+                        <i class="fas fa-book-open mr-2"></i>Read More
+                    </button>
+                </div>
+            </div>
+        `;
             blogGrid.appendChild(blogCard);
         });
     }
@@ -341,6 +450,7 @@ require "views/partials/banner.php";
     // Event Listeners
     createBlogBtn.addEventListener('click', () => {
         createBlogModal.classList.remove('hidden');
+
     });
 
     closeModalBtn.addEventListener('click', () => {
@@ -351,11 +461,11 @@ require "views/partials/banner.php";
         createBlogModal.classList.add('hidden');
     });
 
-    blogPictureInput.addEventListener('change', function(e) {
+    blogPictureInput.addEventListener('change', function (e) {
         if (this.files && this.files[0]) {
             const reader = new FileReader();
 
-            reader.onload = function(e) {
+            reader.onload = function (e) {
                 previewImg.src = e.target.result;
                 imagePreview.classList.remove('hidden');
             }
@@ -363,12 +473,10 @@ require "views/partials/banner.php";
             reader.readAsDataURL(this.files[0]);
         }
     });
-        // create blog
-    blogForm.addEventListener('submit', async function(e) {
+
+    // create blog
+    blogForm.addEventListener('submit', async function (e) {
         e.preventDefault();
-
-        const captchaResponse = grecaptcha.getResponse();
-
 
         try {
             const formData = new FormData(this);
@@ -379,9 +487,8 @@ require "views/partials/banner.php";
                 body: formData,
                 headers: {
                     'Accept': 'application/json',
-                    }
+                }
             });
-
             const data = JSON.parse(await res.text());
 
             if (data.successAdd && data.successCheck) {
@@ -395,12 +502,21 @@ require "views/partials/banner.php";
             console.error('Fetch or network error:', err);
             alert('Something went wrong');
         } finally {
-            try { this.reset(); } catch(err) { console.error(err); }
-            try { imagePreview.classList.add('hidden'); createBlogModal.classList.add('hidden'); } catch(err) { console.error(err); }
+            try {
+                this.reset();
+            } catch (err) {
+                console.error(err);
+            }
+            try {
+                imagePreview.classList.add('hidden');
+                createBlogModal.classList.add('hidden');
+            } catch (err) {
+                console.error(err);
+            }
         }
     });
 
-        // create blog
+    // create blog
     confirmDeleteBtn.addEventListener('click', async function (e) {
         e.preventDefault();
 
@@ -449,8 +565,26 @@ require "views/partials/banner.php";
 
     // Initialize the page
     document.addEventListener('DOMContentLoaded', () => {
+        <?php if($navData['logIn']): ?>
+        createBlogBtn.classList.remove('hidden');
+
+        <?php endif ?>
+
         renderBlogs();
         populateCategories();
+
+        // to put - in the url sends
+        document.querySelectorAll('.blog-link').forEach(link => {
+
+            link.addEventListener('click', function (e) {
+                e.preventDefault();
+                let url = new URL(link.href);
+                url.pathname = url.pathname.replace(/%20/g, '-');
+                history.pushState(null, '', url.pathname);
+                window.location.href = url.pathname;
+            });
+        });
+
     });
 </script>
 </body>

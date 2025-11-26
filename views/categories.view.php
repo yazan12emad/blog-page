@@ -92,7 +92,7 @@
 
                             <div class="flex justify-center space-x-2">
                                 <!-- View Category Button - Visible to all users -->
-                                <a href="/blog?category=<?php echo urlencode($category['cate_name']); ?>"
+                                <a href="/blog/<?=$category['cate_name'];?>?page=1"
                                    class="flex-1 bg-blue-500 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors flex items-center justify-center">
                                     <i class="fas fa-eye mr-1"></i>View
                                 </a>

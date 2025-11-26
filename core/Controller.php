@@ -7,7 +7,6 @@
 
 namespace app\core;
 
-use app\core\Session;
 use JetBrains\PhpStorm\NoReturn;
 
 

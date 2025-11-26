@@ -1,8 +1,5 @@
 <?php
-if (!defined('SECURE_BOOT')) {
-    header('Location: ../');
-    die('Direct access is not permitted.');
-}
+
 
 return [
     'DataBase' => [
@@ -11,6 +8,7 @@ return [
         'dbname' => 'test',
         'charset' => 'utf8mb4',
     ],
+    
     'SMTP' => [
         'Host' => 'sandbox.smtp.mailtrap.io',
         'SMTPAuth' => true,

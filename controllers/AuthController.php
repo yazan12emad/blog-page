@@ -3,7 +3,6 @@
 namespace app\controllers;
 require_once __DIR__ . '/../vendor/autoload.php';
 
-
 use app\core\Controller;
 use app\core\session;
 use app\models\UserModel;
@@ -29,18 +28,6 @@ class AuthController extends Controller
 
     }
 
-    public function showHome(): string
-    {
-        if ($this->session->isGuest())
-            return $this->render('home.view', ['heading' => 'home']);
-
-        else
-            if ($this->session->isAdmin())
-                return $this->render('home.view', ['heading' => 'home']);
-            else
-                return $this->render('home.view', ['heading' => 'home']);
-
-    }
 
 
     public function login(): string
@@ -197,13 +184,7 @@ class AuthController extends Controller
         ], $extra));
     }
 
-    public function logout(): void
-    {
 
-        $this->session->destroy();
-        $this->redirect('.');
-//
-    }
 
     public function forgetPassword(): string
     {
@@ -261,5 +242,12 @@ class AuthController extends Controller
         return $this->render('submitNewPassword.view', ['heading' => 'Reset password']);
     }
 
+
+    public function logout()
+    {
+
+        $this->session->destroy();
+        $this->redirect('.');
+    }
 
 }

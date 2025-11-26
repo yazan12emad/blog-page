@@ -65,7 +65,7 @@
                 <!-- Back to login link -->
                 <div class="text-center text-sm text-gray-600">
                     Remember your password?
-                    <a href="login" class="text-blue-600 font-medium hover:underline">Back to Log in</a>
+                    <a href="/login" class="text-blue-600 font-medium hover:underline">Back to Log in</a>
                 </div>
             </form>
         </div>

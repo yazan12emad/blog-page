@@ -5,7 +5,6 @@ namespace app\controllers;
 use app\core\Controller;
 use app\models\AdminSiteModel;
 use app\core\Session;
-use JetBrains\PhpStorm\NoReturn;
 
 class AdminSite extends Controller
 {
@@ -13,9 +12,7 @@ class AdminSite extends Controller
 
     private session $session;
     private array $usersData;
-
     private array $categoriesData;
-
     private array  $blogData;
 
 
@@ -55,6 +52,7 @@ class AdminSite extends Controller
             ]
 
         );
+        exit;
 
     }
 
@@ -67,6 +65,8 @@ class AdminSite extends Controller
                 'success' => true,
                 'userData' => $this->adminSiteModel->getUserById($_POST['id']),
             ]);
+            exit;
+
         }
 
         if ($_POST['action'] === 'updateUser') {
@@ -75,6 +75,8 @@ class AdminSite extends Controller
                 'success' => $this->adminSiteModel->updateUserData($_POST , $msg),
                 'message' => $msg
             ]);
+            exit;
+
         }
 
     }
@@ -96,6 +98,7 @@ class AdminSite extends Controller
             'success' => true ,
             'categories' => $this->categoriesData ,
         ]);
+        exit;
 
     }
 
@@ -108,6 +111,8 @@ public function editCategory():void{
             'success' => true,
             'category' => $this->adminSiteModel->getCategoryById($_POST['cate_id']),
         ]);
+        exit;
+
     }
 
     if ($_POST['action'] === 'updateCategory') {
@@ -116,6 +121,9 @@ public function editCategory():void{
             'success' => $this->adminSiteModel->updateCategory($_POST , $msg),
             'message' => $msg
         ]);
+
+        exit;
+
     }
 
 
@@ -127,6 +135,8 @@ public function editCategory():void{
             'success' => $this->adminSiteModel->deleteCategory($_POST['cate_id'] , $msg) ,
             'message' => $msg,
         ]);
+        exit;
+
 
     }
         public  function showBlog():void
@@ -136,10 +146,13 @@ public function editCategory():void{
                 'success' => true ,
                 'blogs' => $this->blogData ,
             ]);
+            exit;
+
 
         }
 
         public function editBlog():void{
+
             if($_POST['action'] == 'showBlog'){
 
                 Header('content-type: application/json');
@@ -147,6 +160,7 @@ public function editCategory():void{
                     'success' => true,
                     'blog' =>$this->adminSiteModel->getBlogById($_POST['blog_id']),
                 ]);
+                exit;
 
             }
 
@@ -156,6 +170,7 @@ public function editCategory():void{
                     'success' =>$this->adminSiteModel->updateBlog($_POST , $msg) ,
                     'message' => $msg
                 ]);
+                exit;
 
             }
 
@@ -170,6 +185,7 @@ public function editCategory():void{
                 'success' => $this->adminSiteModel->deleteBlog($_POST['blog_id'] , $msg) ,
                 'message' => $msg ,
             ]);
+            exit;
 
 
         }

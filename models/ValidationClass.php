@@ -2,10 +2,6 @@
 
 namespace app\models;
 
-if (!defined('SECURE_BOOT')) {
-    header('Location: ../');
-    die('Direct access is not permitted.');
-}
 
 use app\core\session;
 
@@ -13,7 +9,7 @@ use app\core\session;
 
 class ValidationClass
 {
-    protected $session;
+    protected Session $session;
 
     public function __construct()
     {

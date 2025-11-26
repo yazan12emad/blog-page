@@ -1,5 +1,3 @@
-
-
 <!doctype html>
 <html lang="en" class="h-full bg-gray-100">
 <head>
@@ -9,11 +7,13 @@
     <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
-        * {box-sizing:border-box}
+        * {
+            box-sizing: border-box
+        }
 
         /* Slideshow container */
         .slideshow-container {
-            max-width: 1000px;
+            max-width: 500px;
             position: relative;
             margin: auto;
         }
@@ -47,7 +47,7 @@
 
         /* On hover, add a black background color with a little bit see-through */
         .prev:hover, .next:hover {
-            background-color: rgba(0,0,0,0.8);
+            background-color: rgba(0, 0, 0, 0.8);
         }
 
         /* Caption text */
@@ -93,8 +93,12 @@
         }
 
         @keyframes fade {
-            from {opacity: .4}
-            to {opacity: 1}
+            from {
+                opacity: .4
+            }
+            to {
+                opacity: 1
+            }
         }
 
     </style>
@@ -114,23 +118,22 @@
 
         <!-- Slideshow container -->
         <div class="slideshow-container">
-
             <!-- Full-width images with number and caption text -->
             <div class="mySlides fade">
-                <div class="numbertext">1 / 3</div>
-                <img src="img1.jpg" style="width:100%">
+                <div class="numbertext ql-color-blue ">1 / 3</div>
+                <img src="https://images.unsplash.com/photo-1490818387583-1baba5e638af?ixlib=rb-4.0.3&auto=format&fit=crop&w=1032&q=80" style="width:70%">
                 <div class="text">Caption Text</div>
             </div>
 
             <div class="mySlides fade">
-                <div class="numbertext">2 / 3</div>
-                <img src="img2.jpg" style="width:100%">
+                <div class="numbertext ql-color-blue">2 / 3</div>
+                <img src="https://images.unsplash.com/photo-1490818387583-1baba5e638af?ixlib=rb-4.0.3&auto=format&fit=crop&w=1032&q=80" style="width:70%">
                 <div class="text">Caption Two</div>
             </div>
 
             <div class="mySlides fade">
-                <div class="numbertext">3 / 3</div>
-                <img src="img3.jpg" style="width:100%">
+                <div class="number text ql-color-blue">3 / 3</div>
+                <img src="https://images.unsplash.com/photo-1490818387583-1baba5e638af?ixlib=rb-4.0.3&auto=format&fit=crop&w=1032&q=80" style="width:70%">
                 <div class="text">Caption Three</div>
             </div>
 
@@ -148,10 +151,10 @@
         </div>
 
 
-        </div>
+</div>
 
 
-    </main>
+</main>
 </div>
 
 
@@ -159,7 +162,6 @@
 
 
 <script>
-
 
 
     let slideIndex = 1;
@@ -175,20 +177,24 @@
         showSlides(slideIndex = n);
     }
 
-    function showSlides(n) {
+    function    showSlides(n) {
         let i;
         let slides = document.getElementsByClassName("mySlides");
         let dots = document.getElementsByClassName("dot");
-        if (n > slides.length) {slideIndex = 1}
-        if (n < 1) {slideIndex = slides.length}
+        if (n > slides.length) {
+            slideIndex = 1
+        }
+        if (n < 1) {
+            slideIndex = slides.length
+        }
         for (i = 0; i < slides.length; i++) {
             slides[i].style.display = "none";
         }
         for (i = 0; i < dots.length; i++) {
             dots[i].className = dots[i].className.replace(" active", "");
         }
-        slides[slideIndex-1].style.display = "block";
-        dots[slideIndex-1].className += " active";
+        slides[slideIndex - 1].style.display = "block";
+        dots[slideIndex - 1].className += " active";
     }
 </script>
 </body>

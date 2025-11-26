@@ -810,10 +810,9 @@
             const response = await fetch('/admin/blog', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
                 }
             });
-
             const data = JSON.parse(await response.text());
 
             if (data.success) {

@@ -3,11 +3,6 @@
 namespace app\core;
 
 
-if (!defined('SECURE_BOOT')) {
-    header('Location: ../');
-    die('Direct access is not permitted.');
-}
-
 class Session
 {
     private static $instance;
@@ -27,12 +22,7 @@ class Session
         return self::$instance;
     }
 
-    public function __wakeup(){
 
-    }
-    private function __clone(){
-
-    }
 
     public function get($key): mixed
     {

@@ -11,10 +11,6 @@ use app\core\AutoloadClass;
 use app\core\Router;
 
 
-$URl = $_SERVER['REQUEST_URI'];
-
-var_dump($URl);
-
 
 AutoloadClass::register();
 

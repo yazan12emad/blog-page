@@ -3,10 +3,7 @@
 namespace app\core;
 
 
-if (!defined('SECURE_BOOT')) {
-    header('Location: ../');
-    die('Direct access is not permitted.');
-}
+
 
 class Router
 {
@@ -19,34 +16,58 @@ class Router
         $this->routes = require_once ROOT_PATH . DIRECTORY_SEPARATOR . 'routes.php';
     }
 
-    public function slug($url){
 
+    public function slug($url): string
+    {
+        $url = str_replace(' ', '-', $url);
+        $url = str_replace('%20', '-', $url);
+        $url = preg_replace('/-+/', '-', $url);
+        return trim($url, '-');
 
-        return $url;
     }
+
 
     public function route(): void
     {
         $url = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+        $url = $this->slug($url);
 
-        $url =  $this->slug($url);
-        var_dump($url);
         if (array_key_exists($url, $this->routes)) {
             [$controller, $method] = $this->routes[$url];
-            $AuthController = new $controller();
-            $result = $AuthController->{$method}();
+            $controllerInstance = new $controller();
+            $result = $controllerInstance->{$method}();
 
-            if (!empty($result)) {
-                echo $result;
+
+        } else {
+            // this code to choose the category of the blog and the full info of the blog
+            foreach ($this->routes as $routePath => $route) {
+                if (str_contains($routePath,')') && preg_match('#'.$routePath.'#', $url, $matches)) {
+                    [$controller, $method] = $route;
+                    $controllerInstance = new $controller();
+                    if(isset($matches[2])){
+                        // to get the blog name to show the full info of it
+                        $result = $controllerInstance->{$method}($matches[2]);
+                        break;
+                    }
+                    else {
+                        // to get the category of the blogs
+                        $result = $controllerInstance->{$method}($matches[1]);
+                        break;
+                    }
+                }
 
             }
+        }
 
-//            require $this->routes[$url];
+
+        if (!empty($result)) {
+            echo $result;
+
         } else {
-            // A request for an invalid route results in a 404 error
             http_response_code(404);
-            // Optionally, you can redirect to a specific page or show a custom error page
-            header('location: /home');
+            header('Location: /home');
+            exit;
         }
     }
 }
+

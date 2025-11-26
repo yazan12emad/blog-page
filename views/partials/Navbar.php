@@ -18,9 +18,9 @@
                 <div class="hidden md:block">
                     <div class="ml-10 flex items-baseline space-x-4">
 
-                        <a href="home" aria-current="page" class=" <?= isUrl('/home') ? 'bg-gray-900' : 'text-gray-300'  ?>  rounded-md px-3 py-2 text-sm font-medium text-white">Home</a>
-                        <a href="blog" class=" <?= isUrl('/blog') ? 'bg-gray-900' : 'text-gray-300'  ?> rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-white/5 hover:text-white">Blog</a>
-                        <a href="categories" class=" <?= isUrl('/categories') ? 'bg-gray-900' : 'text-gray-300'  ?> rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-white/5 hover:text-red">Categories</a>
+                        <a href="/home" aria-current="page" class=" <?= isUrl('/home') ? 'bg-gray-900' : 'text-gray-300'  ?>  rounded-md px-3 py-2 text-sm font-medium text-white">Home</a>
+                        <a href="/blog?page=1" class=" <?= isUrl('/blog') ? 'bg-gray-900' : 'text-gray-300'  ?> rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-white/5 hover:text-white">Blog</a>
+                        <a href="/categories" class=" <?= isUrl('/categories') ? 'bg-gray-900' : 'text-gray-300'  ?> rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-white/5 hover:text-red">Categories</a>
                         <?php if (isset($navData['role']) && $navData['role'] === 'admin'): ?>
                         <a href="admin" class=" <?= isUrl('/categories') ? 'bg-gray-900' : 'text-gray-300'  ?> rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-white/5 hover:text-red">Admin</a>
                         <?php endif; ?>
@@ -63,14 +63,14 @@
                         <div id="profileDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg ring-1 ring-red ring-opacity-5 z-50">
                             <?php if (!$navData['logIn']): ?>
 
-                                <a href="signUp" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Sign Up</a>
-                                <a href="login" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">log in </a>
+                                <a href="/signUp" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Sign Up</a>
+                                <a href="/login" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">log in </a>
 
                             <?php else : ?>
 
-                                <a href="profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Your Profile</a>
-                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a>
-                                <a href="logout" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Sign Out</a>
+                                <a href="/profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Your Profile</a>
+                                <a href="/home" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a>
+                                <a href="/logout" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Sign Out</a>
                             <?php endif; ?>
                         </div>
 

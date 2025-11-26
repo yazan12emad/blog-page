@@ -4,7 +4,6 @@ namespace app\models;
 
 use app\core\DataBase;
 use app\core\Model;
-use app\models\ValidationClass;
 
 class BlogModel extends Model
 {
@@ -20,6 +19,12 @@ class BlogModel extends Model
 
     }
 
+
+    public function getBlogsByRowNumber($start , $end): array
+    {
+        return $this->db->query("SELECT * FROM blog INNER JOIN categories ON blog.blog_category = categories.cate_id
+         WHERE blog_status = 'live' LIMIT $start, $end  ")->fetchAll();
+    }
     public function getAllBlogs(): array
     {
         return $this->db->query("select * from blog
@@ -27,21 +32,38 @@ class BlogModel extends Model
                     where blog_status = 'live'   ")->fetchAll();
     }
 
-    public function getBlogsByCategory($category): array
+    public function getBlogsByCategoryWithLimit($category , $start = 0 , $end = 0): array
     {
+        if($start!== 0 && $end!==0)
         return $this->db->query("select * from blog
                     INNER join categories on blog.blog_category = categories.cate_id 
-                    where blog_status = 'live' && cate_name =:category " ,
+                    where blog_status = 'live' && cate_name =:category LIMIT $start, $end " ,
             [
-             'category' => $category
-        ]
+                'category' => $category
+            ]
         )->fetchAll();
+        else
+            return $this->db->query("select * from blog
+                    INNER join categories on blog.blog_category = categories.cate_id 
+                    where blog_status = 'live' && cate_name =:category " ,
+                [
+                    'category' => $category
+                ]
+            )->fetchAll();
     }
 
-    public function getBlogById($id): array{
-        return $this->db->query("select * from blog where blog_id =:id ",[
+    public function getBlogById($id)
+    {
+        $data = $this->db->query("SELECT * FROM blog INNER JOIN UsersInformation 
+ON blog.author_id = UsersInformation.id
+WHERE blog.blog_id = :id ;
+ ",[
             'id' => $id
         ])->fetch(\PDO::FETCH_ASSOC);
+        if($data)
+            return $data;
+        else
+            return false;
     }
 
     public function getAllBlogsNoCondition(): array
@@ -51,7 +73,7 @@ class BlogModel extends Model
 
     public function createBlogs($blog_title , $blog_body , $blog_picture , $blog_category ,$author_id, &$msg = []):bool
     {
-        if(!$this->validationClass->notEmpty($blog_title ))
+        if(!$this->validationClass->notEmpty($blog_title))
         {
             $msg = 'The blog title is required.';
             return false;
