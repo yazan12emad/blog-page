@@ -26,53 +26,66 @@ class BlogController extends Controller
     }
 
 
+
+
     public function showBlogs($queryParameters = []): string
     {
+            $page = $_GET['page'] ?? null ;
 
-        if (isset($_GET['page']) && (int)$_GET['page'] ) {
+        if (filter_var($page, FILTER_VALIDATE_INT) && !$page <= 1) {
 
-            if($_GET['page'] < 1)
-                $this->redirect('blog?page=1');
+            preg_match('/^([0-9]*)([\w\-]*)/', $_GET['page'], $matches);
 
-            preg_match('/^([0-9]*)([\w\-]*)/',$_GET['page'] , $matches);
-
-            if(!empty($matches[2])) {
+            // if the user change the url and add characters to page
+            // this code will redirect him to page=1
+            if (!empty($matches[2])) {
                 if (!empty($queryParameters))
-                $this->redirect('blog/'.$queryParameters.'?page=' . $matches[1]);
+                    $this->redirect('blog/' . $queryParameters . '?page=' . $matches[1]);
                 else
-                    $this->redirect('blog?page='.$matches[1]);
+                    $this->redirect('blog?page=' . $matches[1]);
             }
 
             $page =  $matches[0];
-            $start = ($page - 1) * 9;
+            $start = ($page - 1) * 6;
 
-            // for categories
+            // for pagination with categories
             if (!empty($queryParameters)) {
-                $blogs = $this->blogModel->getBlogsByCategoryWithLimit($queryParameters, $start, 9);
+                $numberOfPages =ceil(count($this->blogModel->getBlogsByCategoryWithLimit($queryParameters)) / 6);
+                $blogs = $this->blogModel->getBlogsByCategoryWithLimit($queryParameters, $start, 6);
+                if($_GET['page'] > $numberOfPages)
+                    $this->redirect('blog?page=' . $numberOfPages);
+
                 return $this->render('blog.view',
                     [
                         'heading' => 'Blog',
                         'results' => $blogs,
                         'categories' => $this->categoriesModel->getCategories(),
-                        'pages' => ceil(count($this->blogModel->getBlogsByCategoryWithLimit($queryParameters)) / 9),
+                        'pages' => $numberOfPages,
                         'category' => $queryParameters,
                     ]
                 );
             }
-            // for pagination
+            // for pagination without category
             else {
+                $numberOfPages =ceil(count($this->blogModel->getAllBlogs()) / 6);
+                $blogs =$this->blogModel->getBlogsByRowNumber($start, 6);
+
+                if($_GET['page'] > $numberOfPages)
+                    $this->redirect('blog?page=' . $numberOfPages);
+
                 return $this->render('blog.view',
                     [
                         'heading' => 'Blog',
-                        'results' => $this->blogModel->getBlogsByRowNumber($start, 9),
+                        'results' => $blogs,
                         'categories' => $this->categoriesModel->getCategories(),
-                        'pages' => ceil(count($this->blogModel->getAllBlogs()) / 9),
+                        'pages' => $numberOfPages,
 
 
                     ]
                 );
             }
         }
+
         $this->redirect('blog?page=1');
     }
 

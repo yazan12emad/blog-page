@@ -28,15 +28,21 @@ class AuthController extends Controller
 
     }
 
+    public function userInfo(){
+        if (!$this->session->userRole() == 'user' || $this->session->userRole() == 'admin') {
+            return true;
+        }
+        else
+            return false;
+    }
 
 
     public function login(): string
     {
+            if($this->userInfo())
+                $this->redirect('/');
 
-        if (!$this->session->isGuest()) {
-            $this->redirect('.');
-        }
-        if ($this->isPost()) {
+        else if ($this->isPost()) {
 
             $userData = $this->userModel->logInUser(
                 trim($_POST['userName']),
@@ -61,7 +67,7 @@ class AuthController extends Controller
 
     public function register()
     {
-        if (!$this->session->isGuest()) {
+        if ($this->userInfo()) {
             $this->redirect('.');
 
         }
@@ -90,7 +96,7 @@ class AuthController extends Controller
     public function profile(): string
     {
 
-        if ($this->session->isGuest()) {
+        if (!$this->userInfo()) {
             $this->redirect('.');
         }
 

@@ -4,7 +4,10 @@
  * @var $navData array
  * @var $pages int
  * @var $category string
+ * @var $role string
  */
+
+
 ?>
 
 <!doctype html>
@@ -74,67 +77,56 @@ require "views/partials/banner.php";
 
                 <!-- first button  -->
 
-                <?php
-                if(isset($_GET['page']) && $_GET['page'] ) {
-                    // <!-- pagination buttons  -->
-                    echo '<div class="mt-12 flex justify-center "> Showing ' . $_GET["page"] . ' of  ' . $pages . ' </div>';
+        <?php
+        $page = isset($_GET['page']) && $_GET['page'] > 0 ? (int)$_GET['page'] : 1;
+        if ($page > $pages)
+                 $page = $pages;
 
-                    echo '<div class="mt-6 flex justify-center">';
+        $start = max(1, $page - 5);
 
-                    echo '<nav class="flex items-center space-x-2">';
+        $end   = min($pages, $page + 5);
 
-                    $page = $_GET['page'] - 5 >= 1 ? (int)$_GET['page'] - 5 : 1 ;
+        $baseUrl = isset($category) ? "/blog/$category?page=" : "/blog?page=";
 
+        if ($pages > 1): ?>
 
-                    if (isset($category)) {
-                        // Prev arrow
-                        if ($page > 1) {
-                            echo '<a href="/blog/' . $category . '?page=1" class="px-4 py-2 rounded-md gradient-bg text-white">First</a> ';
+            <div class="mt-12 flex justify-center">Showing <?= $page ?> of <?= $pages ?> </div>
 
-                            echo '<a href="/blog/' . $category . '?page=' . ($_GET['page'] - 1) . '" class="px-3 py-2 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300">
-            <i class="fas fa-chevron-left"></i>
-          </a>';
-                        }
-                        // Page numbers
-                        for ($number = $page; $number <= min($page + 10, $pages); $number++) {
-                            echo '<a href="/blog/' . $category . '?page=' . $number . '" class="px-4 py-2 rounded-md gradient-bg text-white">' . $number . '</a>';
-                        }
+            <!-- PAGINATION -->
+            <div class="mt-6 flex justify-center">
+                <nav class="flex items-center space-x-2">
 
-                        // Next arrow
-                        if ($page < $pages) {
-                            echo '<a href="/blog/' . $category . '?page=' . ($_GET['page'] + 1) . '" class="px-3 py-2 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300">
-            <i class="fas fa-chevron-right"></i>
-          </a>';
-                            // last button
-                            echo '<a href="/blog/' . $category . '?page=' . $pages . '" class="px-4 py-2 rounded-md gradient-bg text-white">last</a>';
-                        }
-                    } else {
-                        if ($page > 1) {
-                            echo '<a href="/blog?page=1" class="px-4 py-2 rounded-md gradient-bg text-white">First</a> ';
-                            echo '<a href="/blog?page=' . ($_GET['page'] - 1) . '" class="px-3 py-2 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300">
-            <i class="fas fa-chevron-left"></i>
-          </a>';
-                        }
+                    <!-- First button  -->
+                    <?php if ($page > 1): ?>
+                        <a href="<?= $baseUrl ?>1" class="px-4 py-2 rounded-md gradient-bg text-white">First</a>
 
+                        <!-- prev button  -->
+                        <a href="<?= $baseUrl . ($page - 1) ?>" class="px-3 py-2 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300"> <i class="fas fa-chevron-left"></i>
+                        </a>
+                    <?php endif; ?>
 
-                        // Page numbers
-                        for ($number = $page; $number <= min($page + 10, $pages); $number++) {
-                            echo '<a href="/blog?page=' . $number . '" class="px-4 py-2 rounded-md gradient-bg text-white">' . $number . '</a>';
-                        }
+                    <?php for ($i = $start; $i <= $end; $i++): ?>
+                        <a href="<?= $baseUrl . $i ?>"
+                           class="px-4 py-2 rounded-md
+                           <?= $i == $page ? 'bg-gray-800 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' ?>"> <?= $i ?></a>
+                    <?php endfor; ?>
 
-                        // Next arrow
-                        if ($page < $pages) {
-                            echo '<a href="/blog?page=' . ($_GET['page'] + 1) . '" class="px-3 py-2 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300">
-            <i class="fas fa-chevron-right"></i>
-          </a>';
-                            // last button
-                            echo '<a href="/blog?page=' . $pages . '" class="px-4 py-2 rounded-md gradient-bg text-white">last</a>';
-                        }
-                    }
+                    <!-- last button  -->
+                    <?php if ($page < $pages): ?>
+                        <a href="<?= $baseUrl . ($page + 1) ?>"
+                           class="px-3 py-2 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                        <!-- next button  -->
 
-                }
+                        <a href="<?= $baseUrl . $pages ?>"
+                           class="px-4 py-2 rounded-md gradient-bg text-white">Last</a>
+                    <?php endif; ?>
 
-                ?>
+                </nav>
+            </div>
+
+        <?php endif; ?>
 
 
             </nav>
@@ -187,7 +179,7 @@ require "views/partials/banner.php";
                                     or drag and drop</p>
                                 <p class="text-xs text-gray-500">PNG, JPG, GIF (MAX. 2MB)</p>
                             </div>
-                            <input id="blogPicture" name="blog_picture" type="file" class="hidden" accept="image/*">
+                            <input id="blogPicture" name="blog_picture" type="file" class="hidden" >
                         </label>
                     </div>
                     <div id="imagePreview" class="mt-2 hidden">
@@ -382,6 +374,7 @@ require "views/partials/banner.php";
         `;
             return;
         }
+        console.log(sampleBlogs);
 
         // ✅ Otherwise, render all blogs
         sampleBlogs.forEach(blog => {
@@ -481,7 +474,6 @@ require "views/partials/banner.php";
         try {
             const formData = new FormData(this);
 
-            // Fetch request with awaits to make the js wait the backend response
             const res = await fetch('/blog/create', {
                 method: 'POST',
                 body: formData,

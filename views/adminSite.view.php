@@ -311,7 +311,7 @@
                         <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
                         <select id="editBlogStatus" name ='blog_status' class="w-full px-3 py-2 border border-gray-300 rounded-lg" required>
                             <option value="live">live</option>
-                            <option value="rejected">rejected</option>
+                            <option value="reject">reject</option>
                             <option value="waiting">waiting</option>
 
                         </select>
@@ -841,6 +841,7 @@
             tablesContainer.innerHTML = '';
             return;
         }
+        console.log(blogs);
 
         const tableHTML = `
         <div class="overflow-x-auto">
@@ -876,7 +877,7 @@
                                 </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900">${escapeHtml(blog.author_name || 'no name')}</div>
+                                <div class="text-sm text-gray-900">${escapeHtml(blog.userName || 'no name')}</div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
@@ -888,7 +889,7 @@
                                     ${blog.blog_status === 'live'? 'bg-green-100 text-green-800'
                                         : blog.blog_status === 'waiting'? 'bg-yellow-100 text-yellow-800'
                                             : 'bg-red-100 text-red-800'}">
-                                    ${blog.blog_status ? blog.blog_status : 'Draft'}
+                                    ${blog.blog_status ? blog.blog_status : 'waiting'}
                                 </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -943,7 +944,8 @@
                 document.getElementById('editBlogId').value = blog.blog_id;
                 document.getElementById('editBlogTitle').value = blog.blog_title;
                 document.getElementById('editBlogContent').value = blog.blog_body;
-                document.getElementById('editBlogStatus').value = blog.blog_blog_status ;
+                document.getElementById('editBlogStatus').value = blog.blog_status ;
+
                 openModal('editBlogModal');
             } else {
                 throw new Error(data.message || 'Failed to load blog data');
@@ -994,7 +996,8 @@
 
         const formData = new FormData(this);
         formData.append('action', 'updateBlog');
-
+        const data = Object.fromEntries(formData.entries());
+        console.log(data);
 
         try {
             const response = await fetch('/admin/blog/update', {
@@ -1005,7 +1008,8 @@
                 },
             });
 
-            const result = JSON.parse(await response.text());
+                const result = JSON.parse(await response.text());
+
 
             if (result.success) {
                 showMessage(result.message);

@@ -51,10 +51,11 @@ return  [
     '/admin/blog' => [AdminSite::class , 'showBlog'],
     '/admin/blog/delete' => [AdminSite::class , 'deleteBlog'],
     '/admin/blog/edit'=> [AdminSite::class , 'editBlog'],
-    '/admin/blog/update/'=> [AdminSite::class , 'editBlog'],
+    '/admin/blog/update'=> [AdminSite::class , 'editBlog'],
 
+    '/like'=> [FullViewController::class , 'addLike'],
+    '/Full-Blog\/([\w\-\.\,\d]+)\/([\d]+)'=> [FullViewController::class , 'showBlog'],
 
-    '/Full-Blog/([\w\-]+)/([\d]+)'=> [FullViewController::class , 'showBlog'],
 
 
 ];

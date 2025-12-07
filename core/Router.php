@@ -2,8 +2,7 @@
 
 namespace app\core;
 
-
-
+use http\Header;
 
 class Router
 {
@@ -19,29 +18,36 @@ class Router
 
     public function slug($url): string
     {
-        $url = str_replace(' ', '-', $url);
-        $url = str_replace('%20', '-', $url);
-        $url = preg_replace('/-+/', '-', $url);
-        return trim($url, '-');
+        $url = preg_replace('/[^A-Za-z0-9\/]+/', '-', $url);
 
+        $url = preg_replace('/-+/', '-', $url);
+
+        return trim($url, '-');
     }
 
 
     public function route(): void
     {
-        $url = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-        $url = $this->slug($url);
+        $rawUrl = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+            if(preg_match('/[^A-Za-z0-9\/\-]+/' ,$rawUrl , $match)){
 
-        if (array_key_exists($url, $this->routes)) {
-            [$controller, $method] = $this->routes[$url];
+                $cleanUrl = $this->slug($rawUrl);
+                header('Location: '. $cleanUrl);
+
+            }
+        $cleanUrl = $this->slug($rawUrl);
+
+
+        if (array_key_exists($cleanUrl, $this->routes)) {
+            [$controller, $method] = $this->routes[$cleanUrl];
             $controllerInstance = new $controller();
             $result = $controllerInstance->{$method}();
 
-
         } else {
             // this code to choose the category of the blog and the full info of the blog
+
             foreach ($this->routes as $routePath => $route) {
-                if (str_contains($routePath,')') && preg_match('#'.$routePath.'#', $url, $matches)) {
+                if (str_contains($routePath,')') && preg_match('#'.$routePath.'#', $cleanUrl, $matches)) {
                     [$controller, $method] = $route;
                     $controllerInstance = new $controller();
                     if(isset($matches[2])){

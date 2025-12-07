@@ -188,7 +188,6 @@ class AdminSiteModel
         else
             if($this->BlogModel->updateBlogs($BlogNewData['blog_id'],'blog_status', $BlogNewData['blog_status'] ,$msg))
                 return ++$update;
-
             return $update;
 
 

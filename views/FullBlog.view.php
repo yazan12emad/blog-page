@@ -1,6 +1,6 @@
 <?php
 /*  @var array $blogData
-
+ * @var string $status
  */
 
 ?>
@@ -12,6 +12,140 @@
     <title>Blog Post</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+
+        .love-button-wrapper {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .love-button {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: 2px solid #000;
+            background-color: white;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.2s;
+            padding: 0;
+        }
+
+        .love-button:hover {
+            background-color: #f8f8f8;
+        }
+
+        .love-button.liked {
+            background-color: black;
+            animation: bounce 0.3s;
+        }
+
+        .heart {
+            font-size: 20px;
+            color: black;
+            transition: color 0.2s;
+        }
+
+        .love-button.liked .heart {
+            color: white;
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        .counter {
+            font-size: 20px;
+            font-weight: 500;
+            color: #333;
+            min-width: 30px;
+        }
+
+        /*
+         * Basic button style
+         */
+        .btn {
+            box-shadow: 1px 1px 0 rgba(255, 255, 255, 0.5) inset;
+            border-radius: 3px;
+            border: 1px solid;
+            display: inline-block;
+            height: 18px;
+            line-height: 18px;
+            padding: 0 8px;
+            position: relative;
+
+            font-size: 12px;
+            text-decoration: none;
+            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+        }
+
+        /*
+         * Counter button style
+         */
+        .btn-counter {
+            margin-right: 39px;
+        }
+
+        .btn-counter:after,
+        .btn-counter:hover:after {
+            text-shadow: none;
+        }
+
+        .btn-counter:after {
+            border-radius: 3px;
+            border: 1px solid #d3d3d3;
+            background-color: #eee;
+            padding: 0 8px;
+            color: #777;
+            content: attr(data-count);
+            left: 100%;
+            margin-left: 8px;
+            margin-right: -13px;
+            position: absolute;
+            top: -1px;
+        }
+
+        /*
+         * Custom styles
+         */
+        .btn {
+            background-color: #dbdbdb;
+            border-color: #bbb;
+            color: #666;
+        }
+
+        .btn:hover,
+        .btn.active {
+            text-shadow: 0 1px 0 #000000;
+            background-color: #000000;
+            border-color: #000000;
+        }
+
+        .btn:active {
+            box-shadow: 0 0 5px 3px rgba(0, 0, 0, 0.2) inset;
+        }
+
+        .btn span {
+            color: #000000;
+        }
+
+        .btn:hover, .btn:hover span,
+        .btn.active, .btn.active span {
+            color: #eeeeee;
+        }
+
+        .btn:active span {
+            color: #000000;
+            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -31,12 +165,6 @@
             padding: 20px;
         }
 
-        .blog-header {
-            text-align: center;
-            margin-bottom: 40px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid #e9ecef;
-        }
 
         .blog-title {
             font-size: 2.5rem;
@@ -80,14 +208,14 @@
             object-fit: cover;
             border-radius: 12px;
             margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
         }
 
         .blog-content {
             background: white;
             padding: 40px;
             border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
             margin-bottom: 30px;
         }
 
@@ -132,8 +260,12 @@
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         .error-message {
@@ -192,10 +324,12 @@
     </style>
 </head>
 <body>
+
 <?php
 require 'views/partials/Navbar.php';
 require "views/partials/banner.php";
 ?>
+
 
 <div class="blog-container">
     <!-- Back Button -->
@@ -234,13 +368,24 @@ require "views/partials/banner.php";
         </header>
 
         <!-- Blog Image -->
-        <img id="blogImage" class="blog-hero-image" alt="Blog Featured Image">
+        <img src='' id="blogImage" class="blog-hero-image" alt="Blog Featured Image">
 
         <!-- Blog Body -->
         <article class="blog-content">
             <div class="blog-body" id="blogBody">
-                Blog content will appear here...
             </div>
+
+
+            <div class="love-button-wrapper">
+                <button id="loveButton" class="love-button">
+                    <span class="heart">♥</span>
+                </button>
+                <div class="counter">
+                    <span id="likeCount"></span>
+                </div>
+            </div>
+
+
         </article>
     </div>
 </div>
@@ -251,12 +396,109 @@ require 'views/partials/footer.php';
 
 <script>
     const blogData = <?= (json_encode($blogData)) ?>;
+    const formData = new FormData();
+    formData.set('blog_id',blogData.blog_id)
 
-    if(!blogData)
-        window.location.assign("/blog");
-            // go back function
+
+    likeCount = blogData.Likes;
+    let isLiked = false;
+    const loveButton = document.getElementById('loveButton');
+    const likeCountElement = document.getElementById('likeCount');
+    likeCountElement.textContent = likeCount.toString();
+    let numberOfClicks = 0;
+
+    let clickCount = 0;
+    let firstClickTime = null;
+    let userStatus = <?= $status ?> ;
+
+    console.log(userStatus);
+
+
+    if(userStatus === true){
+        loveButton.classList.add('liked');
+         isLiked = true;
+
+    }
+
+    async function  loveButtonClicked(e) {
+        e.preventDefault();
+
+        const now = Date.now();
+
+        if (!firstClickTime || (now - firstClickTime > 4000)) {
+            clickCount = 0;
+            firstClickTime = now;
+        }
+
+        if (clickCount >= 3) {
+            alert("You can only like/unlike 3 times per minute!");
+            return;
+        }
+        clickCount++;
+         isLiked = !isLiked;
+
+         //add like
+            if (isLiked) {
+                formData.set('Action', 'addLike')
+
+                const res = await fetch('/like', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json',
+                    }
+                });
+                try {
+                    const text = await res.json();
+                    if (text.success) {
+                        likeCount++;
+                        loveButton.classList.add('liked');
+                        likeCountElement.textContent = likeCount.toString() + '   Thanks for liking the blog!';
+                        console.log(text.message);
+                    }
+                    //remove like
+                }
+                catch (error) {
+                    console.log(error);
+                }
+            }
+            else {
+                formData.set('Action', 'removeLike')
+                const res = await fetch('/like', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json',
+                    }
+                });
+                try {
+                    const text = await res.json();
+                    if (text.success) {
+                        likeCount--;
+                        loveButton.classList.remove('liked');
+                        likeCountElement.textContent = likeCount.toString();
+                        console.log(text.message);
+
+                    }
+                }
+                catch (error) {
+                    console.log(error);
+                }
+
+            }
+
+    }
+
+
+
+
+    if (!blogData || Object.keys(blogData).length === 0) {
+        window.location.assign("/blog?page=1");
+    }
+
+    // go back function
     function goBack() {
-        window.location.assign("/blog");
+        window.location.assign("/blog?page=1");
     }
 
     // Function to format date
@@ -272,34 +514,22 @@ require 'views/partials/footer.php';
     }
 
 
-
     // Function to display blog data
     function displayBlogData(blogData) {
-        // Set blog title
-        document.getElementById('blogTitle').textContent = blogData.blog_title;
 
-        // Set author name and avatar
+        document.getElementById('blogTitle').textContent = blogData.blog_title;
         document.getElementById('authorName').textContent = blogData.userName;
         document.getElementById('authorAvatar').textContent = blogData.userName.charAt(0).toUpperCase();
-
-        // Set creation date
         document.getElementById('createdAt').textContent = formatDate(blogData.created_at);
 
-        // Set blog image
         const blogImage = document.getElementById('blogImage');
         blogImage.src = blogData.blog_picture;
         blogImage.alt = blogData.blog_title;
-
-        // Set blog body content
         document.getElementById('blogBody').innerHTML = blogData.blog_body;
-
-        // Update page title
         document.title = `${blogData.blog_title} - Blog Post`;
     }
 
-    // Function to simulate API call (Replace this with your actual API call)
-
-    // Main function to load and display blog
+    // to show the blog content with displayBlogData function
     async function loadBlog() {
         const loadingSpinner = document.getElementById('loadingSpinner');
         const errorMessage = document.getElementById('errorMessage');
@@ -311,7 +541,6 @@ require 'views/partials/footer.php';
             errorMessage.style.display = 'none';
             blogContent.style.display = 'none';
 
-            console.log(blogData);
             displayBlogData(blogData);
 
 
@@ -330,6 +559,9 @@ require 'views/partials/footer.php';
 
     // Initialize when page loads
     document.addEventListener('DOMContentLoaded', loadBlog);
+
+    loveButton.addEventListener('click', loveButtonClicked);
+
 </script>
 </body>
 </html>

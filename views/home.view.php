@@ -1,201 +1,198 @@
+<?php
+/* @var $blogs array
+
+
+ */
+?>
 <!doctype html>
-<html lang="en" class="h-full bg-gray-100">
+<html lang="en" >
 <head>
     <meta charset="utf-8">
     <title>Home page | Blog Project</title>
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=arrow_forward"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.css"/>
+
     <script src="https://cdn.jsdelivr.net/npm/@tailwindplus/elements@1" type="module"></script>
     <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
+        .container {
+            width: 90%;
+            max-width: 1100px;
+        }
+
         * {
-            box-sizing: border-box
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Inter", sans-serif;
         }
 
-        /* Slideshow container */
-        .slideshow-container {
-            max-width: 500px;
-            position: relative;
-            margin: auto;
+        main {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(#ECECEC, #ECECEC);
         }
 
-        /* Hide the images by default */
-        .mySlides {
-            display: none;
+        .card-wrapper{
+            margin: 0 60px 35px ;
+            padding: 20px 10px ;
+            overflow: hidden;
         }
 
-        /* Next & previous buttons */
-        .prev, .next {
-            cursor: pointer;
-            position: absolute;
-            top: 50%;
-            width: auto;
-            margin-top: -22px;
-            padding: 16px;
-            color: white;
-            font-weight: bold;
-            font-size: 18px;
-            transition: 0.6s ease;
-            border-radius: 0 3px 3px 0;
+        .card-list .card-item {
+            list-style: none;
+        }
+
+        .card-list .card-item .card-link {
             user-select: none;
+            width: 400px;
+            display: block;
+            background: #ffffff;
+            padding: 16px;
+            border-radius: 12px;
+            text-decoration: none;
+            border: 2px solid transparent;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+            transition: 0.2s ease;
+
         }
 
-        /* Position the "next button" to the right */
-        .next {
-            right: 0;
-            border-radius: 3px 0 0 3px;
+        .card-list .card-item .card-link:hover {
+            border-color: #506eea
+
         }
 
-        /* On hover, add a black background color with a little bit see-through */
-        .prev:hover, .next:hover {
-            background-color: rgba(0, 0, 0, 0.8);
-        }
-
-        /* Caption text */
-        .text {
-            color: #f2f2f2;
-            font-size: 15px;
-            padding: 8px 12px;
-            position: absolute;
-            bottom: 8px;
+        .card-list .card-link .card-image {
             width: 100%;
-            text-align: center;
+            aspect-ratio: 16/9;
+            object-fit: cover;
+            border-radius: 10px;
+
+
         }
 
-        /* Number text (1/3 etc) */
-        .numbertext {
-            color: #f2f2f2;
-            font-size: 12px;
-            padding: 8px 12px;
-            position: absolute;
-            top: 0;
+        .card-list .card-link .badge {
+            color: #506eea;
+            padding: 8px 16px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            margin: 16px 0 18px;
+            background: #DDE4FF;
+            width: fit-content;
+            border-radius: 50px;
+
         }
 
-        /* The dots/bullets/indicators */
-        .dot {
-            cursor: pointer;
-            height: 15px;
-            width: 15px;
-            margin: 0 2px;
-            background-color: #bbb;
+        .card-list .card-link .card-title {
+            font-size: 1.2rem;
+            color: #000;
+            font-weight: 600;
+        }
+
+        .card-list .card-link .card-button {
+            height: 35px;
+            width: 35px;
+            color: #506eea;
             border-radius: 50%;
-            display: inline-block;
-            transition: background-color 0.6s ease;
+            margin: 30px 0 5px;
+            border: 2px solid #506eea;
+            background: none;
+            cursor: pointer;
+            transform: rotate(-45deg);
+            transition: 0.4s ease;
+
+
         }
 
-        .active, .dot:hover {
-            background-color: #717171;
+        .card-list .card-link:hover .card-button {
+            color: #fff;
+            background: #506eea;
+
+
         }
 
-        /* Fading animation */
-        .fade {
-            animation-name: fade;
-            animation-duration: 1.5s;
-        }
-
-        @keyframes fade {
-            from {
-                opacity: .4
-            }
-            to {
-                opacity: 1
-            }
-        }
 
     </style>
 
 </head>
-
-<body class="h-full">
-
-<div class="">
-
-    <?php
-    require __DIR__ . '/partials/Navbar.php';
-    require __DIR__ . '/partials/banner.php';
-    ?>
-    <main>
+<body >
 
 
-        <!-- Slideshow container -->
-        <div class="slideshow-container">
-            <!-- Full-width images with number and caption text -->
-            <div class="mySlides fade">
-                <div class="numbertext ql-color-blue ">1 / 3</div>
-                <img src="https://images.unsplash.com/photo-1490818387583-1baba5e638af?ixlib=rb-4.0.3&auto=format&fit=crop&w=1032&q=80" style="width:70%">
-                <div class="text">Caption Text</div>
-            </div>
+<?php
+require __DIR__ . '/partials/Navbar.php';
+require __DIR__ . '/partials/banner.php';
+?>
+<main>
+    <div class="container swiper ">
+        <div class="card-wrapper">
+            <ul class="card-list swiper-wrapper ">
+                <?php foreach($blogs as $blog):?>
+                <li class="card-item swiper-slide ">
+                    <a href="/Full-Blog/<?= urlencode($blog['blog_title']) ?>/<?= $blog['blog_id'] ?>" class="card-link">
+                        <img src="<?= $blog['blog_picture'] ?>" class="card-image" alt="...">
+                        <p class="badge"> <?=$blog['cate_name']?> </p>
+                        <h2 class="card-title"><?=$blog['blog_title']?> </h2>
+                        <button class="card-button material-symbols-rounded"> arrow_forward</button>
+                    </a>
+                </li>
+                <?php endforeach; ?>
 
-            <div class="mySlides fade">
-                <div class="numbertext ql-color-blue">2 / 3</div>
-                <img src="https://images.unsplash.com/photo-1490818387583-1baba5e638af?ixlib=rb-4.0.3&auto=format&fit=crop&w=1032&q=80" style="width:70%">
-                <div class="text">Caption Two</div>
-            </div>
-
-            <div class="mySlides fade">
-                <div class="number text ql-color-blue">3 / 3</div>
-                <img src="https://images.unsplash.com/photo-1490818387583-1baba5e638af?ixlib=rb-4.0.3&auto=format&fit=crop&w=1032&q=80" style="width:70%">
-                <div class="text">Caption Three</div>
-            </div>
-
-            <!-- Next and previous buttons -->
-            <a class="prev" onclick="plusSlides(-1)">&#10094;</a>
-            <a class="next" onclick="plusSlides(1)">&#10095;</a>
+            </ul>
+            <div class="swiper-pagination"></div>
+            <div class="swiper-button-prev"></div>
+            <div class="swiper-button-next"></div>
         </div>
-        <br>
-
-        <!-- The dots/circles -->
-        <div style="text-align:center">
-            <span class="dot" onclick="currentSlide(1)"></span>
-            <span class="dot" onclick="currentSlide(2)"></span>
-            <span class="dot" onclick="currentSlide(3)"></span>
-        </div>
-
-
-</div>
-
-
+    </div>
 </main>
-</div>
-
 
 <?php require "partials/footer.php"; ?>
 
 
+    <script src="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.js"></script>
+
 <script>
+    const swiper = new Swiper('.card-wrapper', {
+        loop: true,
+        spaceBetween: 30,
+
+        // If we need pagination
+        pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+            dynamicBullets: true,
+
+        },
+
+        // Navigation arrows
+        navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+        },
+
+        breakpoints: {
+            0:{
+                slidesPerView: 1,
+            },
+
+            768:{
+                slidesPerView: 2,
+            },
+
+            1024:{
+                slidesPerView: 3,
+            }
+
+        }
 
 
-    let slideIndex = 1;
-    showSlides(slideIndex);
-
-    // Next/previous controls
-    function plusSlides(n) {
-        showSlides(slideIndex += n);
     }
-
-    // Thumbnail image controls
-    function currentSlide(n) {
-        showSlides(slideIndex = n);
-    }
-
-    function    showSlides(n) {
-        let i;
-        let slides = document.getElementsByClassName("mySlides");
-        let dots = document.getElementsByClassName("dot");
-        if (n > slides.length) {
-            slideIndex = 1
-        }
-        if (n < 1) {
-            slideIndex = slides.length
-        }
-        for (i = 0; i < slides.length; i++) {
-            slides[i].style.display = "none";
-        }
-        for (i = 0; i < dots.length; i++) {
-            dots[i].className = dots[i].className.replace(" active", "");
-        }
-        slides[slideIndex - 1].style.display = "block";
-        dots[slideIndex - 1].className += " active";
-    }
+    );
 </script>
 </body>
 

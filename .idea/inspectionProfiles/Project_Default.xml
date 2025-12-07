@@ -4,9 +4,11 @@
     <inspection_tool class="HtmlUnknownAttribute" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="myValues">
         <value>
-          <list size="2">
+          <list size="4">
             <item index="0" class="java.lang.String" itemvalue="this.form.submit()" />
             <item index="1" class="java.lang.String" itemvalue="multipart" />
+            <item index="2" class="java.lang.String" itemvalue="command" />
+            <item index="3" class="java.lang.String" itemvalue="commandfor" />
           </list>
         </value>
       </option>
@@ -15,7 +17,7 @@
     <inspection_tool class="HtmlUnknownTag" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="myValues">
         <value>
-          <list size="11">
+          <list size="12">
             <item index="0" class="java.lang.String" itemvalue="nobr" />
             <item index="1" class="java.lang.String" itemvalue="noembed" />
             <item index="2" class="java.lang.String" itemvalue="comment" />
@@ -27,6 +29,7 @@
             <item index="8" class="java.lang.String" itemvalue="el-dropdown" />
             <item index="9" class="java.lang.String" itemvalue="ul" />
             <item index="10" class="java.lang.String" itemvalue="div" />
+            <item index="11" class="java.lang.String" itemvalue="card-button" />
           </list>
         </value>
       </option>

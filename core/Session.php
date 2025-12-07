@@ -72,18 +72,20 @@ class Session
 
     }
 
-    public function isGuest(): bool
+    public function userRole(): string
     {
-        return empty($this->get('id'));
+        if(isset($_SESSION['userRole']) && $_SESSION['userRole'] == 'admin')
+            return 'admin';
+        else if(empty($this->get('id')))
+            return 'guest';
+
+        else
+            return 'user';
+
+
     }
 
-    public function isAdmin(): bool{
-        if($_SESSION['userRole'] == 'admin')
-            return true;
-            else
-               return false;
 
-    }
 
 
 

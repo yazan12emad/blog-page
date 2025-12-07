@@ -27,9 +27,9 @@ class AdminSite extends Controller
 
     }
 
-    public  function showSite(array $extra = []): string
+    public  function showSite(array $extra = [])
     {
-        if($this->session->isAdmin())
+        if($this->session->userRole() == 'admin')
         return $this->render('adminSite.view' ,
             array_merge([
                 'heading' => 'admin',
@@ -39,8 +39,10 @@ class AdminSite extends Controller
                     'userCount'=> count($this->usersData)
                 ]
          , $extra));
-        else
+        else {
             $this->redirect('home');
+        return false;
+        }
     }
     public function showUsers():void
     {
@@ -58,26 +60,34 @@ class AdminSite extends Controller
 
     public function editUser():void
     {
-        if ($_POST['action'] === 'showToEdit') {
-            Header('content-type: application/json');
+        if($this->isPost()) {
 
-            echo JSON_encode([
-                'success' => true,
-                'userData' => $this->adminSiteModel->getUserById($_POST['id']),
-            ]);
-            exit;
 
+            if ($_POST['action'] === 'showToEdit') {
+                Header('content-type: application/json');
+
+                echo JSON_encode([
+                    'success' => true,
+                    'userData' => $this->adminSiteModel->getUserById($_POST['id']),
+                ]);
+                exit;
+
+            }
+
+            if ($_POST['action'] === 'updateUser') {
+                Header('content-type: application/json');
+                echo JSON_encode([
+                    'success' => $this->adminSiteModel->updateUserData($_POST, $msg),
+                    'message' => $msg,
+                    'post' => $_POST,
+
+                ]);
+                exit;
+
+            }
         }
-
-        if ($_POST['action'] === 'updateUser') {
-            Header('content-type: application/json');
-            echo JSON_encode([
-                'success' => $this->adminSiteModel->updateUserData($_POST , $msg),
-                'message' => $msg
-            ]);
-            exit;
-
-        }
+        else
+            $this->redirect('home');
 
     }
 
@@ -168,7 +178,7 @@ public function editCategory():void{
                 header('content-type: application/json');
                 echo JSON_encode([
                     'success' =>$this->adminSiteModel->updateBlog($_POST , $msg) ,
-                    'message' => $msg
+                    'message' => $msg ,
                 ]);
                 exit;
 

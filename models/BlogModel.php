@@ -34,7 +34,7 @@ class BlogModel extends Model
 
     public function getBlogsByCategoryWithLimit($category , $start = 0 , $end = 0): array
     {
-        if($start!== 0 && $end!==0)
+        if($end!==0)
         return $this->db->query("select * from blog
                     INNER join categories on blog.blog_category = categories.cate_id 
                     where blog_status = 'live' && cate_name =:category LIMIT $start, $end " ,
@@ -68,7 +68,9 @@ WHERE blog.blog_id = :id ;
 
     public function getAllBlogsNoCondition(): array
     {
-        return $this->db->query("SELECT * FROM blog INNER JOIN categories on blog.blog_category = categories.cate_id  ")->fetchAll();
+        return $this->db->query("
+    SELECT *  FROM blog INNER JOIN categories  ON blog.blog_category = categories.cate_id INNER JOIN UsersInformation ON blog.author_id = UsersInformation.id
+")->fetchAll();
     }
 
     public function createBlogs($blog_title , $blog_body , $blog_picture , $blog_category ,$author_id, &$msg = []):bool

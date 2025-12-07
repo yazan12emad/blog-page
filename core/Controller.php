@@ -21,7 +21,7 @@ abstract class Controller
         return $_SERVER['REQUEST_METHOD'] === 'POST';
     }
 
-    #[NoReturn]
+
     public function redirect($url) : void
     {
         header('Location: /'.$url );
@@ -30,13 +30,14 @@ abstract class Controller
 
     public function navData():array{
         $this->session = Session::getInstance();
-        if($this->session->isGuest())
+
+        if($this->session->userRole() == 'guest')
         $navData = [
             'logIn' => false ,
             'role' =>'guest'
         ];
 
-        else if($this->session->isAdmin())
+        else if($this->session->userRole() == 'admin')
              $navData =
                  [
                  'logIn' => true ,
@@ -65,13 +66,13 @@ abstract class Controller
         return $content;
     }
 
-    public function partialRender(string $string, array $array = []):string
-    {
-        ob_start();
-        extract($array);
-        require_once ROOT_PATH . '/views/' . $string . '.php';
-        $content = ob_get_contents();
-        ob_end_clean();
-        return $content;
-    }
+//    public function partialRender(string $string, array $array = []):string
+//    {
+//        ob_start();
+//        extract($array);
+//        require_once ROOT_PATH . '/views/' . $string . '.php';
+//        $content = ob_get_contents();
+//        ob_end_clean();
+//        return $content;
+//    }
 }
