@@ -25,97 +25,73 @@ class BlogController extends Controller
         $this->categoriesModel = new CategoriesModel();
     }
 
-
-
-
-    public function showBlogs($queryParameters = []): string
+    public function showBlogs($category = null): string
     {
-            $page = $_GET['page'] ?? null ;
-
-        if (filter_var($page, FILTER_VALIDATE_INT) && !$page <= 1) {
-
-            preg_match('/^([0-9]*)([\w\-]*)/', $_GET['page'], $matches);
-
-            // if the user change the url and add characters to page
-            // this code will redirect him to page=1
-            if (!empty($matches[2])) {
-                if (!empty($queryParameters))
-                    $this->redirect('blog/' . $queryParameters . '?page=' . $matches[1]);
-                else
-                    $this->redirect('blog?page=' . $matches[1]);
-            }
-
-            $page =  $matches[0];
-            $start = ($page - 1) * 6;
-
-            // for pagination with categories
-            if (!empty($queryParameters)) {
-                $numberOfPages =ceil(count($this->blogModel->getBlogsByCategoryWithLimit($queryParameters)) / 6);
-                $blogs = $this->blogModel->getBlogsByCategoryWithLimit($queryParameters, $start, 6);
-                if($_GET['page'] > $numberOfPages)
-                    $this->redirect('blog?page=' . $numberOfPages);
-
-                return $this->render('blog.view',
-                    [
-                        'heading' => 'Blog',
-                        'results' => $blogs,
-                        'categories' => $this->categoriesModel->getCategories(),
-                        'pages' => $numberOfPages,
-                        'category' => $queryParameters,
-                    ]
-                );
-            }
-            // for pagination without category
-            else {
-                $numberOfPages =ceil(count($this->blogModel->getAllBlogs()) / 6);
-                $blogs =$this->blogModel->getBlogsByRowNumber($start, 6);
-
-                if($_GET['page'] > $numberOfPages)
-                    $this->redirect('blog?page=' . $numberOfPages);
-
-                return $this->render('blog.view',
-                    [
-                        'heading' => 'Blog',
-                        'results' => $blogs,
-                        'categories' => $this->categoriesModel->getCategories(),
-                        'pages' => $numberOfPages,
+        // To prevent the user from retrieving all existing blogs at once
+//        if(!isset($_GET['page'])) {
+//
+//            $this->redirect('blog?page=1');
+//
+//        }
 
 
-                    ]
-                );
-            }
+        $page = $_GET['page'] ?? 1 ;
+
+            // the number action(page) must be: 1- int / 2 bigger than 0
+
+        if (!filter_var($page, FILTER_VALIDATE_INT) || $page < 0) {
+            $page =1 ;
         }
 
-        $this->redirect('blog?page=1');
-    }
 
 
+        $numberOfAllowBlogsInPage = 6;
+
+        // to return the blogs that related to these category , for set up the pagination pages
+
+            $numberOfPagesInPagination = !empty($category)
+                ? ceil(count($this->blogModel->getBlogsByCategoryWithLimit($category)) / $numberOfAllowBlogsInPage)
+                : ceil(count($this->blogModel->getAllBlogs()) / $numberOfAllowBlogsInPage);
+        ;
+
+                $page = $page > $numberOfPagesInPagination ? $numberOfPagesInPagination :$page ;
 
 
+            $start = ($page - 1) * $numberOfAllowBlogsInPage;
+
+            $blogs = !empty($category)
+                ? $this->blogModel->getBlogsByCategoryWithLimit($category, $start, $numberOfAllowBlogsInPage)
+                : $this->blogModel->getBlogsByRowNumber($start, $numberOfAllowBlogsInPage);
+
+
+        return $this->render('blog.view',
+                [
+                    'heading' => 'Blog',
+                    'results' => $blogs,
+                    'categories' => $this->categoriesModel->getCategories(),
+                    'pages' => $numberOfPagesInPagination,
+                    'category' => $category,
+                ]
+            );
+            }
 
 
     public function createNewBlog()
     {
         if ($this->isPost()) {
-            $your_secret = "6LfNiAAsAAAAANEvg8Mf3UzbwxZE_quOdK7IfL_s";
-            $client_captcha_response = $_POST['g-recaptcha-response'] ?? '';
-            $user_ip = $_SERVER['REMOTE_ADDR'];
-            $data = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=$your_secret&response=$client_captcha_response&remoteip=$user_ip");
-            $response = json_decode($data, true);
-            $captchaSuccess = $response['success'] ?? false;
 
 
-            if (!$captchaSuccess) {
+            $captchaSuccessResponse = $this->blogModel->captcha_response();
+            if (!$captchaSuccessResponse) {
                 $this->msg = 'You need to check "I am not a robot".';
                 header('Content-Type: application/json');
                 echo json_encode([
                     'successAdd' => false,
-                    'successCheck' => $captchaSuccess,
+                    'successCheck' => $captchaSuccessResponse,
                     'message' => $this->msg,
                 ]);
                 exit();
             }
-
 
             $blog_title = $_POST['blog_title'] ?? '';
             $blog_body = $_POST['blog_body'] ?? '';
@@ -127,7 +103,7 @@ class BlogController extends Controller
             header('Content-Type: application/json');
             echo json_encode([
                 'successAdd' => $result,
-                'successCheck' => $captchaSuccess,
+                'successCheck' => $captchaSuccessResponse,
                 'message' => $this->msg,
             ]);
             exit();

@@ -30,6 +30,7 @@ class AdminSite extends Controller
     public  function showSite(array $extra = [])
     {
         if($this->session->userRole() == 'admin')
+
         return $this->render('adminSite.view' ,
             array_merge([
                 'heading' => 'admin',
@@ -39,6 +40,7 @@ class AdminSite extends Controller
                     'userCount'=> count($this->usersData)
                 ]
          , $extra));
+
         else {
             $this->redirect('home');
         return false;

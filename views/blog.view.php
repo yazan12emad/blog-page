@@ -481,7 +481,7 @@ require "views/partials/banner.php";
                     'Accept': 'application/json',
                 }
             });
-            const data = JSON.parse(await res.text());
+            const data = await res.json();
 
             if (data.successAdd && data.successCheck) {
                 alert('Success: ' + data.message);

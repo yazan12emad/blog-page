@@ -10,13 +10,12 @@ use app\core\session;
 
 class UploadFiles
 {
-//    protected ;
     protected $session;
+
 
 
     public function __construct()
     {
-       // $this->db = new DataBase();
         $this->session = Session::getInstance();
 
     }
@@ -30,11 +29,7 @@ class UploadFiles
         $newFileName = uniqid("profile_", true) . "." . pathinfo($file['name'], PATHINFO_EXTENSION);
         $target_file = $target_dir . $newFileName;
 
-        //Is this necessary ?
-        //
-//        if (!is_dir($target_dir)) {
-//            mkdir($target_dir, 0755, true);
-//        }
+
 
         if (move_uploaded_file($file['tmp_name'], $target_file)) {
 
@@ -76,6 +71,7 @@ class UploadFiles
 
     public function validSize(array $file, &$msg = []): bool
     {
+
         if ($file['size'] >= 5000000) {
             $msg['errorUploadImg'] = "Sorry, your file is too large.";
             return false;

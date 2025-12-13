@@ -143,7 +143,7 @@ class AdminSiteModel
 
     public function getBlogs(): array
     {
-        return $this->BlogModel->getAllBlogsNoCondition();
+        return $this->BlogModel->getAllBlogs();
     }
 
     public function getBlogById($id): array{

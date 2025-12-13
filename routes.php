@@ -54,6 +54,8 @@ return  [
     '/admin/blog/update'=> [AdminSite::class , 'editBlog'],
 
     '/like'=> [FullViewController::class , 'addLike'],
+    '/comment'=> [FullViewController::class , 'addComment'],
+    '/reply'=> [FullViewController::class , 'addComment'],
     '/Full-Blog\/([\w\-\.\,\d]+)\/([\d]+)'=> [FullViewController::class , 'showBlog'],
 
 
