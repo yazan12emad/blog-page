@@ -1,5 +1,7 @@
 <?php
 
+// simplify done
+
 namespace app\controllers;
 
 use app\core\Controller;
@@ -13,11 +15,10 @@ class AdminSite extends Controller
     private session $session;
     private array $usersData;
     private array $categoriesData;
-    private array  $blogData;
+    private array $blogData;
 
-
-
-    public  function __construct(){
+    public function __construct()
+    {
         $this->adminSiteModel = new AdminSiteModel();
         $this->session = Session::getInstance();
 
@@ -27,184 +28,182 @@ class AdminSite extends Controller
 
     }
 
-    public  function showSite(array $extra = [])
+    public function showSite()
     {
-        if($this->session->userRole() == 'admin')
+        if (!$this->requireRole('admin')) {
+            $this->redirect('home');
+        }
 
-        return $this->render('adminSite.view' ,
-            array_merge([
+        return $this->render('adminSite.view',
+            [
                 'heading' => 'admin',
-                'adminName'=> $this->session->get('userName'),
-                'categoryCount' =>count($this->categoriesData),
-                'blogCount' =>count($this->blogData),
-                    'userCount'=> count($this->usersData)
-                ]
-         , $extra));
-
-        else {
-            $this->redirect('home');
-        return false;
-        }
-    }
-    public function showUsers():void
-    {
-
-        Header('content-type: application/json');
-        echo JSON_encode([
-            'success' => true ,
-                'users' => $this->usersData ,
+                'adminName' => $this->session->get('userName'),
+                'categoryCount' => count($this->categoriesData),
+                'blogCount' => count($this->blogData),
+                'userCount' => count($this->usersData)
             ]
-
         );
-        exit;
 
     }
 
-    public function editUser():void
+    public function showUsers(): void
     {
-        if($this->isPost()) {
+        $this->jsonResponse(['success' => true, 'users' => $this->usersData]);
 
+    }
 
-            if ($_POST['action'] === 'showToEdit') {
-                Header('content-type: application/json');
-
-                echo JSON_encode([
-                    'success' => true,
-                    'userData' => $this->adminSiteModel->getUserById($_POST['id']),
-                ]);
-                exit;
-
-            }
-
-            if ($_POST['action'] === 'updateUser') {
-                Header('content-type: application/json');
-                echo JSON_encode([
-                    'success' => $this->adminSiteModel->updateUserData($_POST, $msg),
-                    'message' => $msg,
-                    'post' => $_POST,
-
-                ]);
-                exit;
-
-            }
+    public function editUser(): void
+    {
+        if (!$this->isPost()) {
+            $this->redirect('admin');
         }
-        else
-            $this->redirect('home');
+
+        if ($this->post('action') === 'showToEdit') {
+
+            Header('content-type: application/json');
+            $this->jsonResponse([
+                'success' => true,
+                'userData' => $this->adminSiteModel->getUserById($this->post('id'))]);
+
+        }
+
+        if ($this->post('action') === 'updateUser') {
+
+            $this->jsonResponse(['success' => $this->adminSiteModel->updateUserData($this->post(), $msg),
+                'message' => $msg,
+                'post' => $this->post(),
+            ]);
+
+
+        }
+
 
     }
 
-    public  function deleteUser(): void
+    public function deleteUser(): void
     {
-        Header('content-type: application/json');
-        echo JSON_encode([
-            'success' => $this->adminSiteModel->deleteUser($_POST['id'] , $msg) ,
-            'message'=>$msg,
-        ]);
-        exit;
-    }
-
-    public  function showCategories():void
-    {
-        Header('content-type: application/json');
-        echo JSON_encode([
-            'success' => true ,
-            'categories' => $this->categoriesData ,
-        ]);
-        exit;
-
-    }
-
-
-public function editCategory():void{
-    if ($_POST['action'] === 'showCategory') {
-        Header('content-type: application/json');
-
-        echo JSON_encode([
-            'success' => true,
-            'category' => $this->adminSiteModel->getCategoryById($_POST['cate_id']),
-        ]);
-        exit;
-
-    }
-
-    if ($_POST['action'] === 'updateCategory') {
-        Header('content-type: application/json');
-        echo JSON_encode([
-            'success' => $this->adminSiteModel->updateCategory($_POST , $msg),
-            'message' => $msg
-        ]);
-
-        exit;
-
-    }
-
-
-}
-
-    public function deleteCategory(): void{
-        header('content-type: application/json');
-        echo JSON_encode([
-            'success' => $this->adminSiteModel->deleteCategory($_POST['cate_id'] , $msg) ,
+        $this->jsonResponse(['success' => $this->adminSiteModel->deleteUser($this->post('id'), $msg),
             'message' => $msg,
         ]);
-        exit;
+
+    }
+
+    public function showCategories(): void
+    {
+        $this->jsonResponse([
+            'success' => true,
+            'categories' => $this->categoriesData,
+        ]);
 
 
     }
-        public  function showBlog():void
-        {
-            Header('content-type: application/json');
-            echo JSON_encode([
-                'success' => true ,
-                'blogs' => $this->blogData ,
-            ]);
-            exit;
 
 
+    public function editCategory(): void
+    {
+        if (!$this->isPost()) {
+            $this->redirect('admin');
         }
 
-        public function editBlog():void{
+        $action = $this->post('action');
 
-            if($_POST['action'] == 'showBlog'){
+        if (!$action) {
+            $this->jsonResponse([
+                'success' => false,
+                'message' => 'There is no action',]);
+        }
 
-                Header('content-type: application/json');
-                echo JSON_encode([
+        switch ($action) {
+            case 'showCategory':
+                $this->jsonResponse([
                     'success' => true,
-                    'blog' =>$this->adminSiteModel->getBlogById($_POST['blog_id']),
+                    'category' => $this->adminSiteModel->getCategoryById($this->post('cate_id'))
                 ]);
-                exit;
+                break;
 
-            }
-
-            if($_POST['action'] == 'updateBlog'){
-                header('content-type: application/json');
-                echo JSON_encode([
-                    'success' =>$this->adminSiteModel->updateBlog($_POST , $msg) ,
-                    'message' => $msg ,
+            case 'updateCategory':
+                $this->jsonResponse([
+                    'success' => $this->adminSiteModel->updateCategory($this->post(), $msg),
+                    'message' => $msg
                 ]);
-                exit;
+                break;
 
-            }
-
-
-
+            default:
+                $this->jsonResponse([
+                    'success' => false,
+                    'message' => 'There was a problem with the action',
+                ]);
 
         }
 
-        public function deleteBlog():void{
-            Header('content-type: application/json');
-            echo JSON_encode([
-                'success' => $this->adminSiteModel->deleteBlog($_POST['blog_id'] , $msg) ,
-                'message' => $msg ,
+    }
+
+    public function deleteCategory(): void
+    {
+        $this->jsonResponse([
+            'success' => $this->adminSiteModel->deleteCategory($this->post('cate_id'), $msg),
+            'message' => $msg,
+        ]);
+
+    }
+
+    public function showBlog(): void
+    {
+        $this->jsonResponse([
+            'success' => true,
+            'blogs' => $this->blogData,
+        ]);
+
+    }
+
+    public function editBlog(): void
+    {
+        if (!$this->isPost()) {
+            $this->redirect('admin');
+        }
+
+        $action = $this->post('action');
+
+        if (!$action) {
+            $this->jsonResponse([
+                'success' => false,
+                'message' => 'There is no action',
             ]);
-            exit;
+        }
 
+        switch ($action) {
+            case 'showBlog':
+                $this->jsonResponse([
+                    'success' => true,
+                    'blog' => $this->adminSiteModel->getBlogById($this->post('blog_id')),
+                ]);
+                break;
 
+            case 'updateBlog':
+                $this->jsonResponse([
+                    'success' => $this->adminSiteModel->updateBlog($this->post(), $msg),
+                    'message' => $msg,
+                ]);
+                break;
+            default:
+                $this->jsonResponse([
+                    'success' => false,
+                    'message' => 'There was a problem with the action',
+                ]);
         }
 
 
+    }
+
+    public function deleteBlog(): void
+    {
+        $this->jsonResponse([
+            'success' => $this->adminSiteModel->deleteBlog($this->post('blog_id'), $msg),
+            'message' => $msg,
+        ]);
 
 
+    }
 
 
 }

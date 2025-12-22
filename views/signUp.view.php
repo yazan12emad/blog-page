@@ -35,7 +35,12 @@
 
             <form id="registrationForm"  class="py-6 px-8"  method="POST">
                 <!-- Display PHP errors here if any -->
-
+                <!-- Success message (hidden by default) -->
+                <?php if(isset($success) && !$success): ?>
+                    <div id="successMessage" class="mb-4 p-3 bg-red-100 text-red-700 text-sm rounded-md ">
+                        <?php echo $message['signUpPageError'] ?? ''; ?>
+                    </div>
+                <?php endif; ?>
 
                 <div class="mb-4">
 
@@ -50,12 +55,6 @@
                                class="form-input pl-10 w-full rounded-md border-gray-300 focus:border-blue-500"
                                placeholder="Enter your username">
                     </div>
-                    <?php
-                    if (isset($error['UserNameError'])): ?>
-                    <div class="text-xs text-red-500 mt-1">
-                            <?php echo $error['UserNameError'];  ?>
-
-                    <?php endif; ?>
                 </div>
 
 
@@ -70,12 +69,7 @@
                                class="form-input pl-10 w-full rounded-md border-gray-300 focus:border-blue-500"
                                placeholder="Enter your email">
                     </div>
-                    <?php
-                    if (isset($error['emailAddressError'])):  ?>
-                    <div class="text-xs text-red-500 mt-1">
-                        <?php echo $error['emailAddressError'];  ?>
 
-                        <?php endif; ?>
                 </div>
 
 
@@ -103,13 +97,6 @@
 
                         </div>
                     </div>
-                    <?php
-                    if (isset($error['passwordError'])): ?>
-                        <div class="text-xs text-500 mt-1">
-                            <?php echo $error['passwordError']; ?>
-
-                        </div>
-                    <?php endif; ?>
                 </div>
 
 <br>
@@ -141,17 +128,6 @@
                         Create Account
                     </button>
                 </div>
-                    <?php
-                    if (isset($error['generalError'])): ?>
-                        <div class="text-xs text-500 mt-1">
-                            <?php echo $error['generalError']; ?>
-
-                        </div>
-                    <?php endif; ?>
-
-
-                <!-- log in button   -->
-
                 <div class="text-center text-sm text-gray-600">
                     Already have an account?
                     <a href="login" class="text-blue-600 font-medium hover:underline">Sign in</a>
@@ -198,12 +174,7 @@
         }
     });
 
-
-
-
 </script>
-
-
 <?php      require "views/partials/footer.php"; ?>
 </body>
 </html>

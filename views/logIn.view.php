@@ -1,3 +1,10 @@
+<?php
+/**
+ * @var array $message
+ */
+
+?>
+
 <!DOCTYPE html>
 <html lang="en" class="h-full bg-gray-100">
 <head>
@@ -37,9 +44,9 @@
 
             <form id="loginForm" class="py-6 px-8" method="POST" action="" >
                 <!-- Display PHP errors here if any -->
-                <?php if (isset($error['generalError'])): ?>
-                    <div class="mb-4 p-3 bg-red-100 text-red-700 text-sm rounded-md">
-                        <?php echo $error['generalError']; ?>
+                <?php if(isset($success) && !$success): ?>
+                    <div id="failureMessage" class="mb-4 p-3 bg-red-100 text-red-700 text-sm rounded-md ">
+                        <?php echo $message['logInPageError'] ?? ''; ?>
                     </div>
                 <?php endif; ?>
 
@@ -54,11 +61,7 @@
                                class="form-input pl-10 w-full rounded-md border-gray-300 focus:border-blue-500"
                                placeholder="Enter your email or username">
                     </div>
-                    <?php if (isset($error['UserNameError']) || isset($error['emailAddressError'])): ?>
-                        <div class="text-xs text-red-500 mt-1">
-                            <?php echo $error['UserNameError'] ?? $error['emailAddressError']; ?>
-                        </div>
-                    <?php endif; ?>
+
                 </div>
 
                 <!-- Password -->
@@ -75,11 +78,7 @@
                             <i class="password-toggle fas fa-eye-slash text-gray-400" id="togglePassword"></i>
                         </div>
                     </div>
-                    <?php if (isset($error['passwordError'])): ?>
-                        <div class="text-xs text-red-500 mt-1">
-                            <?php echo $error['passwordError']; ?>
-                        </div>
-                    <?php endif; ?>
+
                 </div>
 
                 <!-- Remember me & Forgot password -->

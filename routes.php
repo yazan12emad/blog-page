@@ -22,7 +22,9 @@ return  [
 
     // blog class
 
-    '/blog/([\w\-]+)' => [BlogController::class, 'showBlogs'],
+    '/blog/([\w\d\-]+)' => [BlogController::class, 'showBlogs'],
+    '/blog/filter' => [BlogController::class, 'showBlogs'],
+
     '/blog' => [BlogController::class, 'showBlogs'],
     '/blog/create'=> [BlogController::class, 'createNewBlog'],
     '/blog/delete'=> [BlogController::class, 'deleteBlog'],

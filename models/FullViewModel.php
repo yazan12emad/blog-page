@@ -3,6 +3,7 @@
 namespace app\models;
 
 use app\core\DataBase;
+use app\core\Session;
 use Exception;
 
 class FullViewModel
@@ -10,16 +11,23 @@ class FullViewModel
     public DataBase $DB;
     public ValidationClass $ValidationClass;
 
+    private session $session;
+
+
     public function __construct()
     {
+        $this->session = Session::getInstance();
         $this->ValidationClass = new ValidationClass();
         $this->DB = DataBase::getInstance();
 
     }
 
-    public function likeAction($action, $blog_id, $user_id, &$msg = null): bool
+
+
+    public function likeAction($action, $blog_id, &$msg = null): bool
     {
         try {
+            $user_id = $this->session->get('id');
             if (!$this->checkIfUserLikes($blog_id, $user_id)) {
 
                 $this->DB->query('update blog set Likes = Likes+1 WHERE blog_id =:blog_id', [
@@ -32,6 +40,8 @@ class FullViewModel
                     'Action' => $action
 
                 ]);
+                $msg = 'like added ';
+
 
             } else {
                 $this->DB->query('update blog set Likes = Likes-1 WHERE blog_id =:blog_id', [
@@ -43,6 +53,7 @@ class FullViewModel
                     'blog_id' => $blog_id
                     , 'User_id' => $user_id]);
 
+                $msg = 'like removed ';
             }
         }
         catch (Exception $e) {
@@ -53,38 +64,52 @@ class FullViewModel
 
     }
 
-    public function checkIfUserLikes($blog_id, $User_id)
+    public function checkIfUserLikes($blog_id)
     {
+        $User_id = $this->session->get('id');
+
         if ($this->DB->query('SELECT * from likes where Blog_id =:Blog_id AND User_id =:User_id  ', [
                 'Blog_id' => $blog_id
                 , 'User_id' => $User_id
             ])->rowCount() !== 0)
-            return 'true';
+            return 1;
         else
-            return 'false';
+            return 0;
 
     }
 
-    public function addComment($commentData, $user_id, &$msg = null)
+    public function addComment($commentData, &$msg )
     {
         $comment_text = $commentData['comment_body'];
-        if (!$this->ValidationClass->notEmpty($comment_text, $msg)) {
+        $user_id = $this->session->get('id');
+        try {
+            if (!$this->ValidationClass->notEmpty($comment_text, $msg)) {
+                $msg = 'the message is empty';
+                return false;
+            }
+
+
+            if ($this->insertComment($commentData['commented_blog_id'], $user_id, $comment_text, $commentData['parent_comment_id']?? null , $msg))
+                return true;
+            else
+                return false;
+
+        }
+        catch (Exception $e) {
+
+            $msg = $e->getMessage();
             return false;
         }
 
-        if ($this->insertComment($commentData['commented_blog_id'], $user_id, $comment_text, $commentData['parent_comment_id'], $msg))
-            return true;
-        else
-            return false;
+        }
 
 
-    }
+
 
 
     public function insertComment($blog_id, $user_id, $comment_text, $parent_comment_id, &$msg = null)
     {
         try {
-
 
             if (empty($parent_comment_id)) {
                 if ($this->DB->query('insert into comment_system(User_id,blog_id , comment_text) VALUES(:User_id , :blog_id ,:comment_text )', [
@@ -116,7 +141,7 @@ class FullViewModel
             }
         }
         catch (Exception $e) {
-            $msg = $e->getMessage();
+            $msg ='samkdalskd';
             return false;
         }
 

@@ -6,7 +6,6 @@ namespace app\models;
 use app\core\session;
 
 
-
 class ValidationClass
 {
     protected Session $session;
@@ -18,47 +17,46 @@ class ValidationClass
     }
 
 
-    public function notEmpty($value , &$msg = []): bool
+    public function notEmpty($value , &$messages = []): bool
     {
-        if (empty($value) ||strlen(trim($value)) === 0) {
-            $msg = 'This field is required.';
+        if (empty($value) || strlen(trim($value)) === 0) {
+            $messages = 'This field is required.';
             return false;
         }
-
         return true;
     }
 
-    public function validateUserNameEdit($currentUserName, $newUserName, &$msg =[] ): bool
+    public function validateUserNameEdit($currentUserName, $newUserName, &$messages =[] ): bool
     {
         if (!$this->notEmpty($newUserName)) {
-            $msg['UserNameError'] = 'user name must at least contain letters and numbers';
+            $messages['UserNameError'] = 'user name must at least contain letters and numbers';
             return false;
         } else if ($currentUserName == $newUserName) {
-            $msg['UserNameError'] = 'Its the same user name ';
+            $messages['UserNameError'] = 'Its the same user name ';
             return false;
         } else
             return true;
 
     }
 
-    function validateEmail($emailAddress , &$msg=[]): bool
+    function validateEmail($emailAddress , &$messages=[]): bool
     {
 
         if ((!$this->notEmpty($emailAddress)) || (!filter_var($emailAddress, FILTER_VALIDATE_EMAIL))) {
-            $msg['emailAddressError'] = 'email address must not be empty';
+            $messages['emailAddressError'] = 'email address must not be empty';
             return false;
         }
             return true;
 
     }
 
-    public function validateEmailEdit($currentUserEmail, $emailAddress, &$msg =[] ): bool|string
+    public function validateEmailEdit($currentUserEmail, $emailAddress, &$messages =[] ): bool|string
     {
         if (!$this->validateEmail($emailAddress)) {
-            $msg['emailAddressError'] = 'email address is Invalid';
+            $messages['emailAddressError'] = 'email address is Invalid';
             return false;
         } else if ($currentUserEmail === $emailAddress) {
-            $msg['emailAddressError'] = 'email address is the same email';
+            $messages['emailAddressError'] = 'email address is the same email';
             return false;
         } else   {
 
@@ -67,32 +65,32 @@ class ValidationClass
 
     }
 
-    public function validationPassword($password , &$msg = null): bool
+    public function validationPassword($password , &$messages = null): bool
     {
         if (!$this->notEmpty($password) || strlen($password) < 7){
-            $msg['passwordError'] = 'Password must be at least 8 characters long';
+            $messages['passwordError'] = 'Password must be at least 8 characters long';
             return false;
     }
             return true;
     }
 
 
-    public function validateNewPasswordEdit($oldPasswordHash, $currentPasswordInput, $newPasswordInput, &$msg = null): bool
+    public function validateNewPasswordEdit($oldPasswordHash, $currentPasswordInput, $newPasswordInput, &$messages = null): bool
     {
         if (!$this->validationPassword($currentPasswordInput)) {
-            $msg['currentPasswordError'] = "Password must be at least 7 characters long";
+            $messages['currentPasswordError'] = "Password must be at least 7 characters long";
             return false;
         }
         else if (!$this->validationPassword($newPasswordInput)) {
-            $msg['newPasswordError'] = 'New password format is invalid';
+            $messages['newPasswordError'] = 'New password format is invalid';
             return false;
         }
         else if (password_verify($currentPasswordInput, $oldPasswordHash)) {
-            $msg['currentPasswordError'] = 'Current password is incorrect';
+            $messages['currentPasswordError'] = 'Current password is incorrect';
             return false;
         }
         else if (password_verify($newPasswordInput, $oldPasswordHash)) {
-            $msg['newPasswordError'] = 'New password cannot be the same as old password';
+            $messages['newPasswordError'] = 'New password cannot be the same as old password';
             return false;
         }
         else {

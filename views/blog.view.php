@@ -52,6 +52,62 @@ require "views/partials/banner.php";
 
 <!-- Main Content -->
 <main>
+    <!-- create filter  -->
+
+    <div id="setFilter" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">choose filter </h2>
+
+                    <button id="closefilterBtn" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+
+
+                <form id="filterForm" class="space-y-6">
+
+                    <!-- Blog Title -->
+                    <div>
+                        <label for="filter" class="block text-sm font-medium text-gray-700 mb-1">Number of blogs in each page</label>
+                        <input type="text" id="filterNumberOfBlogInPage" name="filterNumberOfBlogInPage" required
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                               placeholder="Number of blogs in each page less than 30">
+                    </div>
+
+
+                    <!-- Categories -->
+                    <div>
+                        <label for="categoryFilter" class="block text-sm font-medium text-gray-700 mb-1">Category filter </label>
+                        <select id="categoryFilter" name="categoryFilter" required
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                            <option value="" disabled selected> Select a category</option>
+                        </select>
+                    </div>
+
+
+                    <!-- Form Actions -->
+                    <div class="flex justify-end space-x-3 pt-4">
+                        <button type="button" id="cancelBtn"
+                                class="px-5 py-2.5 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors">
+                            Cancel
+                        </button>
+
+
+                        <button type="submit" id="submitFilterBtn"
+                                class="px-5 py-2.5 gradient-bg text-white rounded-lg hover:opacity-90 transition-opacity">
+                            Create filter
+                        </button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- create blog  -->
+
     <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <!-- Page Header -->
         <div class="mb-8">
@@ -60,13 +116,20 @@ require "views/partials/banner.php";
         </div>
 
         <!-- Create New Blog Button -->
-        <div class="mb-10 text-right">
-            <button id="createBlogBtn"
-                    class="gradient-bg text-white px-6 py-3 rounded-lg font-medium hover:opacity-90 transition-opacity shadow-md hidden">
-                <i class="fas fa-plus mr-2"></i>Create New Blog
+        <div class="mb-10 flex justify-between">
+            <!-- Left button -->
+            <button id="filterBtn"
+                    class="gradient-bg text-white px-6 py-3 rounded-lg font-medium hover:opacity-90 transition-opacity shadow-md">
+                <i class="fas fa-plus mr-2"></i>Filtering
             </button>
 
+            <!-- Right button -->
+            <button id="createBlogBtn"
+                    class="gradient-bg text-white px-6 py-3 rounded-lg font-medium hover:opacity-90 transition-opacity shadow-md">
+                <i class="fas fa-plus mr-2"></i>Create New Blog
+            </button>
         </div>
+
 
         <!-- Blog Grid -->
         <div id="blogGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -78,7 +141,7 @@ require "views/partials/banner.php";
                 <!-- first button  -->
 
         <?php
-        $page = isset($_GET['page']) && $_GET['page'] > 0 ? (int)$_GET['page'] : 1;
+        $page = isset($_GET['page']) && $_GET['page'] > 0 ? $_GET['page'] : 1;
         if ($page > $pages)
                  $page = $pages;
 
@@ -268,6 +331,15 @@ require "views/partials/banner.php";
     const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
     const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
     const deleteCategoryName = document.getElementById('deleteBlog');
+
+
+    const filterBtn = document.getElementById('filterBtn');
+    const setFilter = document.getElementById('setFilter');
+    const submitFilterBtn = document.getElementById('submitBtn');
+    const closeFilterBtn = document.getElementById('closefilterBtn');
+    const categoryFilter = document.getElementById('categoryFilter');
+    const filterForm = document.getElementById('filterForm');
+
     let currentBlogId = null;
     let currentBlogTitle = null;
 
@@ -316,9 +388,52 @@ require "views/partials/banner.php";
 
     });
 
+    // filtering functions
+
+    filterBtn.addEventListener('click', () => {
+        setFilter.classList.remove('hidden');
+    });
+
+    closeFilterBtn.addEventListener('click', () => {
+        setFilter.classList.add('hidden');
+    });
+
+    cancelBtn.addEventListener('click', () => {
+        setFilter.classList.add('hidden');
+    });
+
+
+
+    filterForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const category = categoryFilter.value;
+        const limit = filterNumberOfBlogInPage.value;
+
+        const params = new URLSearchParams({
+            limit: limit
+        });
+
+        window.location.href = `/blog/${category}?${params.toString()}`;
+    });
+
+
     blogForm.addEventListener('submit', function (e) {
         const blogBodyInput = document.getElementById('blog_body');
         blogBodyInput.value = quill.root.innerHTML;
+    });
+
+    function populateCategoriesInFilter() {
+        categories.forEach(category => {
+            const option = document.createElement('option');
+            option.value = category.cate_name;
+            option.textContent = category.cate_name;
+            categoryFilter.appendChild(option);
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        populateCategoriesInFilter();
     });
 
 
@@ -437,13 +552,13 @@ require "views/partials/banner.php";
             option.value = category.cate_id;
             option.textContent = category.cate_name;
             blogCategorySelect.appendChild(option);
+
         });
     }
 
     // Event Listeners
     createBlogBtn.addEventListener('click', () => {
         createBlogModal.classList.remove('hidden');
-
     });
 
     closeModalBtn.addEventListener('click', () => {
@@ -559,7 +674,6 @@ require "views/partials/banner.php";
     document.addEventListener('DOMContentLoaded', () => {
         <?php if($navData['logIn']): ?>
         createBlogBtn.classList.remove('hidden');
-
         <?php endif ?>
 
         renderBlogs();

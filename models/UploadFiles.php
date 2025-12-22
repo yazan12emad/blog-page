@@ -1,10 +1,6 @@
 <?php
 
 namespace app\models;
-if (!defined('SECURE_BOOT')) {
-    header('Location: ../');
-    die('Direct access is not permitted.');
-}
 
 use app\core\session;
 
@@ -19,16 +15,15 @@ class UploadFiles
         $this->session = Session::getInstance();
 
     }
-    public function addImg( $file = [],  &$msg = []): false|string
+    public function addImg($file, &$msg): false|string
     {
+
         if (!$this->checkIsItImg($file,$msg)) {
             return false;
         }
-
         $target_dir = "public/";
         $newFileName = uniqid("profile_", true) . "." . pathinfo($file['name'], PATHINFO_EXTENSION);
         $target_file = $target_dir . $newFileName;
-
 
 
         if (move_uploaded_file($file['tmp_name'], $target_file)) {
@@ -44,8 +39,9 @@ class UploadFiles
     }
 
 
-    public function checkIsItImg( $file = [], &$msg = []): bool
+    public function checkIsItImg($file , &$msg ): bool
     {
+
 
         if (empty($file['tmp_name'])) {
             $msg['errorUploadImg'] = "No file uploaded.";
@@ -53,18 +49,17 @@ class UploadFiles
         }
 
         $check = @getimagesize($file['tmp_name']);
-
         if ($check !== false) {
+
             if ($check[2] == IMAGETYPE_PNG) {
                 return $this->validSize($file, $msg);
-            } else {
+            }
                 $msg['errorUploadImg'] = "The image must be .png";
                 return false;
-            }
-        } else {
+        }
             $msg['errorUploadImg'] = "File is not an image.";
             return false;
-        }
+
     }
 
 

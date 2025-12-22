@@ -18,26 +18,34 @@ class ResetPasswordModel extends Model{
 
     public function getToken($userId)
     {
-        return $this->getDb()->query(
-            'SELECT `token` FROM `reset_tokens` WHERE
-                                       `user_id` = :userId
-                                     AND used = 0 
-                                   ORDER BY expired_at DESC LIMIT 1',
-            [
-                ':userId' => $userId,
-            ]
-        )->fetch(\PDO::FETCH_ASSOC);
+        try {
+            return $this->getDb()->query(
+                'SELECT `token` FROM `reset_tokens` WHERE`user_id` = :userId AND used = 0 ORDER BY expired_at DESC LIMIT 1',
+                [
+                    ':userId' => $userId,
+                ]
+            )->fetch(\PDO::FETCH_ASSOC);
+        }
+        catch (\PDOException $e) {
+            return false ;
+        }
     }
 
 
     public function markTokenAsUsed($userId, $token)
     {
-
-        $this->getDb()->query('UPDATE `reset_tokens` SET used = 1 WHERE user_id = :userId AND token = :token',
-            [
-                ':userId' => $userId,
-                ':token' => $token,
-            ]
-        );
+        try {
+            $this->getDb()->query('UPDATE `reset_tokens` SET used = 1 WHERE user_id = :userId AND token = :token',
+                [
+                    ':userId' => $userId,
+                    ':token' => $token,
+                ]
+            );
+        }
+        catch (\PDOException $e) {
+            return false ;
+        }
+        return true;
     }
+
 }

@@ -86,6 +86,9 @@
                             <h3 class="text-lg font-semibold text-gray-800 mb-2">
                                 <?php echo htmlspecialchars($category['cate_name']); ?>
                             </h3>
+                            <h4 class="text-lg font-semibold text-gray-800 mb-2">
+                                <?php echo htmlspecialchars($category['description']); ?>
+                            </h4>
 
 
                             <!-- Action Buttons (******* to show the categories that the user selected ) -->
@@ -103,12 +106,15 @@
                                 <?php if ($navData['role'] === 'admin'): ?>
                                     <button class="edit-category-btn bg-yellow-500 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-yellow-600 transition-colors"
                                             data-id="<?php echo $category['cate_id']; ?>"
-                                            data-name="<?php echo htmlspecialchars($category['cate_name']); ?>">
+                                            data-name="<?php echo htmlspecialchars($category['cate_name']); ?> "
+                                            data-description="<?= htmlspecialchars($category['description']); ?>">
+
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <button class="delete-category-btn bg-red-500 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-red-600 transition-colors"
-                                            data-id="<?php echo $category['cate_id']; ?>"
-                                            data-name="<?php echo htmlspecialchars($category['cate_name']); ?>">
+                                    <button
+                                            class="delete-category-btn bg-red-500 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-red-600 transition-colors"
+                                            data-id="<?= $category['cate_id']; ?>"
+                                            data-name="<?= htmlspecialchars($category['cate_name']); ?>">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 <?php endif; ?>
@@ -162,6 +168,18 @@
                         Category Name <span class="text-red-500">*</span>
                     </label>
                     <input type="text" id="categoryName" name="cate_name" required
+                           maxlength="50"
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
+                           placeholder="Enter category name">
+                    <p class="text-xs text-gray-500 mt-1">Maximum 50 characters</p>
+                </div>
+                <div>
+                    <!-- Category description -->
+
+                    <label for="cate_desc" class="block text-sm font-medium text-gray-700 mb-2">
+                        Category description <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" id="categoryDescription" name="cate_desc" required
                            maxlength="50"
                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
                            placeholder="Enter category name">
@@ -248,11 +266,14 @@
     }
 
     // Open Edit Category Modal
-    function openEditModal(categoryId, categoryName) {
+    function openEditModal(categoryId, categoryName , categoryDesc) {
         modalTitle.textContent = 'Edit Category';
         submitBtn.innerHTML = '<i class="fas fa-save mr-2"></i>Update Category';
+
         document.getElementById('categoryId').value = categoryId;
         document.getElementById('categoryName').value = categoryName;
+        document.getElementById('categoryDescription').value = categoryDesc;
+
         categoryModal.classList.remove('hidden');
         document.body.style.overflow = 'hidden';
 
@@ -295,7 +316,10 @@
             const button = e.target.classList.contains('edit-category-btn') ? e.target : e.target.closest('.edit-category-btn');
             const categoryId = button.getAttribute('data-id');
             const categoryName = button.getAttribute('data-name');
-            openEditModal(categoryId, categoryName);
+            const categoryDesc = button.getAttribute('data-description');
+            console.log(categoryDesc);
+            console.log(button);
+            openEditModal(categoryId, categoryName ,categoryDesc);
         }
 
         // Delete button click
@@ -326,6 +350,8 @@
 
         const categoryName = document.getElementById('categoryName').value.trim();
         const categoryId = document.getElementById('categoryId').value || '';
+        const categoryDescription = document.getElementById('categoryDescription').value || '';
+
 
         // Validation
         if (!categoryName) {
@@ -339,6 +365,12 @@
             document.getElementById('categoryName').focus();
             return;
         }
+        if (categoryDescription.length > 50) {
+            alert('Category cescription must be less than 50 characters');
+            document.getElementById('categoryDescription').focus();
+            return;
+        }
+
         // validation end
 
         // Show loading state

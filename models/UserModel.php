@@ -2,90 +2,167 @@
 
 namespace app\models;
 
+use app\core\DataBase;
 use app\core\Model;
 use app\controllers\User;
+use PDOException;
 use PHPMailer\PHPMailer\Exception;
 use PHPMailer\PHPMailer\PHPMailer;
 
 
 class UserModel extends Model
 {
-    public $ValidationClass;
+    private Database $dataBase;
+    public validationClass $validationClass;
 
-    private $uploadFile;
+    private UploadFiles $uploadFile;
 
-    private $User;
+    private ResetPasswordModel $resetPasswordModel;
+
+    private $user;
 
 
     protected string $table = 'UsersInformation';
 
     public function __construct()
     {
-        $this->ValidationClass = new ValidationClass();
+        $this->dataBase =DataBase::getInstance();
+        $this->validationClass = new ValidationClass();
         $this->uploadFile = new UploadFiles();
-        $this->User = User::getInstance();
+        $this->resetPasswordModel = new ResetPasswordModel();
+        $this->user = User::getInstance();
 
     }
 
-    public function addUser($UserName, $emailAddress, $password, &$msg = [])
-    {
+    public function addUser($userInputData, &$messages){
 
-        if (!$this->ValidationClass->notEmpty($UserName, $msg)) {
-            return $msg;
-        } else if ($this->getUserInfo($UserName)) {
-            return $msg['UserNameError'] = 'Username is already taken';
-        }
-        if (!$this->ValidationClass->validateEmail($emailAddress, $msg)) {
-            return $msg;
-        } else if ($this->getUserInfo($emailAddress)) {
-            return $msg['emailAddressError'] = 'Email is already taken';
-        }
-        if (!$this->ValidationClass->validationPassword($password, $msg)) {
-            return $msg;
-        }
-        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-        if ($this->insertUserInDataBase($UserName, $emailAddress, $hashedPassword)) {
-            //$this->User->setUserInfo($this->getUserInfo($UserName));
+            $UserName = $userInputData['userName'];
+            $emailAddress = $userInputData['emailAddress'];
+            $password = $userInputData['password'];
 
-            return $this->getUserInfo($UserName);
-        } else
-            $msg['generalError'] = 'error happened ';
-        return false;
-    }
-
-    public function logInUser($UserName, $password, &$msg = [])
-    {
-        if (!$this->ValidationClass->notEmpty($UserName, $msg)) {
-            return false;
-        } else if (!$this->ValidationClass->validationPassword($password, $msg)) {
-            return false;
-        } else {
-            if (filter_var($UserName, FILTER_VALIDATE_EMAIL)) {
-                if (!$this->ValidationClass->validateEmail($UserName, $msg))
-                    return false;
-                else
-                    $user = $this->getUserInfo($UserName);
-            } else {
-                $user = $this->getUserInfo($UserName);
-            }
-            if ($user && password_verify($password, $user['password'])) {
-                $this->User->setUserInfo($user);
-                return $user;
-
-            } else if (($user['password'] ?? false) === $password) {
-                $this->User->setUserInfo($user);
-                return $user ;
-            } else {
-                $msg['passwordError'] = 'password not matched';
+            if (!$this->validationClass->notEmpty($UserName)) {
+                $messages = 'The User name is required.';
                 return false;
             }
+
+            if ($this->getUserInfo($UserName)) {
+                $messages = 'Username is already taken';
+                return false;
+            }
+
+            if (!$this->validationClass->validateEmail($emailAddress)) {
+                $messages = 'The User email is required.';
+                return false;
+            }
+
+            if ($this->getUserInfo($emailAddress)) {
+                $messages = 'Email is already taken';
+                return false;
+            }
+
+            if (!$this->validationClass->validationPassword($password)) {
+                $messages = 'The User password is required.';
+                return false;
+            }
+
+        try {
+            $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+
+        if ($this->insertUserInDataBase($UserName, $emailAddress, $hashedPassword)) {
+            return $this->getUserInfo($UserName);
         }
+            } catch
+        (PDOException $e) {
+            $messages =  'error happened';
+            return false;
+        }
+            $messages = 'error happened ';
+            return false;
     }
 
-    public function changeProfile($currentID, $file)
+    public function logInUser($userInputData, &$messages)
     {
-        //   change img    //
-        $newImg = $this->uploadFile->addImg($file, $msg);
+        $UserName = $userInputData['userName'];
+        $password = $userInputData['password'];
+
+        if (!$this->validationClass->notEmpty($UserName)) {
+            $messages ='The user name  is required ';
+            return false;
+        }
+
+        if (!$this->validationClass->validationPassword($password, $messages)) {
+            $messages ='The user password is required ';
+            return false;
+        }
+
+            if (filter_var($UserName, FILTER_VALIDATE_EMAIL)) {
+
+                if (!$this->validationClass->validateEmail($UserName, $messages)) {
+                    $messages ='email address must not be empty ';
+                    return false;
+                }
+
+            }
+        $storedUser = $this->getUserInfo(trim($UserName));
+
+            if (!$storedUser) {
+                $messages = 'User not found';
+            return false;
+                }
+
+            if (password_verify(trim($password), $storedUser['password'])) {
+                $this->user->setUserInfo($storedUser);
+                return $storedUser;
+
+            }
+
+                $messages = 'password not matched';
+                return false;
+
+        }
+
+    public function saveProfileChanges($userCurrentData, $userInputData, &$messages){
+
+        $imgData = $userInputData['FILEData'];
+        $userInputData = $userInputData['POSTData'];
+
+
+        if (isset($imgData['profileImage']) && !empty($imgData['profileImage']['tmp_name'])) {
+            return ($this->changeProfileImage($userCurrentData['id'], $imgData['profileImage']));
+        }
+
+        //   change userName //
+        if (!empty($userInputData['userName'] && $userInputData['userName'] !== $userCurrentData['userName'])) {
+            return  $this->changeProfileUserName($userCurrentData['id'],
+                $userInputData['userName'],
+                $userCurrentData['userName'],
+                $messages);
+        }
+
+        if ($userCurrentData['emailAddress'] !== $userInputData["emailAddress"]) {
+           return  $this->changeProfileEmail($userCurrentData['id'],
+                $userInputData['emailAddress'],
+                $userCurrentData['emailAddress'],
+                $messages);
+
+            }
+        if (!empty($userInputData['currentPassword']) && !empty($userInputData['newPassword']) && $userInputData['newPassword'] !== $userCurrentData['password']){
+            return  $this->changeProfilePassword($userCurrentData['id'],
+                $userCurrentData['password'],
+                $userInputData['currentPassword'],
+                $userInputData['newPassword'],
+                $messages);
+
+            }
+        return true;
+        }
+
+
+
+    public function changeProfileImage($currentID, $file)
+    {
+
+        $newImg = $this->uploadFile->addImg($file, $messages);
 
         if ($newImg !== false) {
             $this->updateUserData($currentID, 'profileImg', $newImg);
@@ -95,80 +172,102 @@ class UserModel extends Model
 
     }
 
-    public function changeProfileUserName($currentID, $userName, $currentUserName, &$msg = [])
+    public function changeProfileUserName($currentID, $userName, $currentUserName, &$messages = [])
     {
         //  change userName   //
-        if (!$this->ValidationClass->validateUserNameEdit($currentUserName, $userName, $msg))
+        if (!$this->validationClass->validateUserNameEdit($currentUserName, $userName, $messages))
             return false;
 
-        else if ($this->checkUserData('userName', $userName)) {
-            $msg['userNameError'] = 'Username is already taken';
-            return false;
-        } else if ($this->updateUserData($currentID, 'userName', $userName)) {
-            $msg['userNameError'] = 'User name changed successfully';
-            return $userName;
-
-        } else {
-            $msg['generalError'] = 'error happened';
+         if ($this->checkUserData('userName', $userName)) {
+            $messages['userNameError'] = 'Username is already taken';
             return false;
         }
+         if ($this->updateUserData($currentID, 'userName', $userName)) {
+            $messages['userNameError'] = 'User name changed successfully';
+            return $userName;
+
+        }
+            $messages['generalError'] = 'error happened';
+            return false;
+
 
     }
 
-    public function changeProfileEmail($currentID, $emailAddress, $currentUserEmail, &$msg = [])
+    public function changeProfileEmail($currentID, $emailAddress, $currentUserEmail, &$messages = [])
     {
-        if (!$this->ValidationClass->validateEmailEdit($currentUserEmail, $emailAddress, $msg)) {
+        if (!$this->validationClass->validateEmailEdit($currentUserEmail, $emailAddress, $messages)) {
             return false;
 
         } else if ($this->checkUserData('emailAddress', $emailAddress)) {
-            $msg['emailAddressError'] = 'Email is already taken';
+            $messages['emailAddressError'] = 'Email is already taken';
             return false;
 
         } else if ($this->updateUserData($currentID, 'emailAddress', $emailAddress)) {
-            $msg['emailAddressError'] = 'Email changed successfully';
+            $messages['emailAddressError'] = 'Email changed successfully';
             return $emailAddress;
         }
     }
 
-    public function changeProfilePassword($currentID, $oldPassword, $currentPassword, $newPassword, &$msg = []): false
+    public function changeProfilePassword($currentID, $oldPassword, $currentPassword, $newPassword, &$messages = [])
     {
-        if (!$this->ValidationClass->validateNewPasswordEdit($oldPassword, $currentPassword, $newPassword, $msg)) {
+        if (!$this->validationClass->validateNewPasswordEdit($oldPassword, $currentPassword, $newPassword, $messages)) {
             return false;
-
         }
         if ($this->updateUserData($currentID, 'password', password_hash($newPassword, PASSWORD_DEFAULT))) {
-            $msg['newPasswordError'] = 'Password updated successfully';
+            $messages['newPasswordError'] = 'Password updated successfully';
             return $newPassword;
-        } else
-            $msg['generalError'] = 'error happened';
+        }
+
+            $messages['generalError'] = 'error happened';
         return false;
-
-
     }
 
-    public function forgetPassword($emailAddress, &$msg = [])
-    {
 
-        $userInfo = $this->getUserInfo($emailAddress);
-        if (!$this->ValidationClass->validateEmail($emailAddress)) {
-            $msg['forgetPasswordError'] = 'Please enter a valid email address';
-            return false;
-        } else if (!$userInfo) {
-            $msg['forgetPasswordError'] = 'email address does not exist';
-            return false;
-        } else {
-            $token = bin2hex(random_bytes(4));
-            $expireDate = date("Y-m-d H:i:s", strtotime("+30 minutes"));
-            (new ResetPasswordModel)->saveResetToken($userInfo['id'], $token, $expireDate);
+    public function forgetPassword($emailAddress)
+    {
+        if (!$this->validationClass->validateEmail($emailAddress)) {
+            return['success'=> false , 'statusMessage' => 'Please enter a valid email address'];
+        }
+
+        try {
+            $userInfo = $this->getUserInfo($emailAddress);
+        }
+        catch (PDOException $e) {
+
+            return['success'=> false ,'statusMessage' => 'error happened'];
+        }
+
+        if (!$userInfo) {
+            return['success'=>false ,'statusMessage' => 'error happened'];
+        }
+
+            // generate token
+        try {
+            $UserToken = bin2hex(random_bytes(4));
+
+        } catch (\Exception $e) {
+
+            return['success'=>false ,'statusMessage' => 'error happened while resetting password'];
+        }
+
+        $expireTokenDate = date("Y-m-d H:i:s", strtotime("+30 minutes"));
+
+        try {
+            $this->resetPasswordModel->saveResetToken($userInfo['id'], $UserToken, $expireTokenDate);
+        }
+        catch (PDOException $e) {
+
+            return['success'=>false ,'statusMessage' => 'error happened while resetting password'];
+        }
+
             $resetLink = 'http:/yazan.test/submitNewPassword';
 
             try {
                 $mail = new PHPMailer(true);
-
                 $config = require('keys.php');
                 $SMTPKeys = $config['SMTP'];
 
-                // set SMTP
+                // set SMTP (Simple Mail Transfer Protocol)
                 $mail->isSMTP();
                 $mail->Host = $SMTPKeys['Host'];
                 $mail->SMTPAuth = true;
@@ -184,103 +283,104 @@ class UserModel extends Model
         <p>Hi,</p>
         <p>You requested to reset your password. Click the link below:</p>
         <p><a href='$resetLink'>$resetLink</a></p>
-                <p> your reset code is '$token' </p>
+                <p> your reset code is '$UserToken' </p>
         <p>This link will expire in 30 minutes.</p>
     ";
                 $mail->send();
 
             } catch (Exception $e) {
 
-                $msg['forgetPasswordError'] = "Email could not be sent. Mailer Error: {$mail->ErrorInfo}";
-                return false;
-
+                return ['success'=>false ,'statusMessage' => "Email could not be sent. Mailer Error: {$mail->ErrorInfo}"];
             }
-            $msg['forgetPasswordError'] = 'message sent';
-            return $userInfo;
-        }
 
+            return ['success'=> true , 'id' => $userInfo['id'], 'statusMessage' => 'message sent to your email '];
     }
 
-    /**
-     * @throws Exception
-     */
-    public function submitNewPassword($currentID , $inputToken , $newPassword, $confirmPassword, $savedToken, &$msg)
+    public function submitNewPassword($userDataInput , $userId)
     {
+        $inputToken = trim($userDataInput['token']);
+        $newPassword = trim($userDataInput['newPassword']);
+        $confirmNewPassword = trim($userDataInput['confirmPassword']);
+        $savedToken = $this->resetPasswordModel->getToken($userId);
+
         if (!$savedToken) {
-            $msg['submitNewPasswordTokenError'] = 'Token not found or already used';
-            return false;
-        } else if ($savedToken['token'] !== $inputToken) {
-            $msg['submitNewPasswordTokenError'] = 'Invalid token';
-            return false;
-        } else if (!$this->ValidationClass->validationPassword($newPassword)) {
-            $msg['submitNewPasswordError'] = 'Invalid new password';
-
-            return false;
-
-        } else if (!$this->ValidationClass->validationPassword($confirmPassword)) {
-            $msg['submitNewPasswordConfirmPasswordError'] = 'Confirm password is invalid';
-            return false;
-
+            return['success'=> false ,'statusMessage' => 'Token not found or already used'];
         }
-        else if ($newPassword !== $confirmPassword) {
-            $msg['submitNewPasswordError'] = 'New password and Confirm password do not match';
-            return false;
+        if ($savedToken['token'] !== $inputToken) {
+            return['success'=> false ,'statusMessage' => 'Invalid token'];
         }
-        $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
-        if ($this->updateUserData($currentID, 'password', $hashedPassword)) {
-            (new ResetPasswordModel)->markTokenAsUsed($currentID, $savedToken['token']);
-            $msg['submitNewPasswordPassChange'] = 'Password updated successfully';
-            return true;
+        if (!$this->validationClass->validationPassword($newPassword)) {
+            return['success'=> false ,'statusMessage' => 'Invalid new password'];
         }
-        else
-            $msg['submitNewPasswordError'] = 'Password not changed';
-        return false;
-
+        if (!$this->validationClass->validationPassword($confirmNewPassword)) {
+            return['success'=> false ,'statusMessage' => 'Confirm password is invalid'];
+        }
+         if ($newPassword !== $confirmNewPassword) {
+             return['success'=> false ,'statusMessage' => 'New password and Confirm password do not match'];
+        }
+        try {
+            $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+            if ($this->updateUserData($userId, 'password', $hashedPassword)) {
+                if($this->resetPasswordModel->markTokenAsUsed($userId, $savedToken['token'])) {
+                    return['success'=> true ,'statusMessage' => 'Password updated successfully'];
+                }
+            }
+            else
+            return['success'=> false ,'statusMessage' => 'Password not changed'];
+        }
+         catch (\Exception $e) {
+             return['success'=> false ,'statusMessage' => 'error happened'];
+         }
     }
 
     function insertUserInDataBase($UserName, $emailAddress, $password): false|\PDOStatement
     {
-        return $this->getDb()->query(
-            "INSERT INTO `{$this->table}` (`userName`, `emailAddress`, `password`)
+        try {
+            return $this->dataBase->query(
+                "INSERT INTO `{$this->table}` (`userName`, `emailAddress`, `password`)
      VALUES (:userName, :emailAddress, :password)",
-            [
-                ':userName' => $UserName,
-                ':emailAddress' => $emailAddress,
-                ':password' => $password,
-            ]
-        );
+                [
+                    ':userName' => $UserName,
+                    ':emailAddress' => $emailAddress,
+                    ':password' => $password,
+                ]
+            );
+        }
+        catch (PDOException $e) {
+            echo $e->getMessage();
+            return false;
+        }
     }
-
 
     public function getUserInfo($userData)
     {
         if (filter_var($userData, FILTER_VALIDATE_EMAIL)) {
-            return ($this->getDb()->query('SELECT * FROM `UsersInformation` WHERE `emailAddress` = :emailAddress',
+            return ($this->dataBase->query('SELECT * FROM `UsersInformation` WHERE `emailAddress` = :emailAddress',
                 [
                     ':emailAddress' => $userData,
                 ]
             )->fetch(\PDO::FETCH_ASSOC));
-
-        } else {
-            return $this->getDb()->query('SELECT * FROM `UsersInformation` WHERE `userName` = :userName',
+        }
+            return $this->dataBase->query('SELECT * FROM `UsersInformation` WHERE `userName` = :userName',
                 [
                     ':userName' => $userData,
                 ]
             )->fetch(\PDO::FETCH_ASSOC);
 
-        }
+
+
     }
 
-    public function getUserFullInfo(): array
+    public function getAllUsersData(): array
     {
-            return ($this->getDb()->query('SELECT * FROM `UsersInformation` ')->fetchAll(\PDO::FETCH_ASSOC));
+            return ($this->dataBase->query('SELECT * FROM `UsersInformation` ')->fetchAll(\PDO::FETCH_ASSOC));
 
-        }
+    }
 
 
     public function checkUserData($key, $value): bool
     {
-        $dataExist = $this->getDb()->query('SELECT * FROM `UsersInformation` WHERE ' . $key . ' = :value',
+        $dataExist = $this->dataBase->query('SELECT * FROM `UsersInformation` WHERE ' . $key . ' = :value',
             [
                 ':value' => trim($value),
             ]
@@ -292,7 +392,7 @@ class UserModel extends Model
 
     public function getUserImg($id)
     {
-        return $this->getDb()->query(
+        return $this->dataBase->query(
             'SELECT `profileImg` from UsersInformation WHERE `id` = :id',
             [
                 ':id' => $id,
@@ -304,25 +404,38 @@ class UserModel extends Model
 
     public function updateUserData($id, $key, $newValue)
     {
-        if($this->getDb()->query("UPDATE `UsersInformation` SET $key = :value WHERE id = :id", [
-            ':value' => trim($newValue),
-            ':id' => $id
-        ]))
-        return true;
-        else
-            return   throw new Exception("Invalid column name");
+        try {
+            if ($this->dataBase->query("UPDATE `UsersInformation` SET $key = :value WHERE id = :id", [
+                ':value' => trim($newValue),
+                ':id' => $id
+            ]))
+                return true;
+            else
+                return false;
+        }
+        catch (PDOException $e) {
+            echo $e->getMessage();
+            return false;
+        }
 
     }
 
     public function deleteUser($userId):bool
     {
-         if($this->getDb()->query("DELETE FROM UsersInformation where id =:id" , [
-                ':id' => $userId
-            ]
+        try {
+            if ($this->dataBase->query("DELETE FROM UsersInformation where id =:id", [
+                    ':id' => $userId
+                ]
 
-        ))
-             return true;
-         return false;
+            ))
+                return true;
+            return false;
+        }
+        catch (\PDOException $e) {
+            echo $e->getMessage();
+            return false;
+        }
     }
+
 
 }

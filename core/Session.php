@@ -23,7 +23,9 @@ class Session
     }
 
 
-
+public function getAllSessionData(){
+        return $_SESSION ?? null;
+}
     public function get($key): mixed
     {
         return $_SESSION[$key] ?? null;
@@ -32,14 +34,14 @@ class Session
 
     public function set($key, $value)
     {
-        return $_SESSION[$key] = $value;
+        return $_SESSION[$key] = $value ?? null;
 
 
     }
 
     public function edit($key, $value): void
     {
-        $_SESSION[$key] = $value;
+        $_SESSION[$key] = $value ?? null;
 
     }
 
@@ -58,6 +60,7 @@ class Session
     {
         $_SESSION = [];
         session_destroy();
+        self::$instance = null;
 
     }
 
@@ -66,7 +69,6 @@ class Session
         $_SESSION['id'] = $userData['id'];
         $_SESSION['userName'] = $userData['userName'];
         $_SESSION['emailAddress'] = $userData['emailAddress'];
-        $_SESSION['password'] = $userData['password'];
         $_SESSION['profileImg'] = '/public/default.png';
         $_SESSION['userRole'] = $userData['user_role'];
 
@@ -74,13 +76,11 @@ class Session
 
     public function userRole(): string
     {
-        if(isset($_SESSION['userRole']) && $_SESSION['userRole'] == 'admin')
-            return 'admin';
-        else if(empty($this->get('id')))
+        if (empty($this->get('id'))) {
             return 'guest';
+        }
+            return isset($_SESSION['userRole']) && $_SESSION['userRole'] === 'admin' ? 'admin' : 'user';
 
-        else
-            return 'user';
 
 
     }

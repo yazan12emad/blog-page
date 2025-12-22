@@ -6,7 +6,7 @@
  * 2. Category Management (View, Edit, Delete) with AJAX
  * 3. Blog Management (View, Edit, Delete) with AJAX
  * All actions use JavaScript for better UX but call PHP backend
-  * @var array $adminName
+ * @var array $adminName
  *
  */
 
@@ -514,6 +514,7 @@
             });
 
             const data = await response.json();
+            console.log(data);
 
             if (data.success) {
                 const user = data.userData;
@@ -538,6 +539,7 @@
         try {
             const formData = new FormData();
             formData.append('id', userId);
+
             const response = await fetch(`/admin/users/delete`, {
                 method: 'POST',
                 body : formData ,
@@ -545,7 +547,8 @@
                     'Accept': 'application/json',
                 }
             });
-            const data = JSON.parse(await response.text());
+            const data = await response.json();
+
             if (data.success) {
                 showMessage('User deleted successfully');
                 // Reload current section
@@ -813,7 +816,7 @@
                     'Accept': 'application/json',
                 }
             });
-            const data = JSON.parse(await response.text());
+            const data = await response.json();
 
             if (data.success) {
                 console.log(data.blogs);

@@ -1,5 +1,7 @@
 <?php
 
+// simplify done
+
 namespace app\controllers;
 
 use app\core\Controller;
@@ -27,90 +29,63 @@ class BlogController extends Controller
 
     public function showBlogs($category = null): string
     {
-        // To prevent the user from retrieving all existing blogs at once
-//        if(!isset($_GET['page'])) {
-//
-//            $this->redirect('blog?page=1');
-//
-//        }
-
-
-        $page = $_GET['page'] ?? 1 ;
-
-            // the number action(page) must be: 1- int / 2 bigger than 0
-
+        $page = $_GET['page'] ?? 1;
         if (!filter_var($page, FILTER_VALIDATE_INT) || $page < 0) {
-            $page =1 ;
+            $page = 1;
         }
 
-
-
         $numberOfAllowBlogsInPage = 6;
+        if (isset($_GET['limit'])) {
+            $limit = (int) $_GET['limit'];
+            $numberOfAllowBlogsInPage = max(1 , min($limit , 30)) ;
+        }
 
-        // to return the blogs that related to these category , for set up the pagination pages
+        $numberOfPagesInPagination = !empty($category)
+            ? ceil(count($this->blogModel->getBlogsByCategoryWithLimit($category)) / $numberOfAllowBlogsInPage)
+            : ceil(count($this->blogModel->getAllBlogs()) / $numberOfAllowBlogsInPage);;
 
-            $numberOfPagesInPagination = !empty($category)
-                ? ceil(count($this->blogModel->getBlogsByCategoryWithLimit($category)) / $numberOfAllowBlogsInPage)
-                : ceil(count($this->blogModel->getAllBlogs()) / $numberOfAllowBlogsInPage);
-        ;
+        $page = min($page, $numberOfPagesInPagination);
+        $start = ($page - 1) * $numberOfAllowBlogsInPage;
+        $blogs = !empty($category)
+            ? $this->blogModel->getBlogsByCategoryWithLimit($category, $start, $numberOfAllowBlogsInPage)
+            : $this->blogModel->getBlogsByRowNumber($start, $numberOfAllowBlogsInPage);
 
-                $page = $page > $numberOfPagesInPagination ? $numberOfPagesInPagination :$page ;
-
-
-            $start = ($page - 1) * $numberOfAllowBlogsInPage;
-
-            $blogs = !empty($category)
-                ? $this->blogModel->getBlogsByCategoryWithLimit($category, $start, $numberOfAllowBlogsInPage)
-                : $this->blogModel->getBlogsByRowNumber($start, $numberOfAllowBlogsInPage);
-
-
-        return $this->render('blog.view',
-                [
-                    'heading' => 'Blog',
-                    'results' => $blogs,
-                    'categories' => $this->categoriesModel->getCategories(),
-                    'pages' => $numberOfPagesInPagination,
-                    'category' => $category,
-                ]
-            );
-            }
+        return $this->render('blog.view', [
+            'heading' => 'Blog',
+            'results' => $blogs,
+            'categories' => $this->categoriesModel->getCategories(),
+            'pages' => $numberOfPagesInPagination,
+            'category' => $category,
+        ]);
+    }
 
 
     public function createNewBlog()
     {
-        if ($this->isPost()) {
+        if (!$this->isPost()) {
+            $this->redirect('blog');
+        }
 
-
-            $captchaSuccessResponse = $this->blogModel->captcha_response();
-            if (!$captchaSuccessResponse) {
-                $this->msg = 'You need to check "I am not a robot".';
-                header('Content-Type: application/json');
-                echo json_encode([
-                    'successAdd' => false,
-                    'successCheck' => $captchaSuccessResponse,
-                    'message' => $this->msg,
-                ]);
-                exit();
-            }
-
-            $blog_title = $_POST['blog_title'] ?? '';
-            $blog_body = $_POST['blog_body'] ?? '';
-            $blog_picture = $_FILES['blog_picture'] ?? null;
-            $blog_category = $_POST['blog_category'] ?? '';
-
-            $result = $this->blogModel->createBlogs($blog_title, $blog_body, $blog_picture, $blog_category, $this->session->get('id'), $this->msg);
-
-            header('Content-Type: application/json');
-            echo json_encode([
-                'successAdd' => $result,
+        $captchaSuccessResponse = $this->blogModel->captcha_response();
+        if (!$captchaSuccessResponse) {
+            $this->jsonResponse([
+                'successAdd' => false,
                 'successCheck' => $captchaSuccessResponse,
-                'message' => $this->msg,
+                'message' => 'You need to check "I am not a robot".',
             ]);
-            exit();
+        }
 
+        $blog_title = $_POST['blog_title'] ?? null;
+        $blog_body = $_POST['blog_body'] ?? null;
+        $blog_picture = $_FILES['blog_picture'] ?? null;
+        $blog_category = $_POST['blog_category'] ?? null;
 
-        } else
-            $this->redirect('blog?page=1');
+        $result = $this->blogModel->createBlogs($blog_title, $blog_body, $blog_picture, $blog_category, $this->session->get('id'), $this->msg);
+        $this->jsonResponse([
+            'successAdd' => $result,
+            'successCheck' => $captchaSuccessResponse,
+            'message' => $this->msg,
+        ]);
     }
 
 
@@ -121,17 +96,15 @@ class BlogController extends Controller
 
     public function deleteBlog()
     {
-        if ($this->isPost()) {
-            $cate_id = $_POST['blog_id'];
-            header('Content-Type: application/json');
-            echo json_encode([
-                'success' => $this->blogModel->deleteBlogs($cate_id, $this->msg),
-                'message' => $this->msg
-            ]);
-            exit();
-        } else
-            $this->redirect('blog?page=1');
+        if (!$this->isPost()) {
+            $this->redirect('blog');
+        }
 
+        $cate_id = $this->post('blog_id');
+        $this->jsonResponse([
+            'success' => $this->blogModel->deleteBlogs($cate_id, $this->msg),
+            'message' => $this->msg,
+        ]);
     }
 }
 
@@ -139,6 +112,5 @@ class BlogController extends Controller
 
 
 
-// call the db function and function to show the blogs
 
 

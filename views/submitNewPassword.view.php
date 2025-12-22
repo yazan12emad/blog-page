@@ -1,3 +1,13 @@
+<?php
+
+/**
+* @VAR array $error
+ * @VAR boolean $success
+*/
+?>
+
+
+
 <!DOCTYPE html>
 <html lang="en" class="h-full bg-gray-100">
 <head>
@@ -43,12 +53,20 @@
             </div>
 
             <form id="resetPasswordForm" class="py-6 px-8" method="POST">
-                <!-- Success message (hidden by default) -->
 
-                <?php if(isset($error['submitNewPasswordPassChange'])): ?>
-                <div id="successMessage" class="mb-4 p-3 bg-green-100 text-green-700 text-sm rounded-md ">
-                    Your password has been successfully reset.
-                </div>
+                <!-- Success message (hidden by default) -->
+                <?php if(isset($actionSuccess)): ?>
+                    <div id="statusMessage" class="mb-4 p-3 text-sm rounded-md <?= $actionSuccess ? 'bg-green-100 text-green-700 text-center' : 'bg-red-100 text-red-700' ?>">
+                        <?= $statusMessage ?? ''; ?>
+
+                        <?php if($actionSuccess): ?>
+                            <div class="text-center text-sm text-gray-600 mt-2">
+                                <a href="/login" class="text-blue-600 font-medium hover:underline">
+                                    Go to log In
+                                </a>
+                            </div>
+                        <?php endif; ?>
+                    </div>
                 <?php endif; ?>
 
                 <!--  for enter token -->
@@ -63,9 +81,6 @@
                                class="form-input pl-10 pr-10 w-full rounded-md border-gray-300 focus:border-blue-500"
                                placeholder="Enter your reset code ">
                         <div id="passwordRequirements" class="text-xs text-gray-500 mt-1">
-                            <?php if(isset($error['submitNewPasswordTokenError'])):
-                            echo $error['submitNewPasswordTokenError'];
-                            endif; ?>
 
                         </div>
                 </div>
@@ -94,9 +109,7 @@
                         Password must be at least 8 characters with uppercase, lowercase, number, and special character.
                     </div>
                     <div id="newPasswordError" class="text-xs text-red-500 mt-1 ">
-                        <?php if(isset($error['submitNewPasswordError'])):
-                            echo $error['submitNewPasswordError'];
-                        endif; ?>
+
                     </div>
                 </div>
 
@@ -115,9 +128,7 @@
                         </div>
                     </div>
                     <div id="" class="text-xs text-red-500 mt-1 ">
-                        <?php if(isset($error['submitNewPasswordConfirmPasswordError'])):
-                            echo $error['submitNewPasswordConfirmPasswordError'];
-                        endif; ?>
+
 
                     </div>
                 </div>

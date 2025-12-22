@@ -31,9 +31,21 @@
 
             <form id="forgotPassword" class="py-6 px-8" method="POST" action=''>
                 <!-- Success message (hidden by default) -->
-                <div id="successMessage" class="mb-4 p-3 bg-green-100 text-green-700 text-sm rounded-md hidden">
-                    Password reset instructions have been sent to your email.
-                </div>
+
+                <?php if(isset($actionSuccess)): ?>
+                    <div id="statusMessage" class="mb-4 p-3 text-sm rounded-md <?= $actionSuccess ? 'bg-green-100 text-green-700 text-center' : 'bg-red-100 text-red-700' ?>">
+                        <?= $statusMessage ?? ''; ?>
+
+                        <?php if($actionSuccess): ?>
+                            <div class="text-center text-sm text-gray-600 mt-2">
+                                <a href="/submitNewPassword" class="text-blue-600 font-medium hover:underline">
+                                    Submit New Password
+                                </a>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                <?php endif; ?>
+
 
                 <!-- Email -->
                 <div class="mb-4">
@@ -46,11 +58,6 @@
                                class="form-input pl-10 w-full rounded-md border-gray-300 focus:border-blue-500"
                                placeholder="Enter your email address">
                     </div>
-                    <?php if(isset($error['forgetPasswordError'])):  ?>
-                    <div id="emailError" class="text-xs text-red-500 mt-1 ">
-                        <?php echo $error['forgetPasswordError'];  ?>
-                    </div>
-                    <?php  endif; ?>
                 </div>
 
                 <!-- Submit button -->

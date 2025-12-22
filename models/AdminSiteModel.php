@@ -31,17 +31,22 @@ class AdminSiteModel
 
     public function getUsers(): array
     {
-        return $this->UserModel->getUserFullInfo();
+        return $this->UserModel->getAllUsersData();
     }
 
     public function getUserById($id): array
     {
-
-        return $this->db->query('SELECT id ,userName , emailAddress , user_role FROM UsersInformation WHERE id = :id ',
-            [
-                'id' => $id
-            ]
-        )->fetch(\PDO::FETCH_ASSOC);
+        try {
+            return $this->db->query('SELECT id ,userName , emailAddress , user_role FROM UsersInformation WHERE id = :id ',
+                [
+                    'id' => $id
+                ]
+            )->fetch(\PDO::FETCH_ASSOC);
+        }
+        catch (\PDOException $e) {
+            echo $e->getMessage();
+            return [];
+        }
     }
 
     public function deleteUser($userId, &$msg): bool
@@ -125,7 +130,6 @@ class AdminSiteModel
         if ($this->CategoriesModel->updateCategory($cate_data['cate_id'], $cate_data['cate_name'], $msg , $cate_data['description']))
             return true;
         else {
-            $msg = ' error in edit category ';
             return false;
         }
     }

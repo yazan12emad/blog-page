@@ -21,8 +21,11 @@ class categoriesModel extends Model
         return $this->DataBase->query("SELECT * FROM categories")->fetchAll();
     }
 
-    public function getCategoriesName(): array {
-        return $this->DataBase->query("SELECT cate_name FROM categories")->fetchAll();
+
+    public function getCategoriesName($id): array {
+        return $this->DataBase->query("SELECT cate_name FROM categories where cate_id = :id",[
+            "id" => $id
+        ])->fetchAll();
     }
 
     public function checkIfExist($new_name): bool
@@ -36,17 +39,18 @@ class categoriesModel extends Model
         return false;
     }
 
-    public function addCategory($cate_name ,$admin_id , &$msg):bool {
+    public function addCategory($cate_name ,$admin_id ,$der , &$msg):bool {
         if($this->checkIfExist($cate_name))
         {
             $msg = 'category already exists';
             return false;
         }
 
-        else  if($this->DataBase->query("INSERT INTO categories (cate_name, admin_id) VALUES (:cate_name,:admin_id)" ,
+        else  if($this->DataBase->query("INSERT INTO categories (cate_name, admin_id ,description ) VALUES (:cate_name,:admin_id , :description)" ,
             [
                 'cate_name' => $cate_name,
-                'admin_id' => $admin_id
+                'admin_id' => $admin_id,
+                'description' => $der
             ]))
          {
              $msg = 'new category added';
@@ -60,35 +64,37 @@ class categoriesModel extends Model
 
     public function updateCategory($cate_id ,$new_name , &$msg , $der): bool
     {
-        if(empty(trim($new_name))) {
-            $msg = 'new category name is required';
-            return false;
-        }
-        if(empty($der))
-              if($this->DataBase->query("UPDATE categories set cate_name = :new_name WHERE cate_id = :cate_id" ,[
-            'new_name' => trim($new_name),
-            'cate_id' => $cate_id
-        ]))
-        {
-            $msg = 'category updated';
-            return true;
-        }
-        else {
-            $msg = 'error to update category';
-            return false;
-        }
-        else
-            if($this->DataBase->query("UPDATE categories set cate_name = :new_name  , description = :description WHERE cate_id = :cate_id" ,[
-                'new_name' => trim($new_name),
-                'cate_id' => $cate_id ,
-                'description' => trim($der)
-            ]))
-        return true;
-            else {
-                $msg = 'error to update category';
+        try {
+            if (empty(trim($new_name))) {
+                $msg = 'new category name is required';
                 return false;
-
             }
+            if (empty(trim($der))) {
+                $msg = 'new category description is required';
+                return false;
+            }
+
+                if ($this->DataBase->query("UPDATE categories set cate_name = :new_name  , description = :description WHERE cate_id = :cate_id", [
+                    'new_name' => trim($new_name),
+                    'cate_id' => $cate_id,
+                    'description' => trim($der)
+                ]))
+                {
+                    $msg = 'category updated';
+                    return true;
+                }
+
+
+                    $msg = 'error to update category';
+                    return false;
+
+
+        }
+        catch (\Exception $e) {
+            echo $e->getMessage();
+            $msg = $e->getMessage();
+            return false;
+        }
 
     }
 

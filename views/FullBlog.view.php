@@ -822,6 +822,7 @@ require 'views/partials/footer.php';
     let userStatus = <?= $status ?>;
     let commentButton = false;
 
+
     const loveButton = document.getElementById('loveButton');
     const likeCountElement = document.getElementById('likeCount');
     const commented_blog_id = document.getElementById('commented_blog_id');
@@ -838,7 +839,7 @@ require 'views/partials/footer.php';
 
     likeCountElement.textContent = likeCount.toString();
 
-    if (userStatus === true) {
+    if (userStatus === 1) {
         loveButton.classList.add('liked');
         isLiked = true;
 
@@ -896,6 +897,7 @@ require 'views/partials/footer.php';
             });
             try {
                 const text = await res.json();
+
                 if (text.success) {
                     likeCount--;
                     loveButton.classList.remove('liked');
@@ -1060,6 +1062,7 @@ require 'views/partials/footer.php';
         const formData = new FormData(addCommentForm);
         formData.append('comment_body', escapeHtml(formData.get('comment_body')));
 
+
         try {
             const res = await fetch('/comment', {
                 method: 'POST',
@@ -1070,6 +1073,7 @@ require 'views/partials/footer.php';
             });
 
             const Data = await res.json();
+            console.log(Data);
 
             if (Data.success) {
                 console.log(Data);
