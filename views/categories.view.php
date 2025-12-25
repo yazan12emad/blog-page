@@ -84,10 +84,10 @@
                             </div>
                             <!-- Category Name -->
                             <h3 class="text-lg font-semibold text-gray-800 mb-2">
-                                <?php echo htmlspecialchars($category['cate_name']); ?>
+                                <?= htmlspecialchars($category['cate_name']); ?>
                             </h3>
                             <h4 class="text-lg font-semibold text-gray-800 mb-2">
-                                <?php echo htmlspecialchars($category['description']); ?>
+                                <?= htmlspecialchars($category['description']); ?>
                             </h4>
 
 
@@ -95,7 +95,7 @@
 
                             <div class="flex justify-center space-x-2">
                                 <!-- View Category Button - Visible to all users -->
-                                <a href="/blog/<?=$category['cate_name'];?>?page=1"
+                                <a href="/blog/<?=htmlspecialchars($category['cate_name']);?>?page=1"
                                    class="flex-1 bg-blue-500 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors flex items-center justify-center">
                                     <i class="fas fa-eye mr-1"></i>View
                                 </a>
@@ -105,15 +105,15 @@
                                 <!-- Edit/Delete Buttons - Only visible to admin (***** add the navData to retrive the user rule ) -->
                                 <?php if ($navData['role'] === 'admin'): ?>
                                     <button class="edit-category-btn bg-yellow-500 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-yellow-600 transition-colors"
-                                            data-id="<?php echo $category['cate_id']; ?>"
-                                            data-name="<?php echo htmlspecialchars($category['cate_name']); ?> "
+                                            data-id="<?=  htmlspecialchars($category['cate_id']); ?>"
+                                            data-name="<?= htmlspecialchars($category['cate_name']); ?> "
                                             data-description="<?= htmlspecialchars($category['description']); ?>">
 
                                         <i class="fas fa-edit"></i>
                                     </button>
                                     <button
                                             class="delete-category-btn bg-red-500 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-red-600 transition-colors"
-                                            data-id="<?= $category['cate_id']; ?>"
+                                            data-id="<?= htmlspecialchars($category['cate_id']); ?>"
                                             data-name="<?= htmlspecialchars($category['cate_name']); ?>">
                                         <i class="fas fa-trash"></i>
                                     </button>
@@ -253,7 +253,7 @@
     // Open Add Category Modal
     function openAddModal() {
         modalTitle.textContent = 'Add New Category';
-        submitBtn.innerHTML = '<i class="fas fa-plus-circle mr-2"></i>Add Category';
+        submitBtn.textContent = 'Add Category';
         categoryForm.reset();
         document.getElementById('categoryId').value = '';
         categoryModal.classList.remove('hidden');
@@ -268,7 +268,7 @@
     // Open Edit Category Modal
     function openEditModal(categoryId, categoryName , categoryDesc) {
         modalTitle.textContent = 'Edit Category';
-        submitBtn.innerHTML = '<i class="fas fa-save mr-2"></i>Update Category';
+        submitBtn.textContent = 'Update Category';
 
         document.getElementById('categoryId').value = categoryId;
         document.getElementById('categoryName').value = categoryName;
@@ -374,8 +374,8 @@
         // validation end
 
         // Show loading state
-        const originalText = submitBtn.innerHTML;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing...';
+        const originalText = submitBtn.textContent;
+        submitBtn.textContent = 'Processing...';
         submitBtn.disabled = true;
 
         // Determine form action based on whether we're adding or editing
@@ -403,7 +403,7 @@
             })
 
     .finally(() => {
-                submitBtn.innerHTML = originalText;
+                submitBtn.textContent = originalText;
                 submitBtn.disabled = false;
             });
     });
@@ -414,8 +414,8 @@
         if (!currentCategoryId) return;
 
         // Show loading state
-        const originalText = this.innerHTML;
-        this.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Deleting...';
+        const originalText = this.textContent;
+        this.textContent = 'Deleting...';
         this.disabled = true;
 
         const formData = new FormData();
@@ -444,7 +444,7 @@
             })
 
             .finally(() => {
-                this.innerHTML = originalText;
+                this.textContent = originalText;
                 this.disabled = false;
             });
 
@@ -470,7 +470,7 @@
         categoryNameInput.addEventListener('input', function () {
             const length = this.value.length;
             const maxLength = 50;
-            categoryNameInput.innerHTML='hi';
+            categoryNameInput.textContent='hi';
             if (length > maxLength - 10) {
                 this.classList.add('border-yellow-500');
             } else {

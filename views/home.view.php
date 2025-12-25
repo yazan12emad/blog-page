@@ -134,10 +134,10 @@ require __DIR__ . '/partials/banner.php';
             <ul class="card-list swiper-wrapper ">
                 <?php foreach($blogs as $blog):?>
                 <li class="card-item swiper-slide ">
-                    <a href="/Full-Blog/<?= urlencode($blog['blog_title']) ?>/<?= $blog['blog_id'] ?>" class="card-link">
-                        <img src="<?= $blog['blog_picture'] ?>" class="card-image" alt="...">
-                        <p class="badge"> <?=$blog['cate_name']?> </p>
-                        <h2 class="card-title"><?=$blog['blog_title']?> </h2>
+                    <a href="/Full-Blog/<?= htmlspecialchars(urlencode($blog['blog_title'])) ?>/<?= htmlspecialchars($blog['blog_id']) ?>" class="card-link">
+                        <img src="<?= htmlspecialchars($blog['blog_picture']) ?>" class="card-image" alt="...">
+                        <p class="badge"> <?=htmlspecialchars($blog['cate_name']) ?> </p>
+                        <h2 class="card-title"><?=htmlspecialchars($blog['blog_title'])?> </h2>
                         <button class="card-button material-symbols-rounded"> arrow_forward</button>
                     </a>
                 </li>

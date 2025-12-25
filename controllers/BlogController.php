@@ -18,7 +18,7 @@ class BlogController extends Controller
 
     private CategoriesModel $categoriesModel;
 
-    private $msg = [];
+    private $message = [];
 
     public function __construct()
     {
@@ -75,16 +75,16 @@ class BlogController extends Controller
             ]);
         }
 
-        $blog_title = $_POST['blog_title'] ?? null;
-        $blog_body = $_POST['blog_body'] ?? null;
+        $blog_title = $this->post('blog_title')?? null;
+        $blog_body = $this->post('blog_body') ?? null;
         $blog_picture = $_FILES['blog_picture'] ?? null;
-        $blog_category = $_POST['blog_category'] ?? null;
+        $blog_category = $this->post('blog_category') ?? null;
 
-        $result = $this->blogModel->createBlogs($blog_title, $blog_body, $blog_picture, $blog_category, $this->session->get('id'), $this->msg);
+        $result = $this->blogModel->createBlogs($blog_title, $blog_body, $blog_picture, $blog_category, $this->session->get('id'), $this->message);
         $this->jsonResponse([
             'successAdd' => $result,
             'successCheck' => $captchaSuccessResponse,
-            'message' => $this->msg,
+            'message' => $this->message,
         ]);
     }
 
@@ -102,8 +102,8 @@ class BlogController extends Controller
 
         $cate_id = $this->post('blog_id');
         $this->jsonResponse([
-            'success' => $this->blogModel->deleteBlogs($cate_id, $this->msg),
-            'message' => $this->msg,
+            'success' => $this->blogModel->deleteBlogs($cate_id, $this->message),
+            'message' => $this->message,
         ]);
     }
 }

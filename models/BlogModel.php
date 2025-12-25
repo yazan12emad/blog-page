@@ -87,6 +87,7 @@ class BlogModel extends Model
             return false;
         }
         $blog_picture_URL = (new UploadFiles)->addImg($blog_picture);
+
         if (!$blog_picture_URL) {
             $msg = 'Cannot upload picture';
             return false;

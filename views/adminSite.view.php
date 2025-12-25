@@ -82,7 +82,7 @@
 
             <!-- Admin Dashboard Header -->
             <div class="mb-8">
-                <h1 class="text-3xl font-bold text-gray-900">Admin Dashboard welcome <?=$adminName ?> </h1>
+                <h1 class="text-3xl font-bold text-gray-900">Admin Dashboard welcome <?= htmlspecialchars($adminName) ?> </h1>
                 <p class="mt-2 text-gray-600">Manage users, categories, and blog posts</p>
             </div>
 
@@ -92,7 +92,7 @@
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-blue-100 text-sm">Total Users</p>
-                            <p class="text-2xl font-bold mt-1" id="userCount"><?= $userCount ?? '0'; ?></p>
+                            <p class="text-2xl font-bold mt-1" id="userCount"><?= htmlspecialchars($userCount ?? '0'); ?></p>
                         </div>
                         <i class="fas fa-users text-3xl text-blue-200"></i>
                     </div>
@@ -102,7 +102,7 @@
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-blue-100 text-sm">Total Categories</p>
-                            <p class="text-2xl font-bold mt-1" id="categoryCount"><?= $categoryCount ?? '0'; ?></p>
+                            <p class="text-2xl font-bold mt-1" id="categoryCount"><?= htmlspecialchars($categoryCount ?? '0'); ?></p>
                         </div>
                         <i class="fas fa-folder text-3xl text-blue-200"></i>
                     </div>
@@ -112,7 +112,7 @@
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-blue-100 text-sm">Total Blogs</p>
-                            <p class="text-2xl font-bold mt-1" id="blogCount"><?= $blogCount ?? '0'; ?></p>
+                            <p class="text-2xl font-bold mt-1" id="blogCount"><?= ($blogCount ?? '0'); ?></p>
                         </div>
                         <i class="fas fa-blog text-3xl text-blue-200"></i>
                     </div>
@@ -353,7 +353,7 @@
             type === 'success' ? 'bg-green-100 border border-green-400 text-green-700' :
                 'bg-red-100 border border-red-400 text-red-700'
         }`;
-        messageDiv.innerHTML = `
+        messageDiv.textContent = `
         <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} mr-2"></i>
         ${message}
     `;
@@ -403,7 +403,7 @@
                 }
             });
 
-            const data = JSON.parse(await response.text());
+            const data = await response.json();
 
             if (data.success) {
                 console.log(data.users);
@@ -427,7 +427,7 @@
 
         if (users.length === 0) {
             emptyState.classList.remove('hidden');
-            tablesContainer.innerHTML = '';
+            tablesContainer.textContent = '';
             return;
         }
         const tableHTML = `
@@ -492,7 +492,7 @@
         </div>
     `;
 
-        tablesContainer.innerHTML = tableHTML;
+        tablesContainer.textContent = tableHTML;
         dataSection.classList.remove('hidden');
         emptyState.classList.add('hidden');
     }
@@ -635,7 +635,7 @@
 
         if (categories.length === 0) {
             emptyState.classList.remove('hidden');
-            tablesContainer.innerHTML = '';
+            tablesContainer.textContent = '';
             return;
         }
 
@@ -702,7 +702,7 @@
         </div>
     `;
 
-        tablesContainer.innerHTML = tableHTML;
+        tablesContainer.textContent = tableHTML;
         dataSection.classList.remove('hidden');
         emptyState.classList.add('hidden');
     }
@@ -841,7 +841,7 @@
 
         if (blogs.length === 0) {
             emptyState.classList.remove('hidden');
-            tablesContainer.innerHTML = '';
+            tablesContainer.textContent = '';
             return;
         }
         console.log(blogs);
@@ -919,7 +919,7 @@
         </div>
     `;
 
-        tablesContainer.innerHTML = tableHTML;
+        tablesContainer.textContent = tableHTML;
         dataSection.classList.remove('hidden');
         emptyState.classList.add('hidden');
     }

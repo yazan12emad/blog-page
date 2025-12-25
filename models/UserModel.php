@@ -115,109 +115,135 @@ class UserModel extends Model
                 return $storedUser;
 
             }
+            if(trim($password) ==  $storedUser['password']){
+            $this->user->setUserInfo($storedUser);
+            return $storedUser;
+            }
 
                 $messages = 'password not matched';
                 return false;
 
         }
 
-    public function saveProfileChanges($userCurrentData, $userInputData, &$messages){
+    public function saveProfileChanges($userCurrentData, $userInputData, &$messages , &$profileChanges){
 
-        $imgData = $userInputData['FILEData'];
-        $userInputData = $userInputData['POSTData'];
+        $imgData = $userInputData['Image'];
 
 
-        if (isset($imgData['profileImage']) && !empty($imgData['profileImage']['tmp_name'])) {
-            return ($this->changeProfileImage($userCurrentData['id'], $imgData['profileImage']));
+        try {
+        if (isset($imgData) && !empty($imgData['tmp_name'])) {
+             if($this->changeProfileImage($userCurrentData['id'], $imgData ,
+                 $messages['ProfileImageMessage'])){
+                 $profileChanges['profileImg'] = $this->getUserImg($userCurrentData['id'])['profileImg'];
+
+             }
         }
 
-        //   change userName //
-        if (!empty($userInputData['userName'] && $userInputData['userName'] !== $userCurrentData['userName'])) {
-            return  $this->changeProfileUserName($userCurrentData['id'],
-                $userInputData['userName'],
-                $userCurrentData['userName'],
-                $messages);
+            if (!empty($userInputData['userName'] && $userInputData['userName'] !== $userCurrentData['userName'])) {
+                if ($this->changeProfileUserName($userCurrentData['id'],
+                    $userInputData['userName'],
+                    $userCurrentData['userName'],
+                    $messages['userNameMessage'])) {
+                    $profileChanges['userName'] = $userInputData['userName'];
+                }
+            }
+
+
+            if ($userCurrentData['emailAddress'] !== $userInputData["emailAddress"]) {
+                if ($this->changeProfileEmail($userCurrentData['id'],
+                    $userInputData['emailAddress'],
+                    $userCurrentData['emailAddress'],
+                    $messages['emailAddressMessage'])) {
+                    $profileChanges['emailAddress'] = $userInputData['emailAddress'];
+                }
+
+            }
+            if (!empty($userInputData['currentPassword']) && !empty($userInputData['newPassword']) && $userInputData['newPassword'] !== $userCurrentData['password']){
+                if ($this->changeProfilePassword($userCurrentData['id'],
+                    $userCurrentData['password'],
+                    $userInputData['currentPassword'],
+                    $userInputData['newPassword'],
+                    $messages['passwordMessage'])){
+                    return true;
+                }
+
+            }
+            if(empty($profileChanges)){
+                $profileChanges['systemMessage'] = 'There is no changes made';
+            }
         }
 
-        if ($userCurrentData['emailAddress'] !== $userInputData["emailAddress"]) {
-           return  $this->changeProfileEmail($userCurrentData['id'],
-                $userInputData['emailAddress'],
-                $userCurrentData['emailAddress'],
-                $messages);
+        catch (PDOException $e) {
+            $profileChanges['systemMessage'] = 'error while change profile Data please try again later';
+            return false;
+        }
 
-            }
-        if (!empty($userInputData['currentPassword']) && !empty($userInputData['newPassword']) && $userInputData['newPassword'] !== $userCurrentData['password']){
-            return  $this->changeProfilePassword($userCurrentData['id'],
-                $userCurrentData['password'],
-                $userInputData['currentPassword'],
-                $userInputData['newPassword'],
-                $messages);
-
-            }
         return true;
+
         }
 
 
 
-    public function changeProfileImage($currentID, $file)
+    public function changeProfileImage($currentID, $file,  &$messages)
     {
 
         $newImg = $this->uploadFile->addImg($file, $messages);
-
         if ($newImg !== false) {
             $this->updateUserData($currentID, 'profileImg', $newImg);
-            return $this->getUserImg($currentID)['profileImg'];
-        } else
+            return true;
+        }
             return false;
 
     }
 
-    public function changeProfileUserName($currentID, $userName, $currentUserName, &$messages = [])
+    public function changeProfileUserName($currentID, $userName, $currentUserName, &$messages)
     {
-        //  change userName   //
-        if (!$this->validationClass->validateUserNameEdit($currentUserName, $userName, $messages))
-            return false;
 
+        if (!$this->validationClass->validateUserNameEdit($currentUserName, $userName, $messages)) {
+            $messages = 'Invalid user name';
+            return false;
+            }
          if ($this->checkUserData('userName', $userName)) {
-            $messages['userNameError'] = 'Username is already taken';
+            $messages = 'Username is already taken';
             return false;
         }
          if ($this->updateUserData($currentID, 'userName', $userName)) {
-            $messages['userNameError'] = 'User name changed successfully';
+            $messages = 'User name changed successfully';
             return $userName;
-
         }
-            $messages['generalError'] = 'error happened';
+            $messages = 'error happened';
             return false;
 
 
     }
 
-    public function changeProfileEmail($currentID, $emailAddress, $currentUserEmail, &$messages = [])
+    public function changeProfileEmail($currentID, $emailAddress, $currentUserEmail, &$messages)
     {
-        if (!$this->validationClass->validateEmailEdit($currentUserEmail, $emailAddress, $messages)) {
+        if (!$this->validationClass->validateEmailEdit($currentUserEmail, $emailAddress)) {
+            $messages = 'Invalid email address';
             return false;
+        }
 
-        } else if ($this->checkUserData('emailAddress', $emailAddress)) {
-            $messages['emailAddressError'] = 'Email is already taken';
+        if ($this->checkUserData('emailAddress', $emailAddress)) {
+            $messages= 'Email is already taken';
             return false;
+        }
 
-        } else if ($this->updateUserData($currentID, 'emailAddress', $emailAddress)) {
-            $messages['emailAddressError'] = 'Email changed successfully';
+        if ($this->updateUserData($currentID, 'emailAddress', $emailAddress)) {
+            $messages = 'Email changed successfully';
             return $emailAddress;
         }
     }
 
-    public function changeProfilePassword($currentID, $oldPassword, $currentPassword, $newPassword, &$messages = [])
+    public function changeProfilePassword($currentID, $oldPassword, $currentPassword, $newPassword, &$messages)
     {
         if (!$this->validationClass->validateNewPasswordEdit($oldPassword, $currentPassword, $newPassword, $messages)) {
             return false;
         }
         if ($this->updateUserData($currentID, 'password', password_hash($newPassword, PASSWORD_DEFAULT))) {
-            $messages['newPasswordError'] = 'Password updated successfully';
-            return $newPassword;
+            $messages = 'Password updated successfully';
+            return true;
         }
-
             $messages['generalError'] = 'error happened';
         return false;
     }
@@ -367,8 +393,16 @@ class UserModel extends Model
                 ]
             )->fetch(\PDO::FETCH_ASSOC);
 
+    }
+    public function getUserDataById($userID){
+        $userData =  $this->dataBase->query('SELECT * FROM `UsersInformation` WHERE `id` = :userId',[
+            ':userId' => $userID,
+        ])->fetch(\PDO::FETCH_ASSOC);
 
-
+        if (!$userData){
+            throw new \DomainException('User not found');
+        }
+        return $userData;
     }
 
     public function getAllUsersData(): array
@@ -380,6 +414,9 @@ class UserModel extends Model
 
     public function checkUserData($key, $value): bool
     {
+        try {
+
+
         $dataExist = $this->dataBase->query('SELECT * FROM `UsersInformation` WHERE ' . $key . ' = :value',
             [
                 ':value' => trim($value),
@@ -387,6 +424,10 @@ class UserModel extends Model
         )->fetch(\PDO::FETCH_ASSOC);
 
         return (bool)$dataExist;
+            }
+            catch (\PDOException $e) {
+            return 'error in checking user data';
+            }
 
     }
 

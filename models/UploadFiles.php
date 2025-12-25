@@ -6,77 +6,76 @@ use app\core\session;
 
 class UploadFiles
 {
-    protected $session;
+    protected Session $session;
 
+        Private array $acceptedFileTypes = ['.png', '.jpg', '.jpeg'];
+        private int $acceptedFileSize = 5000000;
 
+        private string $fileSavedPath = "public/";
 
     public function __construct()
     {
         $this->session = Session::getInstance();
 
     }
-    public function addImg($file, &$msg): false|string
+    public function addImg($file, &$message =  null): false|string
     {
 
-        if (!$this->checkIsItImg($file,$msg)) {
+        if (!$this->checkIsItImg($file,$message)) {
             return false;
         }
-        $target_dir = "public/";
+
         $newFileName = uniqid("profile_", true) . "." . pathinfo($file['name'], PATHINFO_EXTENSION);
-        $target_file = $target_dir . $newFileName;
+        $target_file = $this->fileSavedPath . $newFileName;
 
 
         if (move_uploaded_file($file['tmp_name'], $target_file)) {
 
-            $msg['errorUploadImg'] = "The file " . basename($file['name']) . " has been uploaded.";
+            $message = "The file " . basename($file['name']) . " has been uploaded.";
 
             return  $target_file;
 
         } else {
-            $msg['errorUploadImg'] = "Error uploading the file.";
+            $message = "Error uploading the file.";
             return false;
         }
     }
 
 
-    public function checkIsItImg($file , &$msg ): bool
+    public function checkIsItImg($file , &$message = null): bool
     {
 
 
         if (empty($file['tmp_name'])) {
-            $msg['errorUploadImg'] = "No file uploaded.";
+            $message = "No file uploaded.";
             return false;
         }
 
         $check = @getimagesize($file['tmp_name']);
         if ($check !== false) {
 
-            if ($check[2] == IMAGETYPE_PNG) {
-                return $this->validSize($file, $msg);
+            if (!in_array($check[2] ,$this->acceptedFileTypes)) {
+                return $this->validSize($file, $message );
             }
-                $msg['errorUploadImg'] = "The image must be .png";
+                $message  = "The image must be .png";
                 return false;
         }
-            $msg['errorUploadImg'] = "File is not an image.";
+            $message  = "File is not an image.";
             return false;
 
     }
 
 
 
-    public function validSize(array $file, &$msg = []): bool
+    public function validSize(array $file, &$message =[]): bool
     {
 
-        if ($file['size'] >= 5000000) {
-            $msg['errorUploadImg'] = "Sorry, your file is too large.";
+        if ($file['size'] >= $this->acceptedFileSize) {
+            $message  = "Sorry, your file is too large.";
             return false;
         }
         return true;
     }
 
-//    public function deletePastImg($imgPath){
-//        unlink($imgPath);
-//        return true;
-//    }
 
 }

@@ -161,10 +161,10 @@ require "views/partials/banner.php";
 
                     <!-- First button  -->
                     <?php if ($page > 1): ?>
-                        <a href="<?= $baseUrl ?>1" class="px-4 py-2 rounded-md gradient-bg text-white">First</a>
+                        <a href="<?= htmlspecialchars($baseUrl); ?>1" class="px-4 py-2 rounded-md gradient-bg text-white">First</a>
 
                         <!-- prev button  -->
-                        <a href="<?= $baseUrl . ($page - 1) ?>" class="px-3 py-2 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300"> <i class="fas fa-chevron-left"></i>
+                        <a href="<?= htmlspecialchars($baseUrl . ($page - 1)); ?>" class="px-3 py-2 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300"> <i class="fas fa-chevron-left"></i>
                         </a>
                     <?php endif; ?>
 
@@ -176,13 +176,13 @@ require "views/partials/banner.php";
 
                     <!-- last button  -->
                     <?php if ($page < $pages): ?>
-                        <a href="<?= $baseUrl . ($page + 1) ?>"
+                        <a href="<?= htmlspecialchars($baseUrl . ($page + 1)); ?>"
                            class="px-3 py-2 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300">
                             <i class="fas fa-chevron-right"></i>
                         </a>
                         <!-- next button  -->
 
-                        <a href="<?= $baseUrl . $pages ?>"
+                        <a href="<?= htmlspecialchars($baseUrl . $pages); ?>"
                            class="px-4 py-2 rounded-md gradient-bg text-white">Last</a>
                     <?php endif; ?>
 
@@ -477,11 +477,11 @@ require "views/partials/banner.php";
 
     // to show the blog that return from the DB
     function renderBlogs() {
-        blogGrid.innerHTML = '';
+        blogGrid.textContent = '';
 
         // ✅ Check if there are no blogs
         if (sampleBlogs.length === 0) {
-            blogGrid.innerHTML = `
+            blogGrid.textContent = `
             <div class="text-center text-gray-500 py-10">
                 <i class="fas fa-info-circle text-3xl mb-3 text-purple-500"></i>
                 <p class="text-lg font-medium">There are no blogs about this category 📝</p>
@@ -501,21 +501,21 @@ require "views/partials/banner.php";
             </div>
             <div class="p-6 flex-grow flex flex-col">
                 <div class="flex justify-between items-start mb-2">
-                    <span class="inline-block bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full">${blog.cate_name}</span>
+                    <span class="inline-block bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full">${escapeHTML(blog.cate_name)}</span>
                     <span class="text-gray-500 text-sm">${new Date(blog.created_at).toLocaleDateString()}</span>
                 </div>
-                <h3 class="text-xl font-bold text-gray-900 mb-3">${blog.blog_title}</h3>
-                <p class="text-gray-600 mb-4 flex-grow">${blog.blog_body}</p>
+                <h3 class="text-xl font-bold text-gray-900 mb-3">${escapeHTML(blog.blog_title)}</h3>
+                <p class="text-gray-600 mb-4 flex-grow">${escapeHTML(blog.blog_body)}</p>
                 <div class="mt-auto">
                     ${(() => {
                 if (role === 'admin') {
                     return `
                                 <button class="w-full edit-category-btn bg-yellow-500 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-yellow-600 transition-colors"
-                                        data-id="${blog.blog_id}" data-name="${blog.blog_title}">
+                                        data-id="${escapeHTML(blog.blog_id)}" data-name="${escapeHTML(blog.blog_title)}">
                                     <i class="fas fa-edit"></i>
                                 </button>
                                 <button class="w-full delete-category-btn bg-red-500 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-red-600 transition-colors"
-                                        data-id="${blog.blog_id}" data-name="${blog.blog_title}">
+                                        data-id="${escapeHTML(blog.blog_id)}" data-name="${escapeHTML(blog.blog_title)}">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             `;
@@ -523,11 +523,11 @@ require "views/partials/banner.php";
                 if (role === 'user' && user_id === blog.author_id) {
                     return `
                                 <button id='edit' class="w-full edit-category-btn bg-yellow-500 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-yellow-600 transition-colors"
-                                        data-id="${blog.blog_id}" data-name="${blog.blog_title}">
+                                        data-id="${escapeHTML(blog.blog_id)}" data-name="${escapeHTML(blog.blog_title)}">
                                     <i class="fas fa-edit"></i>
                                 </button>
                                 <button class="w-full delete-category-btn bg-red-500 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-red-600 transition-colors"
-                                        data-id="${blog.blog_id}" data-name="${blog.blog_title}">
+                                        data-id="${escapeHTML(blog.blog_id)}" data-name="${escapeHTML(blog.blog_title)}">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             `;
@@ -544,6 +544,8 @@ require "views/partials/banner.php";
             blogGrid.appendChild(blogCard);
         });
     }
+
+
 
     // to show the categories in the blog form
     function populateCategories() {
@@ -630,9 +632,9 @@ require "views/partials/banner.php";
 
         if (!currentBlogId) return;
 
-        const originalText = btn.innerHTML;
+        const originalText = btn.textContent;
 
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Deleting...';
+        btn.textContent = '<i class="fas fa-spinner fa-spin mr-2"></i>Deleting...';
         btn.disabled = true;
 
         try {
@@ -664,7 +666,7 @@ require "views/partials/banner.php";
             console.error('Network or fetch error:', err);
             alert('Something went wrong!');
         } finally {
-            btn.innerHTML = originalText;
+            btn.textContent = originalText;
             btn.disabled = false;
         }
     });
@@ -692,6 +694,16 @@ require "views/partials/banner.php";
         });
 
     });
+    function escapeHTML(str) {
+        return String(str)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+
 </script>
 </body>
 </html>

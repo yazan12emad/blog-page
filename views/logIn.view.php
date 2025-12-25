@@ -46,7 +46,7 @@
                 <!-- Display PHP errors here if any -->
                 <?php if(isset($success) && !$success): ?>
                     <div id="failureMessage" class="mb-4 p-3 bg-red-100 text-red-700 text-sm rounded-md ">
-                        <?php echo $message['logInPageError'] ?? ''; ?>
+                        <?= htmlspecialchars( $message['logInPageError'] ?? ''); ?>
                     </div>
                 <?php endif; ?>
 

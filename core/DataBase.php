@@ -16,14 +16,18 @@ class DataBase
         $config = require('keys.php');
         $DataBaseKeys = $config['DataBase'];
 
-        $dsnString = "mysql:host={$DataBaseKeys['host']};dbname={$DataBaseKeys['dbname']};charset=utf8";
+        $dsnString = "mysql:host={$DataBaseKeys['host']};dbname={$DataBaseKeys['dbname']};charset=utf8mb4";
         $this->connection = new \PDO(
             $dsnString,
             $DataBaseKeys['user'] ?? 'root',
-            $DataBaseKeys['pass'] ?? ''
+            $DataBaseKeys['pass'] ?? '',
+            [
+                \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,  //If any SQL error occurs it force PDO to throw an Exception
+                \PDO::ATTR_EMULATE_PREPARES => false, // It prevents the SQL from take prepared statement emulated (Disable Emulated Prepares)
+                \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC //It ensures the DB to return an Associative array
+            ]
         );
 
-        $this->connection->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
     }
 
     public function query($query, $params = []): false|\PDOStatement
@@ -37,8 +41,7 @@ class DataBase
 
         } catch (\PDOException $e) {
 
-            echo $e->getMessage();
-
+            error_log($e->getMessage());
             return false;
         }
 

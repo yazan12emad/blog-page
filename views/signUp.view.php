@@ -38,7 +38,7 @@
                 <!-- Success message (hidden by default) -->
                 <?php if(isset($success) && !$success): ?>
                     <div id="successMessage" class="mb-4 p-3 bg-red-100 text-red-700 text-sm rounded-md ">
-                        <?php echo $message['signUpPageError'] ?? ''; ?>
+                        <?= htmlspecialchars($message['signUpPageError'] ?? ''); ?>
                     </div>
                 <?php endif; ?>
 
@@ -175,6 +175,6 @@
     });
 
 </script>
-<?php      require "views/partials/footer.php"; ?>
+<?php  require "views/partials/footer.php"; ?>
 </body>
 </html>

@@ -56,8 +56,8 @@
 
                 <!-- Success message (hidden by default) -->
                 <?php if(isset($actionSuccess)): ?>
-                    <div id="statusMessage" class="mb-4 p-3 text-sm rounded-md <?= $actionSuccess ? 'bg-green-100 text-green-700 text-center' : 'bg-red-100 text-red-700' ?>">
-                        <?= $statusMessage ?? ''; ?>
+                    <div id="statusMessage" class="mb-4 p-3 text-sm rounded-md <?= htmlspecialchars($actionSuccess) ? 'bg-green-100 text-green-700 text-center' : 'bg-red-100 text-red-700' ?>">
+                        <?= htmlspecialchars($statusMessage ?? ''); ?>
 
                         <?php if($actionSuccess): ?>
                             <div class="text-center text-sm text-gray-600 mt-2">
@@ -223,49 +223,6 @@ require "views/partials/footer.php";
     const newPasswordError = document.getElementById('newPasswordError');
     const confirmPasswordError = document.getElementById('confirmPasswordError');
     const successMessage = document.getElementById('successMessage');
-/*
-    form.addEventListener('submit', function (e) {
-        e.preventDefault();
-
-        // Reset error states
-        newPasswordError.classList.add('hidden');
-        confirmPasswordError.classList.add('hidden');
-
-        let isValid = true;
-        const newPassword = newPasswordInput.value;
-        const confirmPassword = confirmPasswordInput.value;
-
-        // Validate password strength
-        if (!isStrongPassword(newPassword)) {
-            newPasswordError.textContent = 'Password must be at least 8 characters with uppercase, lowercase, number, and special character.';
-            newPasswordError.classList.remove('hidden');
-            isValid = false;
-        }
-
-        // Check if passwords match
-        if (newPassword !== confirmPassword) {
-            confirmPasswordError.classList.remove('hidden');
-            isValid = false;
-        }
-
-        if (isValid) {
-            // In a real application, you would send an AJAX request or submit the form
-            // For demonstration, we'll just show the success message
-            successMessage.classList.remove('hidden');
-
-            // Clear the form
-            newPasswordInput.value = '';
-            confirmPasswordInput.value = '';
-            passwordStrength.style.width = '0%';
-            passwordStrength.style.backgroundColor = '#e5e7eb';
-
-            // Hide success message after 5 seconds
-            setTimeout(() => {
-                successMessage.classList.add('hidden');
-            }, 5000);
-        }
-    });
-*/
     function isStrongPassword(password) {
         // At least 8 characters, one uppercase, one lowercase, one number, one special character
         const strongRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})/;

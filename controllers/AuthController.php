@@ -24,6 +24,7 @@ class AuthController extends Controller
         return $this->requireRole($userRole);
     }
 
+
     public function login()
     {
         if(!$this->checkUserRole('guest')) {
@@ -80,9 +81,10 @@ class AuthController extends Controller
     }
 
 
+
     public function profile()
     {
-        if ($this->checkUserRole('guest')) {
+        if ($this->checkUserRole('guest')){
             $this->redirect('home');
         }
 
@@ -90,22 +92,34 @@ class AuthController extends Controller
             return $this->profileRender();
         }
 
-        $userCurrentData = $this->userModel->getUserInfo($this->session->get('userName'));
-        $userInputData = ['POSTData'=>  $this->post() , 'FILEData' => $_FILES];
+        try {
+            $userCurrentData = $this->userModel->getUserDataById($this->session->get('id'));
+        }
+        catch (\DomainException $e){
+            $this->session->destroy();
+            $this->redirect('home');
+        }
 
-       $profileChanges =  $this->userModel->saveProfileChanges($userCurrentData ,$userInputData ,$this->messages);
-        var_dump($profileChanges);
+        $userInputData = [
+            'userName' => $this->post('userName') ?? null ,
+            'emailAddress' => $this->post('emailAddress') ?? null,
+            'Image' => $_FILES['profileImage'] ?? null,
+            'currentPassword' => $this->post('currentPassword') ?? null,
+            'newPassword'=> $this->post('newPassword') ?? null,
+        ];
 
+         if($this->userModel->saveProfileChanges($userCurrentData ,$userInputData ,$this->messages , $profileChanges))
+        foreach($profileChanges as $key => $value){
+            $this->session->edit($key , $value);
+        }
+         var_dump($this->messages);
 
-
-
-
+        return $this->profileRender(['profileMessage' => $this->messages]);
     }
 
     private function profileRender(array $extra = []): string
     {
         $userFullData = $this->session->getAllSessionData();
-
 
         return $this->render('profile.view', array_merge([
             'heading' => 'profile',

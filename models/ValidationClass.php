@@ -42,7 +42,7 @@ class ValidationClass
     function validateEmail($emailAddress , &$messages=[]): bool
     {
 
-        if ((!$this->notEmpty($emailAddress)) || (!filter_var($emailAddress, FILTER_VALIDATE_EMAIL))) {
+        if (!$this->notEmpty($emailAddress) || (!filter_var($emailAddress, FILTER_VALIDATE_EMAIL))) {
             $messages['emailAddressError'] = 'email address must not be empty';
             return false;
         }
@@ -50,18 +50,19 @@ class ValidationClass
 
     }
 
-    public function validateEmailEdit($currentUserEmail, $emailAddress, &$messages =[] ): bool|string
+    public function validateEmailEdit($currentUserEmail, $emailAddress, &$messages =null ): bool|string
     {
+
         if (!$this->validateEmail($emailAddress)) {
             $messages['emailAddressError'] = 'email address is Invalid';
             return false;
-        } else if ($currentUserEmail === $emailAddress) {
+        }
+        if ($currentUserEmail === $emailAddress) {
             $messages['emailAddressError'] = 'email address is the same email';
             return false;
-        } else   {
-
-            return true;
         }
+            return true;
+
 
     }
 
@@ -78,24 +79,24 @@ class ValidationClass
     public function validateNewPasswordEdit($oldPasswordHash, $currentPasswordInput, $newPasswordInput, &$messages = null): bool
     {
         if (!$this->validationPassword($currentPasswordInput)) {
-            $messages['currentPasswordError'] = "Password must be at least 7 characters long";
+            $messages = "Password must be at least 7 characters long";
             return false;
         }
-        else if (!$this->validationPassword($newPasswordInput)) {
-            $messages['newPasswordError'] = 'New password format is invalid';
-            return false;
+         if (!$this->validationPassword($newPasswordInput)) {
+             $messages =  'New password format is invalid';
+             return false;
         }
-        else if (password_verify($currentPasswordInput, $oldPasswordHash)) {
-            $messages['currentPasswordError'] = 'Current password is incorrect';
-            return false;
+        if (!password_verify($currentPasswordInput, $oldPasswordHash)) {
+             $messages = 'Current password is incorrect';
+             return false;
         }
-        else if (password_verify($newPasswordInput, $oldPasswordHash)) {
-            $messages['newPasswordError'] = 'New password cannot be the same as old password';
-            return false;
+         if (password_verify($newPasswordInput, $oldPasswordHash)) {
+             $messages = 'New password cannot be the same as old password';
+             return false;
         }
-        else {
+
             return true;
-        }
+
     }
 
 

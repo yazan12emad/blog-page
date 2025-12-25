@@ -33,8 +33,8 @@
                 <!-- Success message (hidden by default) -->
 
                 <?php if(isset($actionSuccess)): ?>
-                    <div id="statusMessage" class="mb-4 p-3 text-sm rounded-md <?= $actionSuccess ? 'bg-green-100 text-green-700 text-center' : 'bg-red-100 text-red-700' ?>">
-                        <?= $statusMessage ?? ''; ?>
+                    <div id="statusMessage" class="mb-4 p-3 text-sm rounded-md <?= htmlspecialchars($actionSuccess) ? 'bg-green-100 text-green-700 text-center' : 'bg-red-100 text-red-700' ?>">
+                        <?= htmlspecialchars($statusMessage ?? ''); ?>
 
                         <?php if($actionSuccess): ?>
                             <div class="text-center text-sm text-gray-600 mt-2">

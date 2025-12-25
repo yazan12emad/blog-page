@@ -68,9 +68,6 @@
                 <!-- ================= PROFILE UPDATE FORM ================= -->
                 <form method="post" enctype="multipart/form-data">
 
-                    <!-- CSRF -->
-
-
                     <!-- Profile Image -->
                     <div class="flex flex-col items-center mb-6">
                         <div class="relative">
@@ -87,8 +84,8 @@
                         </div>
 
                         <p class="text-sm text-gray-500 mt-2">
-                            <?= isset($errors['profileImage'])
-                                    ? htmlspecialchars($errors['profileImage'])
+                            <?= isset($profileMessage['ProfileImageMessage'])
+                                    ? htmlspecialchars($profileMessage['ProfileImageMessage'])
                                     : 'Click on camera icon to change photo' ?>
                         </p>
                     </div>
@@ -105,9 +102,9 @@
                                     class="w-full font-medium border rounded px-2 py-1"
                                     value="<?= htmlspecialchars($currentUserName) ?>">
 
-                            <?php if (isset($errors['userName'])): ?>
+                            <?php if (isset($profileMessage['userNameMessage'])): ?>
                                 <p class="text-sm text-red-600 mt-1">
-                                    <?= htmlspecialchars($errors['userName']) ?>
+                                    <?= htmlspecialchars($profileMessage['userNameMessage']) ?>
                                 </p>
                             <?php endif; ?>
                         </div>
@@ -121,39 +118,46 @@
                                     class="w-full font-medium border rounded px-2 py-1"
                                     value="<?= htmlspecialchars($currentUserEmail) ?>">
 
-                            <?php if (isset($errors['emailAddress'])): ?>
+                            <?php if (isset($profileMessage['emailAddressMessage'])): ?>
                                 <p class="text-sm text-red-600 mt-1">
-                                    <?= htmlspecialchars($errors['emailAddress']) ?>
+                                    <?= htmlspecialchars($profileMessage['emailAddressMessage']) ?>
                                 </p>
                             <?php endif; ?>
                         </div>
 
                         <!-- Current Password -->
-                        <div class="p-4 bg-gray-50 rounded-lg">
+                        <div  class="p-4 bg-gray-50 rounded-lg">
                             <p class="text-sm text-gray-500">Current Password</p>
+                            <div class='flex'>
                             <input
                                     type="password"
                                     name="currentPassword"
+                                    id="currentPassword"
                                     class="w-full font-medium border rounded px-2 py-1">
+                            <div  class="inset-y-0 right-0 pr-3 flex items-center">
+                                <i class="password-toggle fas fa-eye-slash text-gray-400" id="toggleCurrentPassword"></i>
+                            </div>
+                            </div>
 
-                            <?php if (isset($errors['currentPassword'])): ?>
-                                <p class="text-sm text-red-600 mt-1">
-                                    <?= htmlspecialchars($errors['currentPassword']) ?>
-                                </p>
-                            <?php endif; ?>
+
                         </div>
 
                         <!-- New Password -->
                         <div class="p-4 bg-gray-50 rounded-lg">
                             <p class="text-sm text-gray-500">New Password</p>
+                            <div class='flex'>
                             <input
+                                    id="newPassword"
                                     type="password"
                                     name="newPassword"
                                     class="w-full font-medium border rounded px-2 py-1">
-
-                            <?php if (isset($errors['newPassword'])): ?>
+                            <div  class="inset-y-0 right-0 pr-3 flex items-center">
+                                <i class="password-toggle fas fa-eye-slash text-gray-400" id="toggleNewPassword"></i>
+                            </div>
+                            </div>
+                            <?php if (isset($profileMessage['passwordMessage'])): ?>
                                 <p class="text-sm text-red-600 mt-1">
-                                    <?= htmlspecialchars($errors['newPassword']) ?>
+                                    <?= htmlspecialchars($profileMessage['passwordMessage']) ?>
                                 </p>
                             <?php endif; ?>
                         </div>
@@ -191,5 +195,32 @@
     <?php require 'views/partials/footer.php'; ?>
 
 </div>
+<script>
+
+
+    const currentPassword = document.getElementById('currentPassword');
+    const passwordInput = document.getElementById('newPassword');
+
+    const toggleIconCurrent = document.getElementById('toggleCurrentPassword');
+    const toggleIconNew = document.getElementById('toggleNewPassword');
+
+
+     function showPassword(toggleIcon, password) {
+        const isPassword = password.type === 'password';
+
+         password.type = isPassword ? 'text' : 'password';
+        toggleIcon.classList.toggle('fa-eye');
+        toggleIcon.classList.toggle('fa-eye-slash');
+    }
+
+
+    toggleIconNew.addEventListener('click',() => {
+        showPassword( toggleIconNew, passwordInput)
+    });
+    toggleIconCurrent.addEventListener('click',() => {
+        showPassword( toggleIconCurrent, currentPassword)
+    });
+
+</script>
 </body>
 </html>

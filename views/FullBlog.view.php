@@ -949,7 +949,7 @@ require 'views/partials/footer.php';
         const blogImage = document.getElementById('blogImage');
         blogImage.src = blogData.blog_picture;
         blogImage.alt = blogData.blog_title;
-        document.getElementById('blogBody').innerHTML = blogData.blog_body;
+        document.getElementById('blogBody').textContent = blogData.blog_body;
         document.title = `${blogData.blog_title} - Blog Post`;
     }
 
@@ -1032,7 +1032,7 @@ require 'views/partials/footer.php';
             if (Data.success) {
                 console.log(Data);
                 messageDiv.style.display = 'inline-block';
-                messageDiv.innerHTML = Data.message;
+                messageDiv.textContent = Data.message;
 
 
                 setTimeout(() => {
@@ -1041,7 +1041,7 @@ require 'views/partials/footer.php';
 
             } else {
                 messageDiv.style.display = 'inline-block';
-                messageDiv.innerHTML = Data.message;
+                messageDiv.textContent = Data.message;
 
 
             }
@@ -1078,7 +1078,7 @@ require 'views/partials/footer.php';
             if (Data.success) {
                 console.log(Data);
                 messageDiv.style.display = 'inline-block';
-                messageDiv.innerHTML = Data.message;
+                messageDiv.textContent = Data.message;
 
 
                 setTimeout(() => {
@@ -1087,7 +1087,7 @@ require 'views/partials/footer.php';
 
             } else {
                 messageDiv.style.display = 'inline-block';
-                messageDiv.innerHTML = Data.message;
+                messageDiv.textContent = Data.message;
 
 
             }
