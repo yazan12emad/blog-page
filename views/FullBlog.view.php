@@ -819,7 +819,7 @@ require 'views/partials/footer.php';
 
     let clickCount = 0;
     let firstClickTime = null;
-    let userStatus = <?= $status ?>;
+    let userStatus = <?= htmlspecialchars($status) ?>;
     let commentButton = false;
 
 
@@ -837,7 +837,8 @@ require 'views/partials/footer.php';
     const commentBody = document.getElementById('comment_body');
     const messageDiv = document.getElementById('comment-message')
 
-    likeCountElement.textContent = likeCount.toString();
+    likeCountElement.innerHTML = likeCount.toString();
+
 
     if (userStatus === 1) {
         loveButton.classList.add('liked');
@@ -845,7 +846,38 @@ require 'views/partials/footer.php';
 
     }
 
-    async function loveButtonClicked(e) {
+
+    async function fetchCall(link, formData) {
+        const response = await fetch(link, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'Accept': 'application/json',
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error ${response.status}`);
+        }
+        return response.json();
+    }
+
+
+    // Function to format date
+    function formatDate(dateString) {
+        const options = {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        };
+        return new Date(dateString).toLocaleDateString('en-US', options);
+    }
+
+
+    // add like function
+    async function addLike(e) {
         e.preventDefault();
 
         const now = Date.now();
@@ -865,38 +897,25 @@ require 'views/partials/footer.php';
         //add like
         if (isLiked) {
             formData.set('Action', 'addLike')
-
-            const res = await fetch('/like', {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'Accept': 'application/json',
-                }
-            });
             try {
-                const text = await res.json();
 
-                if (text.success) {
+                const text = await ( fetchCall('/Full-Blog/like' , formData ));
+
+                if (text.success){
                     likeCount++;
                     loveButton.classList.add('liked');
-                    likeCountElement.textContent = likeCount.toString() + 'Thanks for liking the blog!';
+                    likeCountElement.textContent = likeCount.toString() + ' Thanks for liking the blog!';
                     console.log(text.message);
                 }
-                //remove like
             } catch (error) {
                 console.log(error);
             }
-        } else {
+        }
+        else {
             formData.set('Action', 'removeLike')
-            const res = await fetch('/like', {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'Accept': 'application/json',
-                }
-            });
+
             try {
-                const text = await res.json();
+                const text = await (fetchCall('/Full-Blog/like' , formData));
 
                 if (text.success) {
                     likeCount--;
@@ -908,11 +927,9 @@ require 'views/partials/footer.php';
             } catch (error) {
                 console.log(error);
             }
-
         }
 
-    }
-
+        }
 
     if (!blogData || Object.keys(blogData).length === 0) {
         window.location.assign("/blog?page=1");
@@ -921,18 +938,6 @@ require 'views/partials/footer.php';
     // go back function
     function goBack() {
         window.location.assign("/blog?page=1");
-    }
-
-    // Function to format date
-    function formatDate(dateString) {
-        const options = {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        };
-        return new Date(dateString).toLocaleDateString('en-US', options);
     }
 
 
@@ -947,9 +952,9 @@ require 'views/partials/footer.php';
         commentedBlogReplyId.value = blogData.blog_id;
 
         const blogImage = document.getElementById('blogImage');
-        blogImage.src = blogData.blog_picture;
+        blogImage.src = '/'+blogData.blog_picture;
         blogImage.alt = blogData.blog_title;
-        document.getElementById('blogBody').textContent = blogData.blog_body;
+        document.getElementById('blogBody').innerHTML = blogData.blog_body;
         document.title = `${blogData.blog_title} - Blog Post`;
     }
 
@@ -1020,14 +1025,7 @@ require 'views/partials/footer.php';
             submitReplyButton.disabled = false;
         }, 5000);
         try {
-            const res = await fetch('/reply', {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'Accept': 'application/json',
-                }
-            });
-            const Data = await res.json();
+            const Data = await fetchCall('/Full-Blog/reply', formData);
 
             if (Data.success) {
                 console.log(Data);
@@ -1055,52 +1053,31 @@ require 'views/partials/footer.php';
         e.preventDefault();
 
         submitButton.disabled = true;
-        setTimeout(() => {
-            submitButton.disabled = false;
-        }, 5000);
+        setTimeout(() => submitButton.disabled = false, 5000);
 
         const formData = new FormData(addCommentForm);
-        formData.append('comment_body', escapeHtml(formData.get('comment_body')));
-
 
         try {
-            const res = await fetch('/comment', {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'Accept': 'application/json',
-                }
-            });
+            const data = await fetchCall('/Full-Blog/comment', formData);
+            console.log(data);
 
-            const Data = await res.json();
-            console.log(Data);
+            messageDiv.style.display = 'inline-block';
+            messageDiv.textContent = data.message;
 
-            if (Data.success) {
-                console.log(Data);
-                messageDiv.style.display = 'inline-block';
-                messageDiv.textContent = Data.message;
-
-
+            if (data.success) {
                 setTimeout(() => {
                     messageDiv.style.display = 'none';
                 }, 5000);
-
-            } else {
-                messageDiv.style.display = 'inline-block';
-                messageDiv.textContent = Data.message;
-
-
             }
+
         } catch (error) {
             console.error("Error sending comment:", error);
+            messageDiv.textContent = "Something went wrong. Please try again.";
         }
-
-
-    })
-
+    });
     document.addEventListener('DOMContentLoaded', loadBlog);
 
-    loveButton.addEventListener('click', loveButtonClicked);
+    loveButton.addEventListener('click', addLike);
 
 
 </script>

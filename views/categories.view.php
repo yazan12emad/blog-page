@@ -317,8 +317,6 @@
             const categoryId = button.getAttribute('data-id');
             const categoryName = button.getAttribute('data-name');
             const categoryDesc = button.getAttribute('data-description');
-            console.log(categoryDesc);
-            console.log(button);
             openEditModal(categoryId, categoryName ,categoryDesc);
         }
 
@@ -469,7 +467,7 @@
     if (categoryNameInput) {
         categoryNameInput.addEventListener('input', function () {
             const length = this.value.length;
-            const maxLength = 50;
+            const maxLength = 20;
             categoryNameInput.textContent='hi';
             if (length > maxLength - 10) {
                 this.classList.add('border-yellow-500');

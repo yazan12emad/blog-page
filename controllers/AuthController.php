@@ -25,8 +25,7 @@ class AuthController extends Controller
     }
 
 
-    public function login()
-    {
+    public function login(){
         if(!$this->checkUserRole('guest')) {
             $this->redirect('home');
         }
@@ -108,11 +107,11 @@ class AuthController extends Controller
             'newPassword'=> $this->post('newPassword') ?? null,
         ];
 
-         if($this->userModel->saveProfileChanges($userCurrentData ,$userInputData ,$this->messages , $profileChanges))
-        foreach($profileChanges as $key => $value){
-            $this->session->edit($key , $value);
-        }
-         var_dump($this->messages);
+         if($this->userModel->saveProfileChanges($userCurrentData ,$userInputData ,$this->messages , $profileChanges)) {
+             foreach ($profileChanges as $key => $value) {
+                 $this->session->edit($key, $value);
+             }
+         }
 
         return $this->profileRender(['profileMessage' => $this->messages]);
     }

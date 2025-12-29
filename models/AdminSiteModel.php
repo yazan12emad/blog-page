@@ -2,213 +2,163 @@
 
 namespace app\models;
 
-use app\core\DataBase;
 
 class AdminSiteModel
 {
-    private DataBase $db;
 
-    private UserModel $UserModel;
+    private userModel $userModel;
 
-    private BlogModel $BlogModel;
+    private blogModel $blogModel;
 
-    private CategoriesModel $CategoriesModel;
+    private categoriesModel $categoriesModel;
 
-    private ValidationClass $ValidationClass;
+    private validationClass $validationClass;
 
 
     public function __construct()
     {
-        $this->db = DataBase::getInstance();
 
         // data objects
-        $this->UserModel = new UserModel();
-        $this->BlogModel = new BlogModel();
-        $this->CategoriesModel = new CategoriesModel();
-        $this->ValidationClass = new ValidationClass();
+        $this->userModel = new userModel();
+        $this->blogModel = new blogModel();
+        $this->categoriesModel = new categoriesModel();
+        $this->validationClass = new validationClass();
 
     }
 
     public function getUsers(): array
     {
-        return $this->UserModel->getAllUsersData();
+        return $this->userModel->getAllUsersData();
     }
 
-    public function getUserById($id): array
+    public function deleteUser($userId, &$message): bool
     {
-        try {
-            return $this->db->query('SELECT id ,userName , emailAddress , user_role FROM UsersInformation WHERE id = :id ',
-                [
-                    'id' => $id
-                ]
-            )->fetch(\PDO::FETCH_ASSOC);
-        }
-        catch (\PDOException $e) {
-            echo $e->getMessage();
-            return [];
-        }
-    }
-
-    public function deleteUser($userId, &$msg): bool
-    {
-        if ($this->UserModel->deleteUser($userId)) {
-            $msg = 'delete user';
+        if ($this->userModel->deleteUser($userId, $message)) {
+            $message = 'delete user';
             return true;
-        } else {
-            $msg = 'error while delete ';
-            return false;
-
         }
+        $message = 'error while delete';
+        return false;
+
+
     }
 
-
-    public function updateUserData($userNewData, &$msg, $update = 0)
+    public function updateUserData($userNewData, &$message, $update = 0)
     {
-        $oldData = $this->getUserById($userNewData['id']);
+        $oldData = $this->userModel->getUserDataById($userNewData['id']);
+
+        if (empty($oldData)) {
+            $message = 'Error in update user data';
+            return false;
+        }
 
         if ($userNewData['userName'] !== $oldData['userName']) {
 
-            if ($this->updateUserName($userNewData['id'], $userNewData['userName'], $oldData['userName'], $msg))
+            if ($this->updateUserName($userNewData['id'], $userNewData['userName'], $oldData['userName'], $message))
                 $update++;
-
         }
+
         if ($userNewData['emailAddress'] !== $oldData['emailAddress']) {
-            if ($this->updateUserEmailAddress($userNewData['id'], $userNewData['emailAddress'], $oldData['emailAddress'], $msg))
+            if ($this->updateUserEmailAddress($userNewData['id'], $userNewData['emailAddress'], $oldData['emailAddress'], $message))
                 $update++;
         }
 
         if ($userNewData['user_role'] !== $oldData['user_role'])
-            if ($this->updateUserRole($userNewData['id'], $userNewData['user_role'], $msg))
+            if ($this->updateUserRole($userNewData['id'], $userNewData['user_role'], $message))
                 $update++;
-
         return $update;
-
     }
 
 
-    public function updateUserName($id, $newName, $oldName, &$msg = []): bool
+    public function updateUserName($id, $newName, $oldName, &$message): bool
     {
-        if ($this->UserModel->changeProfileUserName($id, $newName, $oldName, $msg))
-            return true;
-        else {
-            return false;
-        }
+        return $this->userModel->changeProfileUserName($id, $newName, $oldName, $message) ?? false;
+
 
     }
 
-    public function updateUserEmailAddress($id, $newName, $oldName, &$msg = []): bool
+    public function updateUserEmailAddress($id, $newName, $oldName, &$message = []): bool
     {
-        if ($this->UserModel->changeProfileEmail($id, $newName, $oldName, $msg))
-            return true;
-        else {
-            return false;
-        }
+
+        return $this->userModel->changeProfileEmail($id, $newName, $oldName, $message) ?? false;
+
+
     }
 
-    public function updateUserRole($id, $newName, &$msg): bool
+    public function updateUserRole($id, $newName, &$message): bool
     {
-        if ($this->UserModel->updateUserData($id, 'user_role', $newName))
-            return true;
-        else {
-            $msg = ' error in change user role ';
-            return false;
-        }
+        return $this->userModel->updateUserData($id, 'user_role', $newName, $message) ?? false;
+
     }
 
     public function getCategories(): array
     {
-        return $this->CategoriesModel->getCategories();
+        return $this->categoriesModel->getCategories();
     }
 
-    public function getCategoryById($id): array{
-        return $this->CategoriesModel->getCategoryById($id);
-    }
 
-    public function updateCategory($cate_data , &$msg):bool{
-
-
-        if ($this->CategoriesModel->updateCategory($cate_data['cate_id'], $cate_data['cate_name'], $msg , $cate_data['description']))
-            return true;
-        else {
-            return false;
-        }
-    }
-
-    public function deleteCategory($cate_id, &$msg): bool
+    public function updateCategory($cate_data, &$message)
     {
-        if ($this->CategoriesModel->deleteCategory($cate_id, $msg))
-            return true;
-        else {
-            $msg = 'error while delete category ';
-            return false;
-        }
+        return $this->categoriesModel->updateCategory($cate_data['cate_id'], $cate_data['cate_name'], $message, $cate_data['description']) ?? false;
+    }
+
+    public function deleteCategory($cate_id, &$message): bool
+    {
+        return $this->categoriesModel->deleteCategory($cate_id, $message) ?? false;
 
     }
 
     public function getBlogs(): array
     {
-        return $this->BlogModel->getAllBlogs();
+        return $this->blogModel->getAllBlogs();
     }
 
-    public function getBlogById($id): array{
-        return $this->BlogModel->getBlogById($id);
 
-    }
-
-    public function updateBlog($BlogNewData , &$msg)
+    public function updateBlog($BlogNewData, &$message)
     {
-        $blogCurrentData = $this->BlogModel->getBlogById($BlogNewData['blog_id']);
+        $blogCurrentData = $this->blogModel->getBlogById($BlogNewData['blog_id']);
         $update = 0;
 
-        if (trim($BlogNewData['blog_title']) === $blogCurrentData['blog_title'])
-        {
-            $msg = 'The title is the same old title';
+//        if($this->blogModel->validateUpdateBlogData($blogCurrentData , $message))
+//            $update++;
+
+        if (trim($BlogNewData['blog_title']) === $blogCurrentData['blog_title']) {
+            $message = 'The title is the same old title';
         }
 
-        else if(!$this->ValidationClass->notEmpty(trim($BlogNewData['blog_title'])))
-        {
-            $msg = 'The title required';
+        if (!$this->validationClass->notEmpty(trim($BlogNewData['blog_title']))) {
+            $message = 'The title required';
         }
-        else {
-            if($this->BlogModel->updateBlogs($BlogNewData['blog_id'],'blog_title', trim($BlogNewData['blog_title']) ,$msg))
+
+        if ($this->blogModel->updateBlogs($BlogNewData['blog_id'], 'blog_title', trim($BlogNewData['blog_title']), $message))
             $update++;
-        }
 
 
-        if (trim($BlogNewData['blog_body']) === $blogCurrentData['blog_body']){
-            $msg = 'The body is the same old body';
+        if (trim($BlogNewData['blog_body']) === $blogCurrentData['blog_body']) {
+            $message = 'The body is the same old body';
         }
-        else if (!$this->ValidationClass->notEmpty(trim($BlogNewData['blog_body'])))
-            $msg = 'The body required';
-        else {
-            if($this->BlogModel->updateBlogs($BlogNewData['blog_id'],'blog_body', trim($BlogNewData['blog_body']) ,$msg))
+        if (!$this->validationClass->notEmpty(trim($BlogNewData['blog_body'])))
+            $message = 'The body required';
+
+        if ($this->blogModel->updateBlogs($BlogNewData['blog_id'], 'blog_body', trim($BlogNewData['blog_body']), $message))
             $update++;
-        }
 
-        if($BlogNewData['blog_status'] === $blogCurrentData['blog_status'])
-            return $update;
-        else if (!$this->ValidationClass->notEmpty($BlogNewData['blog_status']))
-            $msg = 'The status required';
-        else
-            if($this->BlogModel->updateBlogs($BlogNewData['blog_id'],'blog_status', $BlogNewData['blog_status'] ,$msg))
-                return ++$update;
+
+        if ($BlogNewData['blog_status'] === $blogCurrentData['blog_status'])
             return $update;
 
+        if (!$this->validationClass->notEmpty($BlogNewData['blog_status']))
+            $message = 'The status required';
 
+        if ($this->blogModel->updateBlogs($BlogNewData['blog_id'], 'blog_status', $BlogNewData['blog_status'], $message))
+
+            return ++$update;
+        return $update;
 
     }
 
-    public function deleteBlog($blog_id, &$msg): bool
+    public function deleteBlog($blog_id, &$message): bool
     {
-        if ($this->BlogModel->deleteBlogs($blog_id, $msg))
-            return true;
-        else {
-            $msg = 'error while delete category ';
-            return false;
-        }
-
+        return $this->blogModel->deleteBlogs($blog_id, $message) ?? false;
     }
-
-
-
 }

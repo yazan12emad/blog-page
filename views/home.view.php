@@ -132,7 +132,8 @@ require __DIR__ . '/partials/banner.php';
     <div class="container swiper ">
         <div class="card-wrapper">
             <ul class="card-list swiper-wrapper ">
-                <?php foreach($blogs as $blog):?>
+                <?php if($blogs):
+                foreach($blogs as $blog):?>
                 <li class="card-item swiper-slide ">
                     <a href="/Full-Blog/<?= htmlspecialchars(urlencode($blog['blog_title'])) ?>/<?= htmlspecialchars($blog['blog_id']) ?>" class="card-link">
                         <img src="<?= htmlspecialchars($blog['blog_picture']) ?>" class="card-image" alt="...">
@@ -141,7 +142,8 @@ require __DIR__ . '/partials/banner.php';
                         <button class="card-button material-symbols-rounded"> arrow_forward</button>
                     </a>
                 </li>
-                <?php endforeach; ?>
+                <?php endforeach; endif;?>
+
 
             </ul>
             <div class="swiper-pagination"></div>
@@ -168,9 +170,7 @@ require __DIR__ . '/partials/banner.php';
             dynamicBullets: true,
 
         },
-
-        // Navigation arrows
-        navigation: {
+            navigation: {
             nextEl: '.swiper-button-next',
             prevEl: '.swiper-button-prev',
         },

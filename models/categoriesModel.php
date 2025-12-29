@@ -4,28 +4,28 @@ namespace app\models;
 
 use app\core\DataBase;
 use app\core\Model;
-use app\core\Session;
+use PDOException;
 
 class categoriesModel extends Model
 {
-    private Session $session;
 
     private DataBase $DataBase;
 
+    private ValidationClass $validationClass;
     public function __construct(){
-    $this->session =  Session::getInstance();
     $this->DataBase = DataBase::getInstance();
+    $this->validationClass = new ValidationClass();
+
     }
 
-    public function getCategories(): array {
-        return $this->DataBase->query("SELECT * FROM categories")->fetchAll();
-    }
-
-
-    public function getCategoriesName($id): array {
-        return $this->DataBase->query("SELECT cate_name FROM categories where cate_id = :id",[
-            "id" => $id
-        ])->fetchAll();
+    public function getCategories(&$message = null): array {
+        try {
+            return $this->DataBase->query("SELECT * FROM categories")->fetchAll();
+        }
+        catch (PDOException $e) {
+            $message = 'Error while updating user ';
+            return [];
+        }
     }
 
     public function checkIfExist($new_name): bool
@@ -39,78 +39,79 @@ class categoriesModel extends Model
         return false;
     }
 
-    public function addCategory($cate_name ,$admin_id ,$der , &$msg):bool {
+    public function addCategory($cate_name ,$admin_id ,$der , &$message):bool {
+        if(!$this->validationClass->validateCategoryData($cate_name ,$der ,$message  )){
+            return false;
+        }
         if($this->checkIfExist($cate_name))
         {
-            $msg = 'category already exists';
+            $message = 'category already exists';
             return false;
         }
 
-        else  if($this->DataBase->query("INSERT INTO categories (cate_name, admin_id ,description ) VALUES (:cate_name,:admin_id , :description)" ,
+        if($this->DataBase->query("INSERT INTO categories (cate_name, admin_id ,description ) VALUES (:cate_name,:admin_id , :description)" ,
             [
                 'cate_name' => $cate_name,
                 'admin_id' => $admin_id,
                 'description' => $der
             ]))
          {
-             $msg = 'new category added';
+             $message = 'new category added';
              return true;
          }
-         else {
-             $msg = 'error to add new category';
+
+             $message = 'error to add new category';
              return false;
-         }
+
     }
 
-    public function updateCategory($cate_id ,$new_name , &$msg , $der): bool
+    public function updateCategory($cate_id ,$new_name , &$message , $description): bool
     {
         try {
-            if (empty(trim($new_name))) {
-                $msg = 'new category name is required';
-                return false;
-            }
-            if (empty(trim($der))) {
-                $msg = 'new category description is required';
+            if(!$this->validationClass->validateCategoryData($new_name ,$description ,$message  )){
                 return false;
             }
 
                 if ($this->DataBase->query("UPDATE categories set cate_name = :new_name  , description = :description WHERE cate_id = :cate_id", [
                     'new_name' => trim($new_name),
                     'cate_id' => $cate_id,
-                    'description' => trim($der)
+                    'description' => trim($description)
                 ]))
                 {
-                    $msg = 'category updated';
+                    $message = 'category updated';
                     return true;
                 }
-
-
-                    $msg = 'error to update category';
+                    $message = 'error to update category';
                     return false;
 
 
         }
         catch (\Exception $e) {
-            echo $e->getMessage();
-            $msg = $e->getMessage();
+            $message = 'Error while updating category';
             return false;
         }
 
     }
 
-    public function deleteCategory($cate_id , &$msg): bool {
-         if($this->DataBase->query("DELETE FROM categories WHERE cate_id = :cate_id" ,
-            [
-                'cate_id' => $cate_id
-            ]))
-         {
-             $msg = 'category deleted';
-             return true;
-         }
-         else {
-             $msg = 'error to delete category';
-             return false;
-         }
+    public function deleteCategory($cate_id , &$message): bool {
+        try {
+
+
+            if ($this->DataBase->query("DELETE FROM categories WHERE cate_id = :cate_id",
+                [
+                    'cate_id' => $cate_id
+                ])) {
+                $message = 'category deleted';
+                return true;
+            } else {
+                $message = 'error to delete category';
+                return false;
+            }
+        }
+        catch (\Exception $e) {
+            $message = 'Error while deleting category';
+            return false;
+        }
     }
 
     public function getCategoryById($cate_id): array {

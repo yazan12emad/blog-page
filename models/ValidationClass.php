@@ -13,28 +13,72 @@ class ValidationClass
     public function __construct()
     {
         $this->session = Session::getInstance();
-
     }
 
 
-    public function notEmpty($value , &$messages = []): bool
+    public function notEmpty($value , &$messages = null): bool
     {
-        if (empty($value) || strlen(trim($value)) === 0) {
+        if (empty($value) || strlen(trim($value)) === 0 ) {
             $messages = 'This field is required.';
             return false;
         }
         return true;
     }
 
+    public function regularExpression($pattern , $value){
+
+         if(preg_match($pattern, $value)){
+             return false;
+         }
+         return true;
+    }
+
+    public function validateCategoryData($categoryName ,$categoryDescription , &$messages){
+        if(!$this->notEmpty($categoryName , $messages)){
+            $messages = 'The category name field is required.';
+            return false;
+        }
+        if(!$this->notEmpty($categoryDescription , $messages)){
+            $messages = 'The category description field is required.';
+            return false;
+        }
+        $categoryNamePregPattern = '/^[a-zA-Z0-9_\W+]{3,20}$/';
+
+        if ($this->regularExpression($categoryNamePregPattern, $categoryName)) {
+            $messages = 'Invalid category name format , category name must contain letters and less than 20 characters.';
+            return false;
+        }
+        $categoryDescriptionPregPattern = '/^[a-zA-Z0-9_\W+]{3,50}$/';
+
+        if ($this->regularExpression($categoryDescriptionPregPattern, $categoryDescription)){
+            $messages = 'Invalid category description format , description must contain letters and less than 50 characters.';
+        return false;
+        }
+        return true;
+    }
+    public function validateUsername($username , &$messages): bool{
+    if (!$this->notEmpty($username, $messages))
+        return false;
+
+        $userNamePregPattern = '/^[a-zA-Z0-9]{3,20}$/';
+
+    if (!$this->regularExpression($userNamePregPattern, $username)) {
+        $messages = 'Invalid username format , user name must contain letters , less than 20 characters.';
+        return false;
+    }
+    return true;
+}
+
     public function validateUserNameEdit($currentUserName, $newUserName, &$messages =[] ): bool
     {
-        if (!$this->notEmpty($newUserName)) {
-            $messages['UserNameError'] = 'user name must at least contain letters and numbers';
+        if ($currentUserName === $newUserName) {
+            $messages = 'Its the same user name ';
             return false;
-        } else if ($currentUserName == $newUserName) {
-            $messages['UserNameError'] = 'Its the same user name ';
+        }
+
+        if (!$this->validateUsername($currentUserName , $messages)){
             return false;
-        } else
+        }
             return true;
 
     }
@@ -43,7 +87,11 @@ class ValidationClass
     {
 
         if (!$this->notEmpty($emailAddress) || (!filter_var($emailAddress, FILTER_VALIDATE_EMAIL))) {
-            $messages['emailAddressError'] = 'email address must not be empty';
+            $messages = 'email address must not be empty';
+            return false;
+        }
+        if(strlen($emailAddress) > 100){
+            $messages = 'email address must be less than 100 characters';
             return false;
         }
             return true;
@@ -63,15 +111,15 @@ class ValidationClass
         }
             return true;
 
-
     }
 
     public function validationPassword($password , &$messages = null): bool
     {
-        if (!$this->notEmpty($password) || strlen($password) < 7){
-            $messages['passwordError'] = 'Password must be at least 8 characters long';
-            return false;
-    }
+        $passwordPregPattern = '/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[^a-zA-Z0-9\s])\S{8,20}$/';
+
+        if ($this->regularExpression($passwordPregPattern, $password)){
+            $messages = 'Invalid password format , password must contain big letter , numbers , symbols ,and more than 8 characters.';
+        }
             return true;
     }
 
@@ -79,7 +127,7 @@ class ValidationClass
     public function validateNewPasswordEdit($oldPasswordHash, $currentPasswordInput, $newPasswordInput, &$messages = null): bool
     {
         if (!$this->validationPassword($currentPasswordInput)) {
-            $messages = "Password must be at least 7 characters long";
+            $messages =  'current password format is invalid';
             return false;
         }
          if (!$this->validationPassword($newPasswordInput)) {

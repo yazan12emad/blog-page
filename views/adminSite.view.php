@@ -147,7 +147,8 @@
                         </div>
                         <h2 class="text-xl font-semibold text-gray-800">Category Management</h2>
                     </div>
-                    <p class="text-gray-600 mb-4">Manage blog categories and organization</p>
+                    <p class="text-gray-600 mb-4">Manage blogs categories and organizations</p>
+                    <br>
                     <div class="space-y-3">
                         <button onclick="loadCategories()"
                                 class="w-full bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition-colors action-btn flex items-center justify-center">
@@ -353,7 +354,7 @@
             type === 'success' ? 'bg-green-100 border border-green-400 text-green-700' :
                 'bg-red-100 border border-red-400 text-red-700'
         }`;
-        messageDiv.textContent = `
+        messageDiv.innerHTML = `
         <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} mr-2"></i>
         ${message}
     `;
@@ -406,7 +407,6 @@
             const data = await response.json();
 
             if (data.success) {
-                console.log(data.users);
                 currentData.users = data.users;
                 displayUsersTable(data.users);
                 // updateStats(data.stats);
@@ -430,7 +430,7 @@
             tablesContainer.textContent = '';
             return;
         }
-        const tableHTML = `
+        tablesContainer.innerHTML = `
         <div class="overflow-x-auto">
             <table class="w-full">
                 <thead class="bg-gray-50">
@@ -439,12 +439,11 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Joined</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                    ${users.map(user => `
+                    ${users.map((user ,index) => `
                         <tr class="table-row">
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
@@ -473,12 +472,12 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <div class="flex space-x-2">
-                                    <button onclick="editUser(${user.id})"
+                                    <button onclick="showUserEditBox(${user.id} , ${index})"
                                             class="text-blue-600 hover:text-blue-900 action-btn"
                                             title="Edit User">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <button onclick="deleteUser(${user.id}, '${escapeHtml(user.userName)}')"
+                                    <button onclick="deleteUser(${user.id},'${escapeHtml(user.userName)}')"
                                             class="text-red-600 hover:text-red-900 action-btn"
                                             title="Delete User">
                                         <i class="fas fa-trash"></i>
@@ -491,43 +490,22 @@
             </table>
         </div>
     `;
-
-        tablesContainer.textContent = tableHTML;
         dataSection.classList.remove('hidden');
         emptyState.classList.add('hidden');
     }
 
     //get user data for edit
-    async function editUser(userId) {
+    async function showUserEditBox(userId , index) {
         try {
-            const formData = new FormData();
-            formData.append('id', userId);
-            formData.append('action', 'showToEdit');
-
-
-            const response = await fetch(`/admin/users/edit`, {
-                method: 'POST',
-                body : formData ,
-                headers: {
-                    'Accept': 'application/json',
-                }
-            });
-
-            const data = await response.json();
-            console.log(data);
-
-            if (data.success) {
-                const user = data.userData;
-                document.getElementById('editUserId').value = user.id;
-                document.getElementById('editUsername').value = user.userName;
-                document.getElementById('editUserEmail').value = user.emailAddress;
-                document.getElementById('editUserRole').value = user.user_role;
-                openModal('editUserModal');
-            } else {
-                throw new Error(data.message || 'Failed to load user data');
-            }
-        } catch (error) {
-            showMessage('Error loading user data: ' + error.message, 'error');
+            const user = currentData.users[index];
+            document.getElementById('editUserId').value = user.id;
+            document.getElementById('editUsername').value = user.userName;
+            document.getElementById('editUserEmail').value = user.emailAddress;
+            document.getElementById('editUserRole').value = user.user_role;
+            openModal('editUserModal');
+        }
+        catch (error){
+            showMessage('Error while loading Edit box');
         }
     }
 
@@ -551,7 +529,6 @@
 
             if (data.success) {
                 showMessage('User deleted successfully');
-                // Reload current section
                 if (currentSection === 'users') {
                     await loadUsers();
                 }
@@ -568,7 +545,6 @@
         e.preventDefault();
 
         const formData = new FormData(this);
-        formData.append('action','updateUser');
         try {
             const response = await fetch('/admin/users/update', {
                 method: 'POST',
@@ -578,10 +554,9 @@
                 }
             });
 
-            const data = JSON.parse(await response.text());
+            const data =await response.json();
 
             if (data.success) {
-                console.log(data.success);
                 showMessage('User updated successfully');
                 closeModal('editUserModal');
                 if (currentSection === 'users') {
@@ -610,13 +585,12 @@
                 }
             });
 
-            const data = JSON.parse(await response.text());
+            const data = await response.json();
 
             if (data.success) {
                 console.log(data.categories);
                 currentData.categories = data.categories;
                 displayCategoriesTable(data.categories);
-                // updateStats(data.stats);
             } else {
                 throw new Error(data.message || 'Failed to load categories');
             }
@@ -638,8 +612,7 @@
             tablesContainer.textContent = '';
             return;
         }
-
-        const tableHTML = `
+        tablesContainer.innerHTML = `
         <div class="overflow-x-auto">
             <table class="w-full">
                 <thead class="bg-gray-50">
@@ -652,7 +625,7 @@
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                    ${categories.map(category => `
+                    ${categories.map((category , index) => `
                         <tr class="table-row">
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
@@ -683,7 +656,7 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <div class="flex space-x-2">
-                                    <button onclick="editCategory(${category.cate_id})"
+                                    <button onclick="showCategoryEditBox(${index})"
                                             class="text-blue-600 hover:text-blue-900 action-btn"
                                             title="Edit Category">
                                         <i class="fas fa-edit"></i>
@@ -701,40 +674,22 @@
             </table>
         </div>
     `;
-
-        tablesContainer.textContent = tableHTML;
         dataSection.classList.remove('hidden');
         emptyState.classList.add('hidden');
     }
 
     // Edit category function
-    async function editCategory(categoryId) {
-
-        const formData = new FormData();
-        formData.append('cate_id', categoryId);
-        formData.append('action', 'showCategory');
+    async function showCategoryEditBox(index) {
         try {
-            const response = await fetch(`/admin/categories/edit`, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'Accept': 'application/json',
-                }
-            });
+            const category = currentData.categories[index];
+            document.getElementById('editCategoryId').value = category.cate_id;
+            document.getElementById('editCategoryName').value = category.cate_name;
+            document.getElementById('editCategoryDescription').value = category.description || '';
+            openModal('editCategoryModal');
+        }
+        catch (error){
+            showMessage('Error while loading the category edit box ');
 
-            const data = await response.json();
-
-            if (data.success) {
-                const category = data.category;
-                document.getElementById('editCategoryId').value = category.cate_id;
-                document.getElementById('editCategoryName').value = category.cate_name;
-                document.getElementById('editCategoryDescription').value = category.description || '';
-                openModal('editCategoryModal');
-            } else {
-                throw new Error(data.message || 'Failed to load category data');
-            }
-        } catch (error) {
-            showMessage('Error loading category data: ' + error.message, 'error');
         }
     }
 
@@ -755,7 +710,7 @@
                 }
             });
 
-            const data = JSON.parse(await response.text());
+            const data = await response.json();
 
             if (data.success) {
                 showMessage('Category deleted successfully');
@@ -775,7 +730,6 @@
         e.preventDefault();
 
         const formData = new FormData(this);
-        formData.append('action','updateCategory');
 
         try {
             const response = await fetch('/admin/categories/update', {
@@ -786,9 +740,8 @@
                 body: formData
             });
 
-            const result = JSON.parse(await response.text());
+            const result = await response.json();
             if (result.success) {
-                console.log(result.success);
                 showMessage('Category updated successfully');
                 closeModal('editCategoryModal');
                 if (currentSection === 'categories') {
@@ -819,10 +772,8 @@
             const data = await response.json();
 
             if (data.success) {
-                console.log(data.blogs);
                 currentData.blogs = data.blogs;
                 displayBlogsTable(data.blogs);
-                // updateStats(data.stats);
             } else {
                 throw new Error(data.message || 'Failed to load blogs');
             }
@@ -844,9 +795,8 @@
             tablesContainer.textContent = '';
             return;
         }
-        console.log(blogs);
 
-        const tableHTML = `
+        tablesContainer.innerHTML = `
         <div class="overflow-x-auto">
             <table class="w-full">
                 <thead class="bg-gray-50">
@@ -860,7 +810,7 @@
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                    ${blogs.map(blog => `
+                    ${blogs.map((blog ,index ) => `
                         <tr class="table-row">
                             <td class="px-6 py-4">
                                 <div class="flex items-center">
@@ -889,9 +839,9 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
-                                    ${blog.blog_status === 'live'? 'bg-green-100 text-green-800'
-                                        : blog.blog_status === 'waiting'? 'bg-yellow-100 text-yellow-800'
-                                            : 'bg-red-100 text-red-800'}">
+                                    ${blog.blog_status === 'live' ? 'bg-green-100 text-green-800'
+            : blog.blog_status === 'waiting' ? 'bg-yellow-100 text-yellow-800'
+                : 'bg-red-100 text-red-800'}">
                                     ${blog.blog_status ? blog.blog_status : 'waiting'}
                                 </span>
                             </td>
@@ -900,7 +850,7 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <div class="flex space-x-2">
-                                    <button onclick="editBlog(${blog.blog_id})"
+                                    <button onclick="showBlogEditBox(${index})"
                                             class="text-blue-600 hover:text-blue-900 action-btn"
                                             title="Edit Blog">
                                         <i class="fas fa-edit"></i>
@@ -918,44 +868,24 @@
             </table>
         </div>
     `;
-
-        tablesContainer.textContent = tableHTML;
         dataSection.classList.remove('hidden');
         emptyState.classList.add('hidden');
     }
 
     // Edit blog function
-    async function editBlog(blogId) {
-
-        const formData = new FormData();
-        formData.append('blog_id', blogId);
-        formData.append('action', 'showBlog');
-
+    async function showBlogEditBox(index) {
         try {
-            const response = await fetch(`/admin/blog/edit`, {
-                method: 'POST',
-                body:formData ,
-                headers: {
-                    'Accept': 'application/json',
-                }
-            });
-
-            const data = JSON.parse(await response.text());
-
-            if (data.success) {
-                const blog = data.blog;
-                document.getElementById('editBlogId').value = blog.blog_id;
-                document.getElementById('editBlogTitle').value = blog.blog_title;
-                document.getElementById('editBlogContent').value = blog.blog_body;
-                document.getElementById('editBlogStatus').value = blog.blog_status ;
-
-                openModal('editBlogModal');
-            } else {
-                throw new Error(data.message || 'Failed to load blog data');
-            }
-        } catch (error) {
-            showMessage('Error loading blog data: ' + error.message, 'error');
+            const blog = currentData.blogs[index];
+            document.getElementById('editBlogId').value = blog.blog_id;
+            document.getElementById('editBlogTitle').value = blog.blog_title;
+            document.getElementById('editBlogContent').value = blog.blog_body;
+            document.getElementById('editBlogStatus').value = blog.blog_status;
+            openModal('editBlogModal');
         }
+        catch (error){
+            showMessage('Error while loading the blog edit box');
+        }
+
     }
 
 
@@ -977,12 +907,12 @@
                 }
             });
 
-            const data = JSON.parse(await response.text());
+            const data = await response.json();
 
             if (data.success) {
                 console.log(data.success);
                 showMessage('Blog post deleted successfully');
-                // Reload current section
+
                 if (currentSection === 'blogs') {
                    await loadBlogs();
                 }
@@ -998,9 +928,6 @@
         e.preventDefault();
 
         const formData = new FormData(this);
-        formData.append('action', 'updateBlog');
-        const data = Object.fromEntries(formData.entries());
-        console.log(data);
 
         try {
             const response = await fetch('/admin/blog/update', {
@@ -1011,9 +938,8 @@
                 },
             });
 
-                const result = JSON.parse(await response.text());
-
-
+                const result = await response.json();
+                console.log(result);
             if (result.success) {
                 showMessage(result.message);
                 showMessage('Blog post updated successfully');
@@ -1029,19 +955,6 @@
         }
     });
 
-
-    // Update statistics
-    // function updateStats(stats) {
-    //     if (stats.userCount !== undefined) {
-    //         document.getElementById('userCount').textContent = stats.userCount;
-    //     }
-    //     if (stats.categoryCount !== undefined) {
-    //         document.getElementById('categoryCount').textContent = stats.categoryCount;
-    //     }
-    //     if (stats.blogCount !== undefined) {
-    //         document.getElementById('blogCount').textContent = stats.blogCount;
-    //     }
-    // }
 
 
     // Utility function to escape HTML

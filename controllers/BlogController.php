@@ -66,31 +66,52 @@ class BlogController extends Controller
             $this->redirect('blog');
         }
 
-        $captchaSuccessResponse = $this->blogModel->captcha_response();
+        $captchaSuccessResponse = $this->blogModel->captchaResponse();
         if (!$captchaSuccessResponse) {
             $this->jsonResponse([
-                'successAdd' => false,
-                'successCheck' => $captchaSuccessResponse,
+                'successCreateBlog' => false,
+                'successCheckCaptch' => $captchaSuccessResponse,
                 'message' => 'You need to check "I am not a robot".',
             ]);
         }
 
-        $blog_title = $this->post('blog_title')?? null;
-        $blog_body = $this->post('blog_body') ?? null;
-        $blog_picture = $_FILES['blog_picture'] ?? null;
-        $blog_category = $this->post('blog_category') ?? null;
+        $blogFullInputData = array_merge($this->post() , ['author_id' => $this->session->get('id')]);
 
-        $result = $this->blogModel->createBlogs($blog_title, $blog_body, $blog_picture, $blog_category, $this->session->get('id'), $this->message);
+        $result = $this->blogModel->createBlogs($blogFullInputData, $this->message);
         $this->jsonResponse([
-            'successAdd' => $result,
-            'successCheck' => $captchaSuccessResponse,
+            'successCreateBlog' => $result,
+            'successCheckCaptch' => $captchaSuccessResponse,
             'message' => $this->message,
         ]);
     }
 
 
-    public function edit()
+
+    public function updateBlog()
     {
+        if (!$this->isPost()) {
+            $this->redirect('blog');
+        }
+
+        $captchaSuccessResponse = $this->blogModel->captchaResponse();
+        if (!$captchaSuccessResponse) {
+            $this->jsonResponse([
+                'successUpdate' => false,
+                'successCheckCaptch' => $captchaSuccessResponse,
+                'message' => 'You need to check "I am not a robot".',
+            ]);
+        }
+
+        $blogFullInputData = array_merge($this->post() , ['author_id' => $this->session->get('id')]);
+
+        $result = $this->blogModel->validateUpdateBlogData($blogFullInputData, $this->message);
+        $this->jsonResponse([
+            'successUpdate' => $result,
+            'successCheckCaptch' => $captchaSuccessResponse,
+            'message' => $this->message,
+        ]);
+
+
 
     }
 

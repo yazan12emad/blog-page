@@ -65,9 +65,8 @@ require "views/partials/banner.php";
                     </button>
                 </div>
 
-
+                <!-- filtering function  -->
                 <form id="filterForm" class="space-y-6">
-
                     <!-- Blog Title -->
                     <div>
                         <label for="filter" class="block text-sm font-medium text-gray-700 mb-1">Number of blogs in each page</label>
@@ -308,6 +307,57 @@ require "views/partials/banner.php";
     </div>
 </div>
 
+<!-- Edit Blog Modal -->
+<div id="editBlogModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">Edit Blog Post</h2>
+                    <button onclick="closeEditModal('editBlogModal')" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                <form id="editBlogForm" class="space-y-4">
+                    <input type="hidden" id="editBlogId" name="blog_id">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                        <input type="text" name="blog_title" id="editBlogTitle" class="w-full px-3 py-2 border border-gray-300 rounded-lg" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Content</label>
+
+                        <div id="editEditor" class="w-full border border-gray-300 rounded-lg min-h-[150px] px-3 py-2"></div>
+
+                        <input type="hidden" name="blog_body" id="editBlogContent">
+                    </div>
+
+                    <div class="g-recaptcha" data-sitekey="6LfNiAAsAAAAABtbu-gy2UoYgX-a7FAsgr4nNqZS"></div>
+
+                    <!-- Categories -->
+                    <div>
+                        <label for="blogCategory" class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                        <select id="editBlogCategory" name="blog_category" required
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                            <option value="" disabled selected>Select a category</option>
+                        </select>
+                    </div>
+
+
+                    <div class="flex justify-end space-x-3 pt-4">
+                        <button type="button" onclick="closeEditModal('editBlogModal')" class="px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300">
+                            Cancel
+                        </button>
+                        <button type="submit" class="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600">
+                            Update Blog
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <?php require "views/partials/footer.php"; ?>
 
@@ -327,6 +377,7 @@ require "views/partials/banner.php";
     const imagePreview = document.getElementById('imagePreview');
     const previewImg = document.getElementById('previewImg');
     const blogCategorySelect = document.getElementById('blogCategory');
+    const blogCategoryEditSelect = document.getElementById('editBlogCategory');
     const deleteModal = document.getElementById('deleteModal');
     const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
     const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
@@ -345,27 +396,22 @@ require "views/partials/banner.php";
 
 
     // php var
-    let sampleBlogs = <?= json_encode($results); ?>;
-    let categories = <?= json_encode($categories); ?>;
-    let user_id = <?= json_encode($navData['user_id'] ?? null); ?>;
-    let Admin_id = <?= json_encode($navData['admin_id'] ?? null); ?>;
-    let role = <?= json_encode($navData['role'] ?? null); ?>;
+    let sampleBlogs = <?= json_encode(($results)) ?>;
+    let categories = <?= json_encode(($categories)) ?>;
+    let user_id = <?= json_encode(($navData['user_id'] ?? null)) ?>;
+    let Admin_id = <?= json_encode(($navData['admin_id'] ?? null)) ?>;
+    let role = <?= json_encode(($navData['role'] ?? null)) ?>;
 
     const toolbarOptions = [
         ['bold', 'italic', 'underline', 'strike'],
         ['blockquote', 'code-block'],
-        ['link', 'image', 'video', 'formula'],
 
         [{'header': 1}, {'header': 2}],
         [{'list': 'ordered'}, {'list': 'bullet'}, {'list': 'check'}],
-        [{'script': 'sub'}, {'script': 'super'}],
-        [{'indent': '-1'}, {'indent': '+1'}],
         [{'direction': 'rtl'}],
 
         [{'size': ['small', false, 'large', 'huge']}],
-        [{'header': [1, 2, 3, 4, 5, 6, false]}],
 
-        [{'color': []}, {'background': []}],
         [{'font': []}],
         [{'align': []}],
 
@@ -388,6 +434,18 @@ require "views/partials/banner.php";
 
     });
 
+    const editQuill = new Quill('#editEditor', {
+        theme: 'snow',
+        modules: {
+            toolbar: toolbarOptions,
+            history: {
+                delay: 2000,
+                maxStack: 500,
+                userOnly: true
+            }
+        }
+    });
+
     // filtering functions
 
     filterBtn.addEventListener('click', () => {
@@ -403,26 +461,24 @@ require "views/partials/banner.php";
     });
 
 
-
+// filtering function
     filterForm.addEventListener('submit', (e) => {
         e.preventDefault();
-
         const category = categoryFilter.value;
         const limit = filterNumberOfBlogInPage.value;
-
         const params = new URLSearchParams({
             limit: limit
         });
-
         window.location.href = `/blog/${category}?${params.toString()}`;
     });
 
-
+        // quill function
     blogForm.addEventListener('submit', function (e) {
         const blogBodyInput = document.getElementById('blog_body');
         blogBodyInput.value = quill.root.innerHTML;
     });
 
+    // to show the category in the blog form
     function populateCategoriesInFilter() {
         categories.forEach(category => {
             const option = document.createElement('option');
@@ -436,12 +492,83 @@ require "views/partials/banner.php";
         populateCategoriesInFilter();
     });
 
+    function openEditModal(blogId) {
+        const blog = sampleBlogs.find(b => parseInt(b.blog_id) === blogId);
+
+        if (!blog) {
+            alert('Blog not found');
+            return;
+        }
+
+        document.getElementById('editBlogId').value = blog.blog_id;
+        document.getElementById('editBlogTitle').value = blog.blog_title;
+        document.getElementById('editBlogCategory').value = blog.blog_category;
+
+        editQuill.root.innerHTML = blog.blog_body;
+
+        document.getElementById('editBlogModal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+
+    document.getElementById('editBlogForm').addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        try {
+
+            document.getElementById('editBlogContent').value = editQuill.root.innerHTML;
+
+            const formData = new FormData(this);
+            console.log(Object.fromEntries(formData.entries()));
+
+            const res = await fetch('/blog/update', {
+                method: 'POST',
+                body: formData,
+                headers: { 'Accept': 'application/json' }
+            });
+
+            const data = await res.json();
+            if (data.successUpdate && data.successCheckCaptch) {
+                    for (const key in data.message) {
+                    if (data.message[key]) {
+                        alert(key + ': ' + data.message[key]);
+                    }
+
+                }
+                window.location.reload();
+
+            } else {
+                for (const key in data.message) {
+                    if (data.message[key]) {
+                        alert(key);
+                        alert('Error in ' + key + ': ' + data.message[key]);
+                    }
+                }
+            }
+
+
+        } catch (err) {
+            console.error(err);
+            alert('Update failed');
+        }
+    });
+
+
 
     function openDeleteModal(BlogId, BlogTitle) {
         currentBlogId = BlogId;
         currentBlogTitle = BlogTitle;
         deleteModal.classList.remove('hidden');
         document.body.style.overflow = 'hidden';
+    }
+    function closeEditModal(modalId = null) {
+        if (modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        } else {
+            deleteModal.classList.add('hidden');
+        }
+
+        document.body.style.overflow = 'auto';
+        currentBlogId = null;
     }
 
     function closeModal() {
@@ -452,18 +579,18 @@ require "views/partials/banner.php";
     }
 
     document.addEventListener('click', function (e) {
-        if (e.target.classList.contains('edit-category-btn') || e.target.closest('.edit-category-btn')) {
-            const button = e.target.classList.contains('edit-category-btn') ? e.target : e.target.closest('.edit-category-btn');
-            const BlogId = button.getAttribute('data-id');
-            const BlogTitle = button.getAttribute('data-name');
-            openEditModal(BlogId, BlogTitle);
-        }
 
         if (e.target.classList.contains('delete-category-btn') || e.target.closest('.delete-category-btn')) {
             const button = e.target.classList.contains('delete-category-btn') ? e.target : e.target.closest('.delete-category-btn');
             const BlogId = button.getAttribute('data-id');
             const BlogTitle = button.getAttribute('data-name');
             openDeleteModal(BlogId, BlogTitle);
+        }
+
+        if (e.target.classList.contains('edit-category-btn') || e.target.closest('.edit-category-btn')) {
+            const button = e.target.closest('.edit-category-btn');
+            const BlogId = parseInt(button.dataset.id);
+            openEditModal(BlogId);
         }
     });
 
@@ -489,7 +616,6 @@ require "views/partials/banner.php";
         `;
             return;
         }
-        console.log(sampleBlogs);
 
         // ✅ Otherwise, render all blogs
         sampleBlogs.forEach(blog => {
@@ -505,7 +631,7 @@ require "views/partials/banner.php";
                     <span class="text-gray-500 text-sm">${new Date(blog.created_at).toLocaleDateString()}</span>
                 </div>
                 <h3 class="text-xl font-bold text-gray-900 mb-3">${escapeHTML(blog.blog_title)}</h3>
-                <p class="text-gray-600 mb-4 flex-grow">${escapeHTML(blog.blog_body)}</p>
+                <p class="text-gray-600 mb-4 flex-grow">${blog.blog_body}</p>
                 <div class="mt-auto">
                     ${(() => {
                 if (role === 'admin') {
@@ -554,6 +680,7 @@ require "views/partials/banner.php";
             option.value = category.cate_id;
             option.textContent = category.cate_name;
             blogCategorySelect.appendChild(option);
+            blogCategoryEditSelect.appendChild(option);
 
         });
     }
@@ -600,7 +727,7 @@ require "views/partials/banner.php";
             });
             const data = await res.json();
 
-            if (data.successAdd && data.successCheck) {
+            if (data.successCreateBlog && data.successCheckCaptch) {
                 alert('Success: ' + data.message);
                 window.location.reload();
             } else {
@@ -625,10 +752,9 @@ require "views/partials/banner.php";
         }
     });
 
-    // create blog
+    // delete blog
     confirmDeleteBtn.addEventListener('click', async function (e) {
         e.preventDefault();
-
 
         if (!currentBlogId) return;
 
@@ -646,10 +772,8 @@ require "views/partials/banner.php";
                 body: formData
             });
 
-            const text = await res.text();
-            let data;
+            const data = await res.json();
             try {
-                data = JSON.parse(text);
             } catch (err) {
                 console.error('Error parsing JSON:', err, 'Raw response:', text);
                 alert('Server returned invalid JSON.');

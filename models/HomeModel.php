@@ -4,6 +4,7 @@ namespace app\models;
 
 use app\core\DataBase;
 use app\core\Model;
+use PDOException;
 
 class HomeModel extends Model
 {
@@ -16,8 +17,14 @@ class HomeModel extends Model
     }
 
     public function getBlogs(){
-        return $this->db->query("SELECT * FROM blog INNER JOIN categories ON blog.blog_category = categories.cate_id
+        try {
+            return $this->db->query("SELECT * FROM blog INNER JOIN categories ON blog.blog_category = categories.cate_id
          WHERE blog_status = 'live' LIMIT 0,5   ")->fetchAll();
+        }
+        catch(PDOException $e){
+            echo 'Error in upload blogs in home page';
+            return false;
+        }
     }
 
 }

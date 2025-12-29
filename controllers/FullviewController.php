@@ -5,28 +5,28 @@
 namespace app\controllers;
 
 use app\core\Controller;
+use app\core\Session;
 use app\models\BlogModel;
 use app\models\FullViewModel;
 
 class FullViewController extends Controller
 {
+    private session $session;
+
     private BlogModel $blogModel;
-
     private FullViewModel $fullViewModel;
-
-    private  $msg;
+    private ?string $message ;
 
     public function __construct()
     {
-
+        $this->session = Session::getInstance();
         $this->blogModel = new BlogModel();
         $this->fullViewModel = new FullViewModel();
     }
 
     public function showBlog($blogName , $blogId)
     {
-        if($this->requireRole('guest'))
-        {
+        if($this->requireRole('guest')) {
             $this->redirect('login');
         }
 
@@ -35,13 +35,14 @@ class FullViewController extends Controller
         if (!$blogData)
             return $this->render('FullBlog.view', ['heading' => 'there is no blog available ', 'blogData' => null]);
 
-        $comments = $this->fullViewModel->getComments($blogId);
-        $status = $this->fullViewModel->checkIfUserLikes($blogId);
+        $status = $this->fullViewModel->checkIfUserLikes($blogId , $this->session->get('id'));
 
         return $this->render(
-            'FullBlog.view',
-            ['heading' => $blogData['blog_title'], 'blogData' => $blogData,
-                'status' => $status, 'comments' => $comments]);
+            'FullBlog.view', [
+                'heading' => $blogData['blog_title'],
+                'blogData' => $blogData,
+                'status' => $status,
+                'comments' => $this->fullViewModel->getComments($blogId)]) ?? null;
 
     }
 
@@ -59,8 +60,8 @@ class FullViewController extends Controller
         $blog_id = $this->post('blog_id');
 
         $this->jsonResponse([
-            'success' => $this->fullViewModel->likeAction($action, $blog_id,  $this->msg),
-            'message' => $this->msg]);
+            'success' => $this->fullViewModel->likeAction($action,$this->session->get('id') , $blog_id,  $this->message),
+            'message' => $this->message]);
 
 
     }
@@ -73,8 +74,8 @@ class FullViewController extends Controller
         }
 
         $this->jsonResponse([
-            'success' => $this->fullViewModel->addComment($this->post(), $this->msg),
-            'message' => $this->msg]);
+            'success' => $this->fullViewModel->addComment($this->post(),$this->session->get('id') , $this->message),
+            'message' => $this->message]);
 
 
     }

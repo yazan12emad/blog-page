@@ -1,6 +1,5 @@
 <?php
 
-// simplify done
 
 namespace app\controllers;
 
@@ -16,6 +15,8 @@ class AdminSite extends Controller
     private array $usersData;
     private array $categoriesData;
     private array $blogData;
+
+    private $message = null;
 
     public function __construct()
     {
@@ -33,7 +34,6 @@ class AdminSite extends Controller
         if (!$this->requireRole('admin')) {
             $this->redirect('home');
         }
-
         return $this->render('adminSite.view',
             [
                 'heading' => 'admin',
@@ -43,167 +43,86 @@ class AdminSite extends Controller
                 'userCount' => count($this->usersData)
             ]
         );
-
     }
 
     public function showUsers(): void
     {
-        $this->jsonResponse(['success' => true, 'users' => $this->usersData]);
 
+        $this->jsonResponse([
+            'success' => !empty($this->usersData) ?? false,
+            'users' => $this->usersData ?? null]);
     }
 
-    public function editUser(): void
+    public function updateUser(): void
     {
         if (!$this->isPost()) {
             $this->redirect('admin');
         }
-
-        if ($this->post('action') === 'showToEdit') {
-
-            Header('content-type: application/json');
             $this->jsonResponse([
-                'success' => true,
-                'userData' => $this->adminSiteModel->getUserById($this->post('id'))]);
-
-        }
-
-        if ($this->post('action') === 'updateUser') {
-
-            $this->jsonResponse(['success' => $this->adminSiteModel->updateUserData($this->post(), $msg),
-                'message' => $msg,
-                'post' => $this->post(),
+                'success' => $this->adminSiteModel->updateUserData($this->post(), $this->message),
+                'message' => $this->message,
             ]);
-
-
-        }
-
-
     }
 
     public function deleteUser(): void
     {
-        $this->jsonResponse(['success' => $this->adminSiteModel->deleteUser($this->post('id'), $msg),
-            'message' => $msg,
+        $this->jsonResponse([
+            'success' => $this->adminSiteModel->deleteUser($this->post('id'), $this->message),
+            'message' => $this->message,
         ]);
-
     }
 
     public function showCategories(): void
     {
         $this->jsonResponse([
-            'success' => true,
+            'success' => !empty($this->categoriesData) ?? false,
             'categories' => $this->categoriesData,
         ]);
-
-
     }
 
-
-    public function editCategory(): void
+    public function updateCategory(): void
     {
         if (!$this->isPost()) {
             $this->redirect('admin');
         }
-
-        $action = $this->post('action');
-
-        if (!$action) {
-            $this->jsonResponse([
-                'success' => false,
-                'message' => 'There is no action',]);
-        }
-
-        switch ($action) {
-            case 'showCategory':
                 $this->jsonResponse([
-                    'success' => true,
-                    'category' => $this->adminSiteModel->getCategoryById($this->post('cate_id'))
+                    'success' => $this->adminSiteModel->updateCategory($this->post(), $this->message),
+                    'message' => $this->message
                 ]);
-                break;
-
-            case 'updateCategory':
-                $this->jsonResponse([
-                    'success' => $this->adminSiteModel->updateCategory($this->post(), $msg),
-                    'message' => $msg
-                ]);
-                break;
-
-            default:
-                $this->jsonResponse([
-                    'success' => false,
-                    'message' => 'There was a problem with the action',
-                ]);
-
-        }
-
     }
 
     public function deleteCategory(): void
     {
         $this->jsonResponse([
-            'success' => $this->adminSiteModel->deleteCategory($this->post('cate_id'), $msg),
-            'message' => $msg,
+            'success' => $this->adminSiteModel->deleteCategory($this->post('cate_id'), $this->message),
+            'message' => $this->message,
         ]);
-
     }
 
     public function showBlog(): void
     {
         $this->jsonResponse([
-            'success' => true,
+            'success' => !empty($this->blogData) ?? false,
             'blogs' => $this->blogData,
         ]);
-
     }
 
-    public function editBlog(): void
+    public function updateBlog(): void
     {
         if (!$this->isPost()) {
             $this->redirect('admin');
         }
-
-        $action = $this->post('action');
-
-        if (!$action) {
-            $this->jsonResponse([
-                'success' => false,
-                'message' => 'There is no action',
-            ]);
-        }
-
-        switch ($action) {
-            case 'showBlog':
                 $this->jsonResponse([
-                    'success' => true,
-                    'blog' => $this->adminSiteModel->getBlogById($this->post('blog_id')),
+                    'success' => $this->adminSiteModel->updateBlog($this->post(), $this->message),
+                    'message' => $this->message,
                 ]);
-                break;
-
-            case 'updateBlog':
-                $this->jsonResponse([
-                    'success' => $this->adminSiteModel->updateBlog($this->post(), $msg),
-                    'message' => $msg,
-                ]);
-                break;
-            default:
-                $this->jsonResponse([
-                    'success' => false,
-                    'message' => 'There was a problem with the action',
-                ]);
-        }
-
-
     }
 
     public function deleteBlog(): void
     {
         $this->jsonResponse([
-            'success' => $this->adminSiteModel->deleteBlog($this->post('blog_id'), $msg),
-            'message' => $msg,
+            'success' => $this->adminSiteModel->deleteBlog($this->post('blog_id'), $this->message),
+            'message' => $this->message,
         ]);
-
-
     }
-
-
 }
