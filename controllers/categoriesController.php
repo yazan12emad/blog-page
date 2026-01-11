@@ -10,11 +10,11 @@ use app\core\Session;
 
 class categoriesController extends Controller
 {
-    private $categoriesModel;
+    public $categoriesModel;
 
-    private $session;
+    public Session $session;
 
-    private $msg = [];
+    public $msg = [];
 
 
     public function __construct(){

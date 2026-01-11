@@ -60,12 +60,12 @@ class ValidationClass
     if (!$this->notEmpty($username, $messages))
         return false;
 
-        $userNamePregPattern = '/^[a-zA-Z0-9]{3,20}$/';
-
-    if (!$this->regularExpression($userNamePregPattern, $username)) {
-        $messages = 'Invalid username format , user name must contain letters , less than 20 characters.';
-        return false;
-    }
+//        $userNamePregPattern = '/^[a-zA-Z0-9]{3,20}$/';
+//
+//    if (!$this->regularExpression($userNamePregPattern, $username)) {
+//        $messages = 'Invalid username format , user name must contain letters , less than 20 characters.';
+//        return false;
+//    }
     return true;
 }
 

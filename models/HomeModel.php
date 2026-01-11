@@ -8,17 +8,17 @@ use PDOException;
 
 class HomeModel extends Model
 {
-    private Database $db;
+    public Database $database;
 
 
     public function __construct(){
-        $this->db = DataBase::getInstance();
+        $this->database = DataBase::getInstance();
 
     }
 
     public function getBlogs(){
         try {
-            return $this->db->query("SELECT * FROM blog INNER JOIN categories ON blog.blog_category = categories.cate_id
+            return $this->database->query("SELECT * FROM blog INNER JOIN categories ON blog.blog_category = categories.cate_id
          WHERE blog_status = 'live' LIMIT 0,5   ")->fetchAll();
         }
         catch(PDOException $e){

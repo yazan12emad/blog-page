@@ -11,11 +11,11 @@ use app\models\FullViewModel;
 
 class FullViewController extends Controller
 {
-    private session $session;
+    public session $session;
 
-    private BlogModel $blogModel;
-    private FullViewModel $fullViewModel;
-    private ?string $message ;
+    public BlogModel $blogModel;
+    public FullViewModel $fullViewModel;
+    public ?string $message ;
 
     public function __construct()
     {

@@ -6,13 +6,13 @@ namespace app\models;
 class AdminSiteModel
 {
 
-    private userModel $userModel;
+    public userModel $userModel;
 
-    private blogModel $blogModel;
+    public blogModel $blogModel;
 
-    private categoriesModel $categoriesModel;
+    public categoriesModel $categoriesModel;
 
-    private validationClass $validationClass;
+    public validationClass $validationClass;
 
 
     public function __construct()
@@ -45,7 +45,7 @@ class AdminSiteModel
 
     public function updateUserData($userNewData, &$message, $update = 0)
     {
-        $oldData = $this->userModel->getUserDataById($userNewData['id']);
+        $oldData = $this->userModel->getUserDataById( $userNewData['id']);
 
         if (empty($oldData)) {
             $message = 'Error in update user data';
@@ -107,12 +107,10 @@ class AdminSiteModel
         return $this->categoriesModel->deleteCategory($cate_id, $message) ?? false;
 
     }
-
     public function getBlogs(): array
     {
         return $this->blogModel->getAllBlogs();
     }
-
 
     public function updateBlog($BlogNewData, &$message)
     {
@@ -132,7 +130,6 @@ class AdminSiteModel
 
         if ($this->blogModel->updateBlogs($BlogNewData['blog_id'], 'blog_title', trim($BlogNewData['blog_title']), $message))
             $update++;
-
 
         if (trim($BlogNewData['blog_body']) === $blogCurrentData['blog_body']) {
             $message = 'The body is the same old body';

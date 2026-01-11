@@ -8,10 +8,10 @@ class UploadFiles
 {
     protected Session $session;
 
-        Private array $acceptedFileTypes = ['.png', '.jpg', '.jpeg'];
-        private int $acceptedFileSize = 5000000;
+    public array $acceptedFileTypes = ['.png', '.jpg', '.jpeg'];
+    public int $acceptedFileSize = 5000000;
 
-        private string $fileSavedPath = "public/";
+    public string $fileSavedPath = "public/";
 
     public function __construct()
     {
@@ -44,8 +44,6 @@ class UploadFiles
 
     public function checkIsItImg($file , &$message = null): bool
     {
-
-
         if (empty($file['tmp_name'])) {
             $message = "No file uploaded.";
             return false;

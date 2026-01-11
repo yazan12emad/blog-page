@@ -952,7 +952,7 @@ require 'views/partials/footer.php';
         commentedBlogReplyId.value = blogData.blog_id;
 
         const blogImage = document.getElementById('blogImage');
-        blogImage.src = '/'+blogData.blog_picture;
+        blogImage.src = ''+blogData.blog_picture;
         blogImage.alt = blogData.blog_title;
         document.getElementById('blogBody').innerHTML = blogData.blog_body;
         document.title = `${blogData.blog_title} - Blog Post`;

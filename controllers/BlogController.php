@@ -11,14 +11,14 @@ use app\models\categoriesModel;
 
 class BlogController extends Controller
 {
-    private Session $session;
+    public Session $session;
 
-    private BlogModel $blogModel;
+    public BlogModel $blogModel;
 
 
-    private CategoriesModel $categoriesModel;
+    public CategoriesModel $categoriesModel;
 
-    private $message = [];
+    public $message = [];
 
     public function __construct()
     {
@@ -35,7 +35,7 @@ class BlogController extends Controller
         }
 
         $numberOfAllowBlogsInPage = 6;
-        if (isset($_GET['limit'])) {
+        if (isset($_GET['limit'])){
             $limit = (int) $_GET['limit'];
             $numberOfAllowBlogsInPage = max(1 , min($limit , 30)) ;
         }
@@ -56,6 +56,8 @@ class BlogController extends Controller
             'categories' => $this->categoriesModel->getCategories(),
             'pages' => $numberOfPagesInPagination,
             'category' => $category,
+            'page' => $page,
+            'numberOfAllowBlogsInPage' => $numberOfAllowBlogsInPage,
         ]);
     }
 

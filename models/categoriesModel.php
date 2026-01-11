@@ -9,9 +9,9 @@ use PDOException;
 class categoriesModel extends Model
 {
 
-    private DataBase $DataBase;
+    public DataBase $DataBase;
 
-    private ValidationClass $validationClass;
+    public ValidationClass $validationClass;
     public function __construct(){
     $this->DataBase = DataBase::getInstance();
     $this->validationClass = new ValidationClass();

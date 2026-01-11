@@ -13,11 +13,10 @@ use PHPMailer\PHPMailer\PHPMailer;
 class UserModel extends Model
 {
     public validationClass $validationClass;
-    protected string $table = 'UsersInformation';
-    private Database $dataBase;
-    private UploadFiles $uploadFile;
-    private ResetPasswordModel $resetPasswordModel;
-    private $user;
+    public Database $dataBase;
+    public UploadFiles $uploadFile;
+    public ResetPasswordModel $resetPasswordModel;
+    public $user;
 
     public function __construct()
     {
@@ -40,7 +39,7 @@ class UserModel extends Model
             return false;
         }
 
-        if ($this->getUserInfo($UserName)) {
+        if ($this->getUserInfoByName($UserName)){
             $messages = 'Username is already taken';
             return false;
         }
@@ -50,7 +49,7 @@ class UserModel extends Model
             return false;
         }
 
-        if ($this->getUserInfo($emailAddress)) {
+        if ($this->getUserInfoByEmail($emailAddress)) {
             $messages = 'Email is already taken';
             return false;
         }
@@ -62,9 +61,8 @@ class UserModel extends Model
 
         try {
             $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-
-            if ($this->insertUserInDataBase($UserName, $emailAddress, $hashedPassword)) {
-                return $this->getUserInfo($UserName);
+            if ($this->insertUserInDataBase($UserName, $emailAddress, $hashedPassword)){
+                return $this->getUserInfoByName($UserName);
             }
         } catch
         (PDOException $e) {
@@ -75,28 +73,30 @@ class UserModel extends Model
         return false;
     }
 
-    public function getUserInfo($userData)
+    public function getUserInfoByName($userData)
     {
-        if (filter_var($userData, FILTER_VALIDATE_EMAIL)) {
+        return $this->dataBase->query('SELECT * FROM `UsersInformation` WHERE `userName` = :userName',
+            [
+                ':userName' => $userData,
+            ]
+        )->fetch(\PDO::FETCH_ASSOC);
+    }
+
+    public function getUserInfoByEmail($userData){
+        if (filter_var($userData, FILTER_VALIDATE_EMAIL)){
             return ($this->dataBase->query('SELECT * FROM `UsersInformation` WHERE `emailAddress` = :emailAddress',
                 [
                     ':emailAddress' => $userData,
                 ]
             )->fetch(\PDO::FETCH_ASSOC));
         }
-        return $this->dataBase->query('SELECT * FROM `UsersInformation` WHERE `userName` = :userName',
-            [
-                ':userName' => $userData,
-            ]
-        )->fetch(\PDO::FETCH_ASSOC);
-
+        return false;
     }
 
     function insertUserInDataBase($UserName, $emailAddress, $password): false|\PDOStatement
     {
         try {
-            return $this->dataBase->query(
-                "INSERT INTO `{$this->table}` (`userName`, `emailAddress`, `password`)
+            return $this->dataBase->query("INSERT INTO `UsersInformation` (`userName`, `emailAddress`, `password`)
      VALUES (:userName, :emailAddress, :password)",
                 [
                     ':userName' => $UserName,
@@ -132,7 +132,7 @@ class UserModel extends Model
             }
 
         }
-        $storedUser = $this->getUserInfo(trim($UserName));
+        $storedUser = $this->getUserInfoByName(trim($UserName));
 
         if (!$storedUser) {
             $messages = 'User not found';
@@ -163,7 +163,6 @@ class UserModel extends Model
                 if ($this->changeProfileImage($userCurrentData['id'], $imgData,
                     $messages['ProfileImageMessage'])) {
                     $profileChanges['profileImg'] = $this->getUserImg($userCurrentData['id'])['profileImg'];
-
                 }
             }
 
@@ -175,7 +174,6 @@ class UserModel extends Model
                     $profileChanges['userName'] = $userInputData['userName'];
                 }
             }
-
 
             if ($userCurrentData['emailAddress'] !== $userInputData["emailAddress"]) {
                 if ($this->changeProfileEmail($userCurrentData['id'],
@@ -432,6 +430,7 @@ class UserModel extends Model
             return ['success' => false, 'statusMessage' => 'error happened'];
         }
     }
+
 
     public function getUserDataById($userID)
     {

@@ -8,7 +8,7 @@
 namespace app\core;
     abstract class Controller
 {
-    private Session $session;
+        public Session $session;
     public string $layout = '';
 
     public function getSession(): Session
@@ -50,6 +50,8 @@ namespace app\core;
                 'logIn' => true ,
                 'role' =>'admin',
                 'admin_id' => $this->session->get('id'),
+                'profileImg' => $this->session->get('profileImg'),
+
             ];
         }
 
@@ -57,6 +59,7 @@ namespace app\core;
             'logIn' => true ,
             'role' =>'user' ,
             'user_id' => $this->session->get('id'),
+            'profileImg' => $this->session->get('profileImg'),
         ];
     }
 

@@ -7,21 +7,11 @@ use http\Header;
 class Router
 {
     // Point the routes to the protected app/controllers directory
-    private array $routes;
-
+    public array $routes;
 
     public function __construct()
     {
         $this->routes = require_once ROOT_PATH . DIRECTORY_SEPARATOR . 'routes.php';
-    }
-
-    public function slug($url): string
-    {
-        $url = preg_replace('/[^A-Za-z0-9\/]+/', '-', $url);
-
-        $url = preg_replace('/-+/', '-', $url);
-
-        return trim($url, '-');
     }
 
     public function route(): void
@@ -35,7 +25,6 @@ class Router
 
         }
         $cleanUrl = $this->slug($rawUrl);
-
 
         if (array_key_exists($cleanUrl, $this->routes)) {
             [$controller, $method] = $this->routes[$cleanUrl];
@@ -68,6 +57,15 @@ class Router
             header('Location: /home');
             exit;
         }
+    }
+
+    public function slug($url): string
+    {
+        $url = preg_replace('/[^A-Za-z0-9\/]+/', '-', $url);
+
+        $url = preg_replace('/-+/', '-', $url);
+
+        return trim($url, '-');
     }
 
 

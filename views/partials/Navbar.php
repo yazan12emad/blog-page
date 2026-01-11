@@ -49,7 +49,7 @@
                                  alt="1User Avatar"
                                  class="h-10 w-10 rounded-full object-cover"/>
                             <?php else :?>
-                                <img src="/public/default.png"
+                                <img src=<?=$navData['profileImg']?>
                                      alt="1User Avatar"
                                      class="h-10 w-10 rounded-full object-cover"/>
                             <?php endif; ?>
@@ -73,6 +73,7 @@
                         </div>
 
                     </div>
+
 
                     <?php if (isset($navData['role']) && $navData['role'] === 'admin'): ?>
                                 <span class="text-xs text-white font-semibold bg-indigo-600 rounded-md px-2 py-0.5 mt-1">(Admin)</span>

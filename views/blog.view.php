@@ -135,12 +135,11 @@ require "views/partials/banner.php";
 
         </div>
 
-
-
                 <!-- first button  -->
 
         <?php
         $page = isset($_GET['page']) && $_GET['page'] > 0 ? $_GET['page'] : 1;
+
         if ($page > $pages)
                  $page = $pages;
 
@@ -151,7 +150,6 @@ require "views/partials/banner.php";
         $baseUrl = isset($category) ? "/blog/$category?page=" : "/blog?page=";
 
         if ($pages > 1): ?>
-
             <div class="mt-12 flex justify-center">Showing <?= $page ?> of <?= $pages ?> </div>
 
             <!-- PAGINATION -->
@@ -677,10 +675,9 @@ require "views/partials/banner.php";
     function populateCategories() {
         categories.forEach(category => {
             const option = document.createElement('option');
-            option.value = category.cate_id;
+            option.textContent = category.cate_id;
             option.textContent = category.cate_name;
             blogCategorySelect.appendChild(option);
-            blogCategoryEditSelect.appendChild(option);
 
         });
     }

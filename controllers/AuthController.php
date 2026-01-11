@@ -9,9 +9,9 @@ use app\models\UserModel;
 
 class AuthController extends Controller
 {
-    private Session $session;
-    private UserModel $userModel;
-    private array $messages = [];
+    public Session $session;
+    public UserModel $userModel;
+    public array $messages = [];
 
     public function __construct()
     {
@@ -137,19 +137,18 @@ class AuthController extends Controller
             return $this->render('forgetPassword.view', ['heading' => 'Reset password']);
         }
 
-            $emailAddress = $this->post('emailAddress');
-            $resetUserPassword = $this->userModel->forgetPassword($emailAddress);
+        $emailAddress = $this->post('emailAddress');
+        $resetUserPassword = $this->userModel->forgetPassword($emailAddress);
 
+        if($resetUserPassword['success']) {
+            $this->session->set('resetID', $resetUserPassword['id']);
+        }
 
-                if($resetUserPassword['success']) {
-                    $this->session->set('resetID', $resetUserPassword['id']);
-                }
-
-                return $this->render('forgetPassword.view',
-                    ['heading' => 'forgetPassword',
-                        'actionSuccess' => $resetUserPassword['success'],
-                        'statusMessage' => $resetUserPassword['statusMessage']
-                    ]);
+        return $this->render('forgetPassword.view', [
+            'heading' => 'forgetPassword',
+            'actionSuccess' => $resetUserPassword['success'],
+            'statusMessage' => $resetUserPassword['statusMessage']
+        ]);
         }
 
     public function submitNewPassword(): string

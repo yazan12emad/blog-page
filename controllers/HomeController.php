@@ -8,7 +8,7 @@ use app\models\HomeModel;
 
 class HomeController extends Controller
 {
-    private HomeModel $HomeModel;
+    public HomeModel $HomeModel;
 
     public function __construct()
     {

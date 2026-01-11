@@ -13,7 +13,7 @@ class User  {
 //    private $password;
 
     private static  $instance;
-    private array $User = [];
+    public array $User = [];
 
     private function __construct()
     {

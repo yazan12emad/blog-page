@@ -7,9 +7,9 @@ use app\core\Model;
 
 class BlogModel extends Model
 {
-    private Database $dataBase;
+    public Database $dataBase;
 
-    private ValidationClass $validationClass;
+    public ValidationClass $validationClass;
 
 
     public function __construct()

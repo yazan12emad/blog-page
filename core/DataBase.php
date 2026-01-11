@@ -7,15 +7,13 @@ class DataBase
 {
 
     private static $instance;
-    private $connection;
+    private \PDO $connection;
 
 
     private function __construct()
     {
-
-        $config = require('keys.php');
-        $DataBaseKeys = $config['DataBase'];
-
+        $configKeys = require('keys.php');
+        $DataBaseKeys = $configKeys['DataBase'];
         $dsnString = "mysql:host={$DataBaseKeys['host']};dbname={$DataBaseKeys['dbname']};charset=utf8mb4";
         $this->connection = new \PDO(
             $dsnString,
@@ -27,20 +25,16 @@ class DataBase
                 \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC //It ensures the DB to return an Associative array
             ]
         );
-
     }
 
     public function query($query, $params = []): false|\PDOStatement
     {
         try {
             $stmt = $this->connection->prepare($query);
-
-            $stmt->execute($params); // pass parameters!
-
+            $stmt->execute($params); // pass parameters
             return $stmt;
 
         } catch (\PDOException $e) {
-
             error_log($e->getMessage());
             return false;
         }

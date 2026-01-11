@@ -9,14 +9,14 @@ use app\core\Session;
 
 class AdminSite extends Controller
 {
-    private AdminSiteModel $adminSiteModel;
+    public AdminSiteModel $adminSiteModel;
 
-    private session $session;
-    private array $usersData;
-    private array $categoriesData;
-    private array $blogData;
+    public session $session;
+    public array $usersData;
+    public array $categoriesData;
+    public array $blogData;
 
-    private $message = null;
+    public $message = null;
 
     public function __construct()
     {
@@ -34,6 +34,7 @@ class AdminSite extends Controller
         if (!$this->requireRole('admin')) {
             $this->redirect('home');
         }
+
         return $this->render('adminSite.view',
             [
                 'heading' => 'admin',
