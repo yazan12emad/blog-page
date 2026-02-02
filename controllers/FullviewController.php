@@ -15,6 +15,7 @@ class FullViewController extends Controller
 
     public BlogModel $blogModel;
     public FullViewModel $fullViewModel;
+
     public ?string $message ;
 
     public function __construct()

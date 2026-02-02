@@ -1,7 +1,10 @@
 <?php
 
 
-namespace app\core;
+namespace app\core\DataBase;
+
+use app\core\MySQLConnection;
+use Exception;
 
 class DataBase
 {
@@ -25,7 +28,13 @@ class DataBase
                 \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC //It ensures the DB to return an Associative array
             ]
         );
+
+
+
     }
+    private function __clone() {}
+    public function __wakeup() { throw new \Exception("Cannot unserialize singleton"); }
+
 
     public function query($query, $params = []): false|\PDOStatement
     {
@@ -41,6 +50,15 @@ class DataBase
 
     }
 
+
+//    public static function make(string $driver): MySQLConnection
+//    {
+//        return match ($driver) {
+//            'mysql' => new MySQLConnection(),
+//            default => throw new Exception("Unsupported database driver"),
+//        };
+//    }
+
     public static function getInstance(): DataBase
     {
         if (self::$instance === null) {
@@ -48,6 +66,7 @@ class DataBase
         }
         return self::$instance;
     }
+
 
 
 }

@@ -5,14 +5,13 @@ const ROOT_PATH = __DIR__;
 require 'core/AutoloadClass.php';
 use app\core\AutoloadClass;
 use app\core\Router;
-
-
-
 AutoloadClass::register();
 
 
-$router = new Router();
-$router->route();
+//$router = new Router();
+//$router->route();
+
+new router()->route();
 
 
 function isUrl($value): bool

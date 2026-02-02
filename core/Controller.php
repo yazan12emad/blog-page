@@ -16,7 +16,7 @@ namespace app\core;
         return $this->session = Session::getInstance();
     }
 
-    public function isPost()
+    public function isPost(): bool
     {
         return $_SERVER['REQUEST_METHOD'] === 'POST';
     }
@@ -79,7 +79,7 @@ namespace app\core;
     {
         header('Content-Type: application/json');
         echo json_encode($data);
-        exit();
+        exit;
     }
 
 

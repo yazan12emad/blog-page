@@ -2,8 +2,7 @@
 
 namespace app\models;
 
-use app\core\DataBase;
-use app\core\Session;
+use app\core\DataBase\DataBase;
 use Exception;
 use PDO;
 
@@ -63,7 +62,7 @@ class FullViewModel
 
         if ($this->dataBase->query('SELECT * from likes where Blog_id =:Blog_id AND User_id =:User_id  ', [
                 'Blog_id' => $blog_id
-                , 'User_id' => $User_id
+                ,'User_id' => $User_id
             ])->rowCount() !== 0)
             return 1;
         else

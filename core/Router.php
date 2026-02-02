@@ -11,17 +11,23 @@ class Router
 
     public function __construct()
     {
+        // ------------------------ ROOT_PATH =  the root of the application
+        // ------------------------ DIRECTORY_SEPARATOR = / after the root of the application
         $this->routes = require_once ROOT_PATH . DIRECTORY_SEPARATOR . 'routes.php';
+
     }
 
     public function route(): void
     {
+        // Get current path only (without query string)
         $rawUrl = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
-        if (preg_match('/[^A-Za-z0-9\/\-]+/', $rawUrl, $match)) {
+        // if the URL contains invalid characters, redirect to the cleaned URL after slug it
+        if (preg_match('/[^A-Za-z0-9\/\-]+/', $rawUrl)) {
 
             $cleanUrl = $this->slug($rawUrl);
             header('Location: ' . $cleanUrl);
+            exit;
 
         }
         $cleanUrl = $this->slug($rawUrl);
@@ -35,6 +41,7 @@ class Router
 
         } else {
 
+
             foreach ($this->routes as $route => [$controllerClass, $method]) {
                 $regex = "#^{$route}$#";
 
@@ -42,7 +49,8 @@ class Router
                     array_shift($matches);
                     $controller = new $controllerClass();
                     $result = $controller->{$method}(...$matches);
-
+                    // the (...) of the Spread Operator is used to unpack the $matches array into individual arguments
+                    // with dynamic number of parameters
                     break;
                 }
             }
@@ -62,9 +70,7 @@ class Router
     public function slug($url): string
     {
         $url = preg_replace('/[^A-Za-z0-9\/]+/', '-', $url);
-
         $url = preg_replace('/-+/', '-', $url);
-
         return trim($url, '-');
     }
 

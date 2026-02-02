@@ -899,8 +899,7 @@ require 'views/partials/footer.php';
             formData.set('Action', 'addLike')
             try {
 
-                const text = await ( fetchCall('/Full-Blog/like' , formData ));
-
+                const text = await (fetchCall('/Full-Blog/like' , formData ));
                 if (text.success){
                     likeCount++;
                     loveButton.classList.add('liked');
@@ -916,7 +915,6 @@ require 'views/partials/footer.php';
 
             try {
                 const text = await (fetchCall('/Full-Blog/like' , formData));
-
                 if (text.success) {
                     likeCount--;
                     loveButton.classList.remove('liked');
@@ -1026,7 +1024,6 @@ require 'views/partials/footer.php';
         }, 5000);
         try {
             const Data = await fetchCall('/Full-Blog/reply', formData);
-
             if (Data.success) {
                 console.log(Data);
                 messageDiv.style.display = 'inline-block';

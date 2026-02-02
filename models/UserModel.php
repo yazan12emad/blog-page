@@ -2,9 +2,9 @@
 
 namespace app\models;
 
-use app\core\DataBase;
-use app\core\Model;
 use app\controllers\User;
+use app\core\DataBase\DataBase;
+use app\core\Model;
 use PDOException;
 use PHPMailer\PHPMailer\Exception;
 use PHPMailer\PHPMailer\PHPMailer;
