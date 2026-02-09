@@ -23,7 +23,7 @@
     <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
 
-
+m
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 
@@ -232,14 +232,15 @@ require "views/partials/banner.php";
                     <label for="blogPicture" class="block text-sm font-medium text-gray-700 mb-1">Blog Picture</label>
                     <div class="flex items-center justify-center w-full">
                         <label for="blogPicture"
-                               class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+                               class="flex flex-col items-center justify-center w-full h-32 border-2
+                               border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
                             <div class="flex flex-col items-center justify-center pt-5 pb-6">
                                 <i class="fas fa-cloud-upload-alt text-gray-400 text-2xl mb-2"></i>
                                 <p class="mb-2 text-sm text-gray-500"><span class="font-semibold">Click to upload</span>
                                     or drag and drop</p>
                                 <p class="text-xs text-gray-500">PNG, JPG, GIF (MAX. 2MB)</p>
                             </div>
-                            <input id="blogPicture" name="blog_picture" type="file" class="hidden" >
+                            <input id="blogPicture" name="blog_picture" type="file" class="hidden" required>
                         </label>
                     </div>
                     <div id="imagePreview" class="mt-2 hidden">

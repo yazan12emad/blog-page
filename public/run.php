@@ -1,22 +1,56 @@
 #!/usr/bin/php
 <?php
-// my_cron_script.php
 
-// Define the absolute path for any files you create/write to.
-$logFile = '/Applications/Blog-project-1/cron_log.txt';
 
-// The task you want to perform.
-$timestamp = date('Y-m-d H:i:s');
-$message = "Cron job ran successfully at: $timestamp\n";
+require_once __DIR__ . '/../vendor/autoload.php';
 
-// Example: Append a message to a log file.
-if (file_put_contents($logFile, $message, FILE_APPEND) === false) {
-    // If writing fails, print an error message that cron can capture.
-    echo "Error writing to log file.\n";
-} else {
-    // Optional: Print a success message (cron will email this by default).
-    echo "Task completed successfully.\n";
-}
+use app\core\DataBase;
+use app\models\SendEmail;
 
-// Exit explicitly (good practice for CLI scripts).
-exit(0);
+    require_once __DIR__ . '/../core/DataBase.php';
+    require_once __DIR__ . '/../models/SendEmail.php';
+
+
+    $DataBase = DataBase::getInstance();
+    $SendEmail = new SendEmail();
+        $q = new SplQueue();
+
+
+    $startingTime = microtime(true);
+
+    foreach ( $DataBase->query('SELECT emailAddress FROM UsersInformation ')->fetchAll() as $email) {
+        $q->enqueue($email['emailAddress']);
+        }
+
+        $subject = 'Test Email from Cron Job';
+        $body = '<p>This is a test email sent from a cron job.</p>';
+        foreach ($q as $email) {
+            $sendResult = $SendEmail->SendEmailBySMTP($email, $subject, $body);
+
+            if ($sendResult) {
+                echo "Email sent successfully to: $email\n";
+            } else {
+                echo "Failed to send email to: $email\n";
+            }
+
+        }
+
+    $logFile = '/Applications/Blog-project-1/cron_log.txt';
+
+    $timestamp = date('Y-m-d H:i:s');
+    $message = "Cron job ran successfully at: [ $timestamp ] new code\n ";
+
+    if (file_put_contents($logFile, $message, FILE_APPEND) === false) {
+        echo "[" . date('Y-m-d H:i:s') . "] : Error writing to log file.\n";
+    } else {
+        echo "[" . date('Y-m-d H:i:s') . "] : Task completed successfully.\n";
+    }
+
+$endingTime = microtime(true);
+
+$executionTime = $endingTime - $startingTime;
+
+
+echo "Total Execution Time: " . $executionTime . " seconds\n";
+
+exit;

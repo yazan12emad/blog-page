@@ -2,8 +2,6 @@
 
 namespace app\core;
 
-use app\core\DataBase\DataBase;
-
 abstract class Model
 {
     protected string $table;

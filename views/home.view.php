@@ -24,7 +24,7 @@
             max-width: 1100px;
         }
 
-        * {
+        *{
             margin: 0;
             padding: 0;
             box-sizing: border-box;
@@ -114,7 +114,6 @@
             color: #fff;
             background: #506eea;
 
-
         }
 
 
@@ -139,7 +138,7 @@ require __DIR__ . '/partials/banner.php';
                         <img src="<?= htmlspecialchars($blog['blog_picture']) ?>" class="card-image" alt="...">
                         <p class="badge"> <?=htmlspecialchars($blog['cate_name']) ?> </p>
                         <h2 class="card-title"><?=htmlspecialchars($blog['blog_title'])?> </h2>
-                        <button class="card-button material-symbols-rounded"> arrow_forward</button>
+                        <button class="card-button material-symbols-rounded"> arrow_forward </button>
                     </a>
                 </li>
                 <?php endforeach; endif;?>
@@ -161,13 +160,16 @@ require __DIR__ . '/partials/banner.php';
 <script>
     const swiper = new Swiper('.card-wrapper', {
         loop: true,
-        spaceBetween: 30,
+        spaceBetween: 400 ,
+            mousewheel: true,
+            keyboard: true,
 
         // If we need pagination
         pagination: {
             el: '.swiper-pagination',
             clickable: true,
             dynamicBullets: true,
+
 
         },
             navigation: {
@@ -186,7 +188,11 @@ require __DIR__ . '/partials/banner.php';
 
             1024:{
                 slidesPerView: 3,
-            }
+            },
+
+            1600:{
+                slidesPerView: 4,
+            },
 
         }
 

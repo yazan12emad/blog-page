@@ -1,10 +1,7 @@
 <?php
 
 
-namespace app\core\DataBase;
-
-use app\core\MySQLConnection;
-use Exception;
+namespace app\core;
 
 class DataBase
 {

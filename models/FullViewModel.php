@@ -2,7 +2,7 @@
 
 namespace app\models;
 
-use app\core\DataBase\DataBase;
+use app\core\DataBase;
 use Exception;
 use PDO;
 

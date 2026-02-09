@@ -3,11 +3,10 @@
 namespace app\models;
 
 use app\controllers\User;
-use app\core\DataBase\DataBase;
+use app\core\DataBase;
 use app\core\Model;
 use PDOException;
 use PHPMailer\PHPMailer\Exception;
-use PHPMailer\PHPMailer\PHPMailer;
 
 
 class UserModel extends Model
@@ -16,6 +15,9 @@ class UserModel extends Model
     public Database $dataBase;
     public UploadFiles $uploadFile;
     public ResetPasswordModel $resetPasswordModel;
+
+    public SendEmail $sendEmail;
+
     public $user;
 
     public function __construct()
@@ -24,7 +26,9 @@ class UserModel extends Model
         $this->validationClass = new ValidationClass();
         $this->uploadFile = new UploadFiles();
         $this->resetPasswordModel = new ResetPasswordModel();
+        $this->sendEmail = new SendEmail();
         $this->user = User::getInstance();
+
 
     }
 
@@ -328,7 +332,7 @@ class UserModel extends Model
         }
 
         try {
-            $userInfo = $this->getUserInfo($emailAddress);
+            $userInfo = $this->getUserInfoByEmail($emailAddress);
         } catch (PDOException $e) {
 
             return ['success' => false, 'statusMessage' => 'error happened'];
@@ -356,37 +360,15 @@ class UserModel extends Model
             return ['success' => false, 'statusMessage' => 'error happened while resetting password'];
         }
 
-        $resetLink = 'http:/yazan.test/submitNewPassword';
 
         try {
-            $mail = new PHPMailer(true);
-            $config = require('keys.php');
-            $SMTPKeys = $config['SMTP'];
+            if (!$this->sendEmail->sendResetEmail($emailAddress, $UserToken)) {
+                return ['success' => false, 'statusMessage' => 'Email could not be sent.'];
+            }
+        }
+         catch (Exception $e) {
 
-            // set SMTP (Simple Mail Transfer Protocol)
-            $mail->isSMTP();
-            $mail->Host = $SMTPKeys['Host'];
-            $mail->SMTPAuth = true;
-            $mail->Username = $SMTPKeys['Username'];
-            $mail->Password = $SMTPKeys['Password'];
-            $mail->Port = $SMTPKeys['Port'];
-
-            $mail->setFrom('no-reply@yourapp.com', 'Your App');
-            $mail->addAddress($emailAddress);
-            $mail->isHTML(true);
-            $mail->Subject = 'Password Reset Request';
-            $mail->Body = "
-        <p>Hi,</p>
-        <p>You requested to reset your password. Click the link below:</p>
-        <p><a href='$resetLink'>$resetLink</a></p>
-                <p> your reset code is '$UserToken' </p>
-        <p>This link will expire in 30 minutes.</p>
-    ";
-            $mail->send();
-
-        } catch (Exception $e) {
-
-            return ['success' => false, 'statusMessage' => "Email could not be sent. Mailer Error: {$mail->ErrorInfo}"];
+            return ['success' => false, 'statusMessage' => "Email could not be sent. Mailer Error:"];
         }
 
         return ['success' => true, 'id' => $userInfo['id'], 'statusMessage' => 'message sent to your email '];
