@@ -12,7 +12,7 @@ use app\models\SendEmail;
 
 
     $DataBase = DataBase::getInstance();
-    $SendEmail = new SendEmail();
+    $SendEmail = SendEmail::getInstance();
         $q = new SplQueue();
 
 

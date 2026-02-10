@@ -12,7 +12,7 @@ return
                 'charset' => 'utf8mb4',
             ],
 
-        'SMTP' =>
+        'SMTPByMAilTrab' =>
             [
                 'Host' => 'sandbox.smtp.mailtrap.io',
                 'SMTPAuth' => true,
@@ -20,6 +20,14 @@ return
                 'Password' => 'c7e0becec9c2d9',
                 'Port' => 2525,
             ],
+
+        'SMTPByMailHog' => [
+            'Host' => 'localhost',
+            'Port'=> 1025 ,
+            'Username' => '',
+            'Password' => '',
+
+        ] ,
 
         'captcha' =>
             [

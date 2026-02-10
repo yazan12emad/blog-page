@@ -7,6 +7,7 @@ use app\core\DataBase;
 use app\core\Model;
 use PDOException;
 use PHPMailer\PHPMailer\Exception;
+use app\models\SendEmail;
 
 
 class UserModel extends Model
@@ -26,7 +27,7 @@ class UserModel extends Model
         $this->validationClass = new ValidationClass();
         $this->uploadFile = new UploadFiles();
         $this->resetPasswordModel = new ResetPasswordModel();
-        $this->sendEmail = new SendEmail();
+        $this->sendEmail = SendEmail::getInstance();
         $this->user = User::getInstance();
 
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourcePerFileMappings">
-    <file url="file://$PROJECT_DIR$/public/run.php" value="96fabdf4-c71f-49f0-b796-2abecc36d866" />
+    <file url="file://$PROJECT_DIR$/cron_jobs/run.php" value="96fabdf4-c71f-49f0-b796-2abecc36d866" />
     <file url="file://$APPLICATION_CONFIG_DIR$/consoles/db/96fabdf4-c71f-49f0-b796-2abecc36d866/console.sql" value="96fabdf4-c71f-49f0-b796-2abecc36d866" />
     <file url="file://$APPLICATION_CONFIG_DIR$/consoles/db/96fabdf4-c71f-49f0-b796-2abecc36d866/console_1.sql" value="96fabdf4-c71f-49f0-b796-2abecc36d866" />
   </component>

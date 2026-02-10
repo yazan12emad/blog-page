@@ -12,7 +12,7 @@ class DataBase
 
     private function __construct()
     {
-        $configKeys = require('keys.php');
+        $configKeys = require __DIR__ . '/../keys.php';
         $DataBaseKeys = $configKeys['DataBase'];
         $dsnString = "mysql:host={$DataBaseKeys['host']};dbname={$DataBaseKeys['dbname']};charset=utf8mb4";
         $this->connection = new \PDO(

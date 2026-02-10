@@ -7,15 +7,29 @@ use PHPMailer\PHPMailer\PHPMailer;
 
 class SendEmail
 {
-       public array $Links =[
+       private array $Links =[
            'resetLink' => 'http://yazan.test/submitNewPassword' ,
        ];
+
+    private static $instance;
+
+
+    private function __construct() {
+       }
+
+       public static function getInstance(): self{
+                if (self::$instance == null) {
+                          self::$instance = new self();
+                }
+                return self::$instance;
+       }
+
 
        public function CreateSMTP()
        {
                $mail = new PHPMailer(true);
-               $config = require('keys.php');
-               $SMTPKeys = $config['SMTP'];
+           $config = require __DIR__ . '/../keys.php';
+           $SMTPKeys = $config['SMTPByMailHog'];
 
                // set SMTP (Simple Mail Transfer Protocol)
                $mail->isSMTP();
